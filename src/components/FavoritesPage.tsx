@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
 import { useLoginModal } from './LoginModal'
+import { useToast } from './Toast'
 import { api, apiDelete } from '../lib/api-client'
 
 export default function FavoritesPage() {
@@ -10,6 +11,7 @@ export default function FavoritesPage() {
   const nav = useNavigate()
   const [items, setItems] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
 
   function loadFavorites() {
     api('/api/favorites')
@@ -26,7 +28,11 @@ export default function FavoritesPage() {
   function removeFavorite(productId: number) {
     apiDelete('/api/favorites', { productId })
       .then(r => r.json())
-      .then(d => { if (d.success) setItems(prev => prev.filter(it => it.id !== productId)) })
+      .then(d => {
+        if (d.success) { setItems(prev => prev.filter(it => it.id !== productId)); toast('已取消收藏', 'success') }
+        else toast(d.error?.message || '操作失败', 'error')
+      })
+      .catch(() => toast('网络错误', 'error'))
   }
 
   if (!isSignedIn) return <div className="p-8 text-center text-gray-400">请先登录</div>
@@ -52,7 +58,7 @@ export default function FavoritesPage() {
                 <h3 className="text-sm">{item.title}</h3>
                 <div className="flex gap-2 mt-1 text-xs text-gray-400">
                   <span className="text-cyan-400">{item.brand}</span>
-                  {item.price && <span>{item.currency} ${item.price}</span>}
+                  {item.price && <span>{item.currency} {item.price}</span>}
                 </div>
               </div>
               <button

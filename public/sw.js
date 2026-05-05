@@ -1,5 +1,5 @@
-const CACHE_STATIC = 'bibimiao-static-v1';
-const CACHE_PAGES = 'bibimiao-pages-v1';
+const CACHE_STATIC = 'bibimiao-static-v2';
+const CACHE_PAGES = 'bibimiao-pages-v2';
 
 const STATIC_PATTERNS = [/\.(js|css|svg|png|jpg|woff2?)$/, /^\/assets\//];
 
@@ -24,12 +24,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // API — network first
+  // API — network only, no caching
   if (url.pathname.startsWith('/api/')) {
     return;
   }
 
-  // Static assets — cache first
+  // Static assets (hashed filenames) — cache first
   if (isStatic(url)) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
@@ -46,16 +46,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Pages — stale-while-revalidate
+  // HTML pages — network first (always get latest deploy)
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetched = fetch(event.request).then((response) => {
-        if (response.ok) {
-          caches.open(CACHE_PAGES).then((cache) => cache.put(event.request, response.clone()));
-        }
-        return response;
-      }).catch(() => cached);
-      return cached || fetched;
-    })
+    fetch(event.request).then((response) => {
+      if (response.ok) {
+        const clone = response.clone();
+        caches.open(CACHE_PAGES).then((cache) => cache.put(event.request, clone));
+      }
+      return response;
+    }).catch(() => caches.match(event.request))
   );
 });

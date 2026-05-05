@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@clerk/clerk-react'
 import { useLocation } from 'react-router-dom'
 import { api, apiPut, apiPost, apiDelete } from '../../lib/api-client'
+import { useToast } from '../Toast'
 
 const BRANDS = ['Osprey', 'Gregory', 'Mystery Ranch', 'The North Face', 'Stussy', 'Vivienne Westwood']
 const TIERS = ['free', 'monthly', 'annual', 'lifetime']
@@ -13,6 +14,7 @@ function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => v
   const [status, setStatus] = useState(user.status || 'active')
   const [brands, setBrands] = useState<string[]>(user.configuredBrands || [])
   const [saving, setSaving] = useState(false)
+  const { toast } = useToast()
 
   function toggleBrand(b: string) {
     setBrands(prev => prev.includes(b) ? prev.filter(x => x !== b) : [...prev, b])
@@ -23,8 +25,8 @@ function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => v
     apiPut('/api/admin/users', { userId: user.id, membershipTier: tier, status, brands })
       .then(r => r.json())
       .then(d => {
-        if (d.success) onSaved()
-        else alert(d.error?.message || '保存失败')
+        if (d.success) { onSaved(); toast('用户已更新', 'success') }
+        else toast(d.error?.message || '保存失败', 'error')
       })
       .finally(() => setSaving(false))
   }
@@ -102,13 +104,14 @@ function ProductEditModal({ product, onClose, onSaved }: { product?: any; onClos
     country: product?.country || '',
   })
   const [saving, setSaving] = useState(false)
+  const { toast } = useToast()
 
   function set(key: string, value: string) {
     setForm(prev => ({ ...prev, [key]: value }))
   }
 
   function save() {
-    if (!form.title || !form.brand) { alert('标题和品牌为必填'); return }
+    if (!form.title || !form.brand) { toast('标题和品牌为必填', 'error'); return }
     setSaving(true)
     const body = isEdit ? { id: product.id, ...form } : form
     const fetcher = isEdit
@@ -117,8 +120,8 @@ function ProductEditModal({ product, onClose, onSaved }: { product?: any; onClos
     fetcher
       .then(r => r.json())
       .then(d => {
-        if (d.success) onSaved()
-        else alert(d.error?.message || '保存失败')
+        if (d.success) { onSaved(); toast(isEdit ? '商品已更新' : '商品已添加', 'success') }
+        else toast(d.error?.message || '保存失败', 'error')
       })
       .finally(() => setSaving(false))
   }
@@ -158,6 +161,7 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
   const [errors, setErrors] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
   const [importing, setImporting] = useState(false)
+  const { toast } = useToast()
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -185,8 +189,8 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
     apiPost('/api/admin/products', { import: 'confirm', rows })
       .then(r => r.json())
       .then(d => {
-        if (d.success) { onImported(); onClose() }
-        else alert(d.error?.message || '导入失败')
+        if (d.success) { onImported(); onClose(); toast('导入成功', 'success') }
+        else toast(d.error?.message || '导入失败', 'error')
       })
       .finally(() => setImporting(false))
   }
@@ -258,6 +262,7 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
 // ─── Main Admin Page ───
 export default function AdminPage() {
   const { isSignedIn } = useUser()
+  const { toast } = useToast()
   const loc = useLocation()
   const isUsers = loc.pathname.includes('users')
   const isProducts = loc.pathname.includes('products')
@@ -411,7 +416,11 @@ export default function AdminPage() {
                     if (!confirm('确认删除该商品？')) return
                     apiDelete('/api/admin/products', { id: p.id })
                       .then(r => r.json())
-                      .then(d => { if (d.success) fetchData(page) })
+                      .then(d => {
+                        if (d.success) { fetchData(page); toast('商品已删除', 'success') }
+                        else toast(d.error?.message || '删除失败', 'error')
+                      })
+                      .catch(() => toast('网络错误', 'error'))
                   }} className="text-red-400 text-xs hover:underline">删除</button>
                 </td>
               </tr>

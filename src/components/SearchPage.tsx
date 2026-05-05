@@ -188,6 +188,17 @@ export default function SearchPage() {
               className={`px-2.5 py-1.5 text-xs ${viewMode === 'grid' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}`}
             >⊞</button>
           </div>
+          {(brand || source || currency) && (
+            <button
+              onClick={() => {
+                setBrand(''); setSource(''); setCurrency('')
+                doSearch(page, { brand: '', source: '', currency: '' })
+              }}
+              className="text-xs text-gray-500 hover:text-red-400 transition-colors px-2 py-1.5 shrink-0"
+            >
+              清除筛选
+            </button>
+          )}
         </div>
       )}
 
@@ -238,7 +249,7 @@ export default function SearchPage() {
                     </div>
                     {item.price && (
                       <div className="text-right shrink-0">
-                        <div className="text-cyan-400 font-bold">{item.currency || ''} ${item.price}</div>
+                        <div className="text-cyan-400 font-bold">{item.currency || ''} {item.price}</div>
                       </div>
                     )}
                     <button
@@ -285,7 +296,7 @@ export default function SearchPage() {
                 </h3>
                 <div className="flex items-center justify-between">
                   {item.price ? (
-                    <span className="text-cyan-400 font-bold text-sm">{item.currency || ''} ${item.price}</span>
+                    <span className="text-cyan-400 font-bold text-sm">{item.currency || ''} {item.price}</span>
                   ) : (
                     <span className="text-gray-600 text-xs">登录查看价格</span>
                   )}

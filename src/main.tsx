@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/clerk-react'
 import { LoginModalProvider } from './components/LoginModal'
+import { ToastProvider } from './components/Toast'
 import App from './App'
 import './index.css'
 
@@ -31,9 +32,11 @@ createRoot(document.getElementById('root')!).render(
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
       <AuthInit>
         <LoginModalProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+          <ToastProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </ToastProvider>
         </LoginModalProvider>
       </AuthInit>
     </ClerkProvider>

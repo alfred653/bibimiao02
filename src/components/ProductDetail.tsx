@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
 import { useLoginModal } from './LoginModal'
+import { useToast } from './Toast'
 import { api, apiPost, apiDelete } from '../lib/api-client'
 
 const SHIPPING_MODES = [
@@ -31,6 +32,7 @@ export default function ProductDetail() {
   const nav = useNavigate()
   const { isSignedIn } = useUser()
   const { openLogin } = useLoginModal()
+  const { toast } = useToast()
   const [product, setProduct] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [favorited, setFavorited] = useState(false)
@@ -48,6 +50,7 @@ export default function ProductDetail() {
   const [estimating, setEstimating] = useState(false)
   const [estimate, setEstimate] = useState<EstimateResult | null>(null)
   const [estimateError, setEstimateError] = useState('')
+  const [sourceCopied, setSourceCopied] = useState(false)
 
   useEffect(() => {
     if (!isSignedIn) { openLogin(); return }
@@ -102,7 +105,7 @@ export default function ProductDetail() {
     if (!estimate || !product) return
     const lines = [
       `${product.title}`,
-      `价格: ${product.currency} $${product.price}`,
+      `价格: ${product.currency} ${product.price}`,
       `汇率: 1 ${product.currency} = ${estimate.exchangeRate.rate} ${targetCurrency}`,
       `换算: ${estimate.convertedPriceFormatted}`,
     ]
@@ -116,7 +119,7 @@ export default function ProductDetail() {
       lines.push(`预估利润: ${estimate.profitTrial.estimatedProfit}`)
       lines.push(`毛利率: ${estimate.profitTrial.estimatedMarginRate}`)
     }
-    navigator.clipboard.writeText(lines.join('\n')).catch(() => {})
+    navigator.clipboard.writeText(lines.join('\n')).then(() => toast('已复制到剪贴板', 'success')).catch(() => {})
   }
 
   if (!isSignedIn) return <div className="p-8 text-center text-gray-400">请先登录</div>
@@ -148,12 +151,12 @@ export default function ProductDetail() {
       <div className="bg-white/5 rounded-xl p-4 mb-4 space-y-2 text-sm">
         <div className="flex justify-between">
           <span className="text-gray-400">价格</span>
-          <span className="text-cyan-400 font-bold text-lg">{product.currency} ${product.price}</span>
+          <span className="text-cyan-400 font-bold text-lg">{product.currency} {product.price}</span>
         </div>
         {product.originalPrice && (
           <div className="flex justify-between">
             <span className="text-gray-400">原价</span>
-            <span className="text-gray-500 line-through">{product.currency} ${product.originalPrice}</span>
+            <span className="text-gray-500 line-through">{product.currency} {product.originalPrice}</span>
           </div>
         )}
         {product.exchangeRate && (
@@ -359,7 +362,18 @@ export default function ProductDetail() {
       >
         {favorited ? '♥ 已收藏' : '♡ 收藏'}
       </button>
-      <button className="w-full bg-white/10 py-3 rounded-xl text-sm">🔗 去购买</button>
+      <button
+        onClick={() => {
+          if (!product?.sourceUrl) return
+          navigator.clipboard.writeText(product.sourceUrl).then(() => {
+            setSourceCopied(true)
+            setTimeout(() => setSourceCopied(false), 2000)
+          }).catch(() => {})
+        }}
+        className="w-full bg-white/10 py-3 rounded-xl text-sm hover:bg-white/20 transition-colors"
+      >
+        {sourceCopied ? '✓ 已复制链接' : '🔗 来源'}
+      </button>
     </div>
   )
 }
