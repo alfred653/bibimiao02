@@ -18,7 +18,14 @@ export async function api(path: string, init: RequestInit = {}): Promise<Respons
     if (token) headers['Authorization'] = `Bearer ${token}`;
   }
 
-  return fetch(path, { ...init, headers });
+  const res = await fetch(path, { ...init, headers });
+  if (!res.ok) {
+    const text = await res.text();
+    let msg = text;
+    try { msg = JSON.parse(text).error?.message || text; } catch {}
+    throw new Error(msg);
+  }
+  return res;
 }
 
 // Convenience methods

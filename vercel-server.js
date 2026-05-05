@@ -87,7 +87,10 @@ const app = express();
 app.use(express.json());
 
 // ─── API middleware ───
-app.use('/api/*', async (req, res) => {
+app.use(async (req, res, next) => {
+  // Only handle /api/* routes
+  if (!req.path.startsWith('/api/')) return next();
+
   const route = matchRoute(req.method, req.path);
   if (!route) {
     return res.status(404).json({ success: false, error: { message: 'Not found', code: 404 } });

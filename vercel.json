@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "vercel-server.js": {
+      "includeFiles": "src/**/*.ts"
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/vercel-server" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
