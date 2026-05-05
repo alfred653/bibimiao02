@@ -1,0 +1,1 @@
+bash: wc: command not found
