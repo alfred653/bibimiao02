@@ -1,0 +1,61 @@
+const CACHE_STATIC = 'bibimiao-static-v1';
+const CACHE_PAGES = 'bibimiao-pages-v1';
+
+const STATIC_PATTERNS = [/\.(js|css|svg|png|jpg|woff2?)$/, /^\/assets\//];
+
+function isStatic(url) {
+  return STATIC_PATTERNS.some((p) => p.test(url.pathname));
+}
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(self.skipWaiting());
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((k) => k !== CACHE_STATIC && k !== CACHE_PAGES).map((k) => caches.delete(k))
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // API — network first
+  if (url.pathname.startsWith('/api/')) {
+    return;
+  }
+
+  // Static assets — cache first
+  if (isStatic(url)) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        const fetched = fetch(event.request).then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_STATIC).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        });
+        return cached || fetched;
+      })
+    );
+    return;
+  }
+
+  // Pages — stale-while-revalidate
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      const fetched = fetch(event.request).then((response) => {
+        if (response.ok) {
+          caches.open(CACHE_PAGES).then((cache) => cache.put(event.request, response.clone()));
+        }
+        return response;
+      }).catch(() => cached);
+      return cached || fetched;
+    })
+  );
+});
