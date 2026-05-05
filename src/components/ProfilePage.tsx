@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useUser, useClerk } from '@clerk/clerk-react'
 import { useLoginModal } from './LoginModal'
 import { api } from '../lib/api-client'
@@ -7,6 +8,7 @@ export default function ProfilePage() {
   const { isSignedIn, user } = useUser()
   const { signOut } = useClerk()
   const { openLogin } = useLoginModal()
+  const navigate = useNavigate()
   const [profile, setProfile] = useState<any>(null)
 
   useEffect(() => {
@@ -40,6 +42,12 @@ export default function ProfilePage() {
             ))}
           </div>
         </div>
+      )}
+
+      {profile?.role === 'admin' && (
+        <button onClick={() => navigate('/admin')} className="w-full bg-cyan-600/20 text-cyan-400 py-3 rounded-xl text-sm mt-4">
+          管理后台
+        </button>
       )}
 
       <button onClick={() => signOut()} className="w-full bg-red-600/20 text-red-400 py-3 rounded-xl text-sm mt-4">

@@ -11,7 +11,14 @@ async function getJWKS() {
   if (jwksCache && Date.now() - jwksCache.ts < JWKS_CACHE_TTL) {
     return jwksCache.keys;
   }
-  const resp = await fetch(CLERK_JWKS_URL);
+  const headers: Record<string, string> = {};
+  if (process.env.CLERK_SECRET_KEY) {
+    headers['Authorization'] = `Bearer ${process.env.CLERK_SECRET_KEY}`;
+  }
+  const resp = await fetch(CLERK_JWKS_URL, { headers });
+  if (!resp.ok) {
+    throw new Error(`JWKS fetch failed: ${resp.status}`);
+  }
   const keys = await resp.json() as jose.JSONWebKeySet;
   jwksCache = { keys, ts: Date.now() };
   return keys;
@@ -35,7 +42,7 @@ export async function getUserId(req: Request): Promise<string | null> {
     });
     // Validate issuer: must be Clerk (clerk.<domain>.accounts.dev)
     const iss = payload.iss;
-    if (!iss || !/^https:\/\/clerk\..+\.accounts\.dev$/.test(iss)) return null;
+    if (!iss || !/^https:\/\/.+\.clerk\.accounts\.dev$/.test(iss)) return null;
     return (payload.sub as string) ?? null;
   } catch {
     return null;
