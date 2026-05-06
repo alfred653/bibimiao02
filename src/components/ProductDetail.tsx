@@ -39,7 +39,7 @@ export default function ProductDetail() {
   const [favToggling, setFavToggling] = useState(false)
 
   // Estimate form state
-  const [targetCurrency, setTargetCurrency] = useState('CNY')
+
   const [shipMode, setShipMode] = useState('standard')
   const [weight, setWeight] = useState('1.5')
   const [length, setLength] = useState('')
@@ -98,7 +98,7 @@ export default function ProductDetail() {
     apiPost('/api/cost-estimate', {
         price: product.price,
         currency: product.currency || 'CNY',
-        targetCurrency,
+        targetCurrency: 'CNY',
         shipping: {
           mode: shipMode,
           weight: parseFloat(weight) || 0,
@@ -135,7 +135,7 @@ export default function ProductDetail() {
     const lines = [
       `${product.title}`,
       `价格: ${product.currency} ${product.price}`,
-      `汇率: 1 ${product.currency} = ${estimate.exchangeRate.rate} ${targetCurrency}`,
+      `汇率: 1 ${product.currency} = ${estimate.exchangeRate.rate} CNY`,
       `换算: ${estimate.convertedPriceFormatted}`,
     ]
     if (estimate.shippingEstimate) {
@@ -239,23 +239,9 @@ export default function ProductDetail() {
 
       {/* Cost Estimate Panel */}
       <div className="bg-white/5 rounded-xl p-4 mb-4">
-        <h2 className="text-sm font-bold mb-3 text-gray-300">📊 成本估算</h2>
+        <h2 className="text-sm font-bold mb-3 text-gray-300">📊 成本估算 <span className="text-xs text-gray-500 font-normal">(CNY)</span></h2>
 
         <div className="space-y-3">
-          {/* Target currency */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400 w-16 shrink-0">目标币种</span>
-            <select
-              value={targetCurrency}
-              onChange={e => setTargetCurrency(e.target.value)}
-              className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700"
-            >
-              {TARGET_CURRENCIES.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-
           {/* Shipping mode */}
           <div>
             <div className="flex items-center gap-2 mb-1">
