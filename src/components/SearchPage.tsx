@@ -51,6 +51,42 @@ function SkeletonCard() {
   )
 }
 
+function PaginationJumper({ current, max, onJump }: { current: number; max: number; onJump: (p: number) => void }) {
+  const [input, setInput] = useState(String(current))
+
+  useEffect(() => { setInput(String(current)) }, [current])
+
+  function handleJump() {
+    const n = parseInt(input, 10)
+    if (n >= 1 && n <= max && n !== current) onJump(n)
+    else setInput(String(current))
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') handleJump()
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 text-xs text-[#b0aea5]">
+      <span>跳至</span>
+      <input
+        className="w-12 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-2 py-1 text-center text-[#faf9f5] text-xs focus:outline-none focus:border-[#d97757]/50"
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        inputMode="numeric"
+      />
+      <button
+        onClick={handleJump}
+        className="bg-white/[0.04] hover:bg-white/[0.06] text-[#b0aea5] rounded-lg px-2 py-1 transition-colors"
+      >
+        跳转
+      </button>
+      <span className="text-[#b0aea5]/70">/ {max} 页</span>
+    </div>
+  )
+}
+
 export default function SearchPage() {
   const [params] = useSearchParams()
   const nav = useNavigate()
@@ -431,19 +467,26 @@ export default function SearchPage() {
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-6">
-          <button disabled={page <= 1} onClick={() => doSearch(page - 1)} className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed">上一页</button>
-          {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
-            let pageNum: number
-            if (pagination.totalPages <= 5) { pageNum = i + 1 }
-            else if (page <= 3) { pageNum = i + 1 }
-            else if (page >= pagination.totalPages - 2) { pageNum = pagination.totalPages - 4 + i }
-            else { pageNum = page - 2 + i }
-            return (
-              <button key={pageNum} onClick={() => doSearch(pageNum)} className={`w-8 h-8 rounded-lg text-xs ${pageNum === page ? 'bg-[#d97757] text-white' : 'bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06]'}`}>{pageNum}</button>
-            )
-          })}
-          <button disabled={page >= pagination.totalPages} onClick={() => doSearch(page + 1)} className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed">下一页</button>
+        <div className="flex flex-col items-center gap-2 mt-6">
+          <div className="flex items-center justify-center gap-1.5 flex-wrap">
+            <button disabled={page <= 1} onClick={() => doSearch(page - 1)} className="px-2.5 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">上一页</button>
+            {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
+              let pageNum: number
+              if (pagination.totalPages <= 5) { pageNum = i + 1 }
+              else if (page <= 3) { pageNum = i + 1 }
+              else if (page >= pagination.totalPages - 2) { pageNum = pagination.totalPages - 4 + i }
+              else { pageNum = page - 2 + i }
+              return (
+                <button key={pageNum} onClick={() => doSearch(pageNum)} className={`w-8 h-8 rounded-lg text-xs transition-colors ${pageNum === page ? 'bg-[#d97757] text-white' : 'bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06]'}`}>{pageNum}</button>
+              )
+            })}
+            <button disabled={page >= pagination.totalPages} onClick={() => doSearch(page + 1)} className="px-2.5 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">下一页</button>
+          </div>
+          <PaginationJumper
+            current={page}
+            max={pagination.totalPages}
+            onJump={p => doSearch(p)}
+          />
         </div>
       )}
 
