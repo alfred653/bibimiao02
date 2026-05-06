@@ -260,6 +260,55 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
   )
 }
 
+function PaginationBar({ page, totalPages, onChange }: { page: number; totalPages: number; onChange: (p: number) => void }) {
+  const [input, setInput] = useState(String(page))
+
+  useEffect(() => { setInput(String(page)) }, [page])
+
+  function jump() {
+    const n = parseInt(input, 10)
+    if (n >= 1 && n <= totalPages && n !== page) onChange(n)
+    else setInput(String(page))
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') jump()
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-2 mt-6">
+      <div className="flex items-center justify-center gap-2">
+        <button disabled={page <= 1} onClick={() => onChange(page - 1)}
+          className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30">
+          上一页
+        </button>
+        <span className="text-xs text-[#b0aea5]">{page} / {totalPages}</span>
+        <button disabled={page >= totalPages} onClick={() => onChange(page + 1)}
+          className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30">
+          下一页
+        </button>
+      </div>
+      <div className="flex items-center gap-1.5 text-xs text-[#b0aea5]">
+        <span>跳至</span>
+        <input
+          className="w-12 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-2 py-1 text-center text-[#faf9f5] text-xs focus:outline-none focus:border-[#d97757]/50"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          inputMode="numeric"
+        />
+        <button
+          onClick={jump}
+          className="bg-white/[0.04] hover:bg-white/[0.06] text-[#b0aea5] rounded-lg px-2 py-1 transition-colors"
+        >
+          跳转
+        </button>
+        <span className="text-[#b0aea5]/70">/ {totalPages} 页</span>
+      </div>
+    </div>
+  )
+}
+
 export default function AdminPage() {
   const { isSignedIn } = useUser()
   const { toast } = useToast()
@@ -481,17 +530,11 @@ export default function AdminPage() {
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-6">
-          <button disabled={page <= 1} onClick={() => setPage(page - 1)}
-            className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30">
-            上一页
-          </button>
-          <span className="text-xs text-[#b0aea5]">{page} / {pagination.totalPages}</span>
-          <button disabled={page >= pagination.totalPages} onClick={() => setPage(page + 1)}
-            className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30">
-            下一页
-          </button>
-        </div>
+        <PaginationBar
+          page={page}
+          totalPages={pagination.totalPages}
+          onChange={setPage}
+        />
       )}
 
       {/* Batch action bar */}
