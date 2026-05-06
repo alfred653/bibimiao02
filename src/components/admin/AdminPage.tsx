@@ -189,8 +189,14 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
     apiPost('/api/admin/products', { import: 'confirm', rows })
       .then(r => r.json())
       .then(d => {
-        if (d.success) { onImported(); onClose(); toast('导入成功', 'success') }
-        else toast(d.error?.message || '导入失败', 'error')
+        if (d.success) {
+          const parts = [`导入 ${d.imported} 条`]
+          if (d.skippedCount) parts.push(`跳过 ${d.skippedCount} 条重复`)
+          if (d.failures?.length) parts.push(`失败 ${d.failures.length} 条`)
+          onImported(); onClose(); toast(parts.join('，'), 'success')
+        } else {
+          toast(d.error?.message || '导入失败', 'error')
+        }
       })
       .finally(() => setImporting(false))
   }

@@ -155,23 +155,57 @@ export async function POST(req: Request) {
         processed.push(row);
       }
 
+      // Deduplicate: query all existing title+brand pairs in one shot
+      const pairs = [...new Set(processed.map(r => `${r.title}|||${r.brand}`))].map(s => {
+        const [title, brand] = s.split('|||');
+        return { title, brand };
+      });
+
+      const existingSet = new Set<string>();
+      if (pairs.length > 0) {
+        const existing = await db.select({ title: products.title, brand: products.brand })
+          .from(products)
+          .where(
+            or(...pairs.map(p => and(eq(products.title, p.title), eq(products.brand, p.brand))!))
+          );
+        for (const e of existing) {
+          existingSet.add(`${e.title}|||${e.brand}`);
+        }
+      }
+
       const imported: unknown[] = [];
+      const skipped: { row: number; reason: string }[] = [];
+
       for (let i = 0; i < processed.length; i++) {
+        const key = `${processed[i].title}|||${processed[i].brand}`;
+        if (existingSet.has(key)) {
+          skipped.push({ row: i + 1, reason: `"${processed[i].title}" (${processed[i].brand}) 已存在，跳过` });
+          continue;
+        }
         try {
           const [row] = await db.insert(products).values(processed[i]).returning();
           imported.push(row);
+          existingSet.add(key);
         } catch (e) {
           failures.push({ row: i + 1, reason: mapDbError(e) });
         }
       }
 
-      return success({ imported: imported.length, total: body.rows.length, failures });
+      return success({ imported: imported.length, skippedCount: skipped.length, total: body.rows.length, failures, skipped });
     }
 
-    // Single product — use normalizeRow for consistent preprocessing
+    // Single product — check duplicate
     const row = normalizeRow(body);
     if (!row.title || !row.brand) {
       return error('title 和 brand 为必填', 400);
+    }
+
+    const [dup] = await db.select({ id: products.id })
+      .from(products)
+      .where(and(eq(products.title, row.title), eq(products.brand, row.brand)))
+      .limit(1);
+    if (dup) {
+      return error(`"${row.title}" (${row.brand}) 已存在`, 409);
     }
 
     const [inserted] = await db.insert(products).values(row).returning();
