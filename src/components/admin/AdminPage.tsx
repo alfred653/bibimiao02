@@ -392,8 +392,8 @@ export default function AdminPage() {
         <h1 className="text-xl font-bold">{isUsers ? '用户管理' : '商品管理'}</h1>
         {isProducts && (
           <div className="flex gap-2">
-            <button onClick={() => setShowAddProduct(true)} className="bg-cyan-600 px-3 py-1.5 rounded text-xs">+ 添加商品</button>
-            <button onClick={() => setShowImport(true)} className="bg-white/10 px-3 py-1.5 rounded text-xs">📥 导入 Excel</button>
+            <button onClick={() => setShowAddProduct(true)} className="bg-cyan-600 px-3 py-1.5 rounded text-xs active:bg-cyan-700 transition-colors">+ 添加商品</button>
+            <button onClick={() => setShowImport(true)} className="bg-white/10 px-3 py-1.5 rounded text-xs active:bg-white/20 transition-colors">📥 导入 Excel</button>
           </div>
         )}
       </div>
@@ -426,26 +426,29 @@ export default function AdminPage() {
 
       {/* User Table */}
       {isUsers && (
-        <table className="w-full text-sm">
-          <thead><tr className="text-left text-gray-400 border-b border-white/10"><th className="py-2">邮箱</th><th>等级</th><th>品牌</th><th>状态</th><th>操作</th></tr></thead>
-          <tbody>
-            {data.map(u => (
-              <tr key={u.id} className="border-b border-white/5">
-                <td className="py-2 text-xs">{u.email}</td>
-                <td><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-gray-600' : 'bg-amber-600'}`}>{u.membershipTier}</span></td>
-                <td className="text-xs text-gray-400">{(u.configuredBrands || []).join(', ') || '—'}</td>
-                <td><span className={`text-xs ${u.status === 'active' ? 'text-green-400' : 'text-red-400'}`}>{u.status}</span></td>
-                <td><button onClick={() => setEditUser(u)} className="text-cyan-400 text-xs hover:underline">编辑</button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto -mx-4 px-4">
+          <table className="w-full text-sm min-w-[480px]">
+            <thead><tr className="text-left text-gray-400 border-b border-white/10"><th className="py-2">邮箱</th><th>等级</th><th>品牌</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              {data.map(u => (
+                <tr key={u.id} className="border-b border-white/5">
+                  <td className="py-2 text-xs">{u.email}</td>
+                  <td><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-gray-600' : 'bg-amber-600'}`}>{u.membershipTier}</span></td>
+                  <td className="text-xs text-gray-400">{(u.configuredBrands || []).join(', ') || '—'}</td>
+                  <td><span className={`text-xs ${u.status === 'active' ? 'text-green-400' : 'text-red-400'}`}>{u.status}</span></td>
+                  <td><button onClick={() => setEditUser(u)} className="text-cyan-400 text-xs hover:underline active:text-cyan-300">编辑</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* Product Table */}
       {isProducts && (
-        <table className="w-full text-sm">
-          <thead><tr className="text-left text-gray-400 border-b border-white/10"><th className="py-2 w-8"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-cyan-600 cursor-pointer" /></th><th className="py-2 w-10"></th><th className="py-2">标题</th><th>品牌</th><th>价格</th><th>来源</th><th>状态</th><th>操作</th></tr></thead>
+        <div className="overflow-x-auto -mx-4 px-4">
+          <table className="w-full text-sm min-w-[640px]">
+            <thead><tr className="text-left text-gray-400 border-b border-white/10"><th className="py-2 w-8"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-cyan-600 cursor-pointer" /></th><th className="py-2 w-10"></th><th className="py-2">标题</th><th>品牌</th><th>价格</th><th>来源</th><th>状态</th><th>操作</th></tr></thead>
           <tbody>
             {data.map(p => (
               <tr key={p.id} className="border-b border-white/5">
@@ -483,6 +486,7 @@ export default function AdminPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {/* Pagination */}
@@ -502,7 +506,7 @@ export default function AdminPage() {
 
       {/* Batch action bar */}
       {selectedIds.size > 0 && isProducts && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#0d1621] border border-white/20 rounded-xl px-4 py-3 flex items-center gap-3 shadow-2xl shadow-black/50">
+        <div className="fixed bottom-4 left-2 right-2 sm:bottom-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-40 bg-[#0d1621] border border-white/20 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 flex flex-wrap items-center gap-2 shadow-2xl shadow-black/50 max-w-full">
           <span className="text-xs text-gray-300">已选 <b className="text-white">{selectedIds.size}</b> 项</span>
           <button onClick={handleBatchDelete} disabled={batchLoading} className="bg-red-600/20 text-red-400 px-3 py-1 rounded text-xs hover:bg-red-600/30 disabled:opacity-50 whitespace-nowrap">
             批量删除
@@ -528,7 +532,7 @@ export default function AdminPage() {
               <option key={b} value={b}>{b}</option>
             ))}
           </select>
-          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} className="text-xs text-gray-500 hover:text-gray-300 disabled:opacity-50">
+          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} className="text-xs text-gray-500 hover:text-gray-300 active:text-gray-200 disabled:opacity-50 py-0.5">
             取消选择
           </button>
         </div>

@@ -32,30 +32,30 @@ export default function HomePage() {
 
       {overview && (
         <>
-          <div className="grid grid-cols-3 gap-3 mb-6 text-center">
-            <div className="bg-white/5 rounded-xl p-3">
-              <div className="text-2xl font-bold text-cyan-400">{overview.totalProducts}</div>
-              <div className="text-xs text-gray-500">收录商品</div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 text-center">
+            <div className="bg-white/5 rounded-xl p-3 sm:p-4">
+              <div className="text-xl sm:text-2xl font-bold text-cyan-400">{overview.totalProducts}</div>
+              <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">收录商品</div>
             </div>
-            <div className="bg-white/5 rounded-xl p-3">
-              <div className="text-2xl font-bold text-cyan-400">{overview.brandCount}</div>
-              <div className="text-xs text-gray-500">品牌</div>
+            <div className="bg-white/5 rounded-xl p-3 sm:p-4">
+              <div className="text-xl sm:text-2xl font-bold text-cyan-400">{overview.brandCount}</div>
+              <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">品牌</div>
             </div>
-            <div className="bg-white/5 rounded-xl p-3">
-              <div className="text-2xl font-bold text-cyan-400">{overview.currencyCount}</div>
-              <div className="text-xs text-gray-500">货币</div>
+            <div className="bg-white/5 rounded-xl p-3 sm:p-4">
+              <div className="text-xl sm:text-2xl font-bold text-cyan-400">{overview.currencyCount}</div>
+              <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">货币</div>
             </div>
           </div>
 
           <h2 className="text-sm text-gray-400 mb-3">支持品牌</h2>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {overview.brands.map(b => (
               <button key={b.name} onClick={() => nav(`/search?q=${encodeURIComponent(b.name)}&brand=${encodeURIComponent(b.name)}`)}
-                className="bg-white/5 hover:bg-white/10 rounded-lg p-3 flex items-center gap-3 text-left"
+                className="bg-white/5 hover:bg-white/10 active:bg-white/15 rounded-xl p-3 sm:p-4 flex items-center gap-3 text-left transition-colors min-h-[56px]"
               >
-                <img src={b.logo} alt={b.name} className="w-8 h-8 rounded" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                <div>
-                  <div className="text-sm">{b.name}</div>
+                <img src={b.logo} alt={b.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                <div className="min-w-0">
+                  <div className="text-sm font-medium truncate">{b.name}</div>
                   <div className="text-xs text-gray-500">{b.count} 件</div>
                 </div>
               </button>

@@ -244,85 +244,89 @@ export default function ProductDetail() {
         <div className="space-y-3">
           {/* Shipping mode */}
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs text-gray-400 w-16 shrink-0">运费模板</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400 w-14 sm:w-16 shrink-0">运费模板</span>
               <select
                 value={shipMode}
                 onChange={e => setShipMode(e.target.value)}
-                className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700"
+                className="flex-1 bg-white border border-gray-300 rounded-lg px-2 sm:px-3 py-2 text-sm text-gray-700"
               >
                 {SHIPPING_MODES.map(m => (
                   <option key={m.value} value={m.value}>{m.label}</option>
                 ))}
               </select>
             </div>
-            <p className="text-[10px] text-gray-500 ml-[4.5rem] pl-2">
+            <p className="text-[10px] text-gray-500 mt-0.5 pl-14 sm:pl-16">
               {SHIPPING_MODES.find(m => m.value === shipMode)?.hint}
             </p>
           </div>
 
-          {/* Weight + Dimensions */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400 w-10">重量</span>
-              <input
-                type="number" step="0.1" min="0"
-                value={weight}
-                onChange={e => setWeight(e.target.value)}
-                placeholder="kg"
-                className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm text-white placeholder-gray-600"
-              />
-              <span className="text-xs text-gray-500">kg</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <input
-                type="number" step="0.1" min="0"
-                value={length}
-                onChange={e => setLength(e.target.value)}
-                placeholder="长"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm text-white placeholder-gray-600"
-              />
-              <span className="text-gray-600 text-xs">×</span>
-              <input
-                type="number" step="0.1" min="0"
-                value={width}
-                onChange={e => setWidth(e.target.value)}
-                placeholder="宽"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm text-white placeholder-gray-600"
-              />
-              <span className="text-gray-600 text-xs">×</span>
-              <input
-                type="number" step="0.1" min="0"
-                value={height}
-                onChange={e => setHeight(e.target.value)}
-                placeholder="高"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm text-white placeholder-gray-600"
-              />
-              <span className="text-xs text-gray-500">cm</span>
-            </div>
+          {/* Weight */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400 w-14 sm:w-16 shrink-0">重量</span>
+            <input
+              type="number" step="0.1" min="0"
+              value={weight}
+              onChange={e => setWeight(e.target.value)}
+              placeholder="kg"
+              className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400"
+            />
+            <span className="text-xs text-gray-500 w-5">kg</span>
+          </div>
+
+          {/* Dimensions */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400 w-14 sm:w-16 shrink-0">尺寸</span>
+            <span className="text-[10px] text-gray-500 w-4">长</span>
+            <input
+              type="number" step="0.1" min="0"
+              value={length}
+              onChange={e => setLength(e.target.value)}
+              placeholder="0"
+              className="flex-1 bg-white border border-gray-300 rounded-lg px-2 py-2 text-sm text-gray-700 placeholder-gray-400"
+            />
+            <span className="text-gray-400 text-xs">×</span>
+            <span className="text-[10px] text-gray-500 w-4">宽</span>
+            <input
+              type="number" step="0.1" min="0"
+              value={width}
+              onChange={e => setWidth(e.target.value)}
+              placeholder="0"
+              className="flex-1 bg-white border border-gray-300 rounded-lg px-2 py-2 text-sm text-gray-700 placeholder-gray-400"
+            />
+            <span className="text-gray-400 text-xs">×</span>
+            <span className="text-[10px] text-gray-500 w-4">高</span>
+            <input
+              type="number" step="0.1" min="0"
+              value={height}
+              onChange={e => setHeight(e.target.value)}
+              placeholder="0"
+              className="flex-1 bg-white border border-gray-300 rounded-lg px-2 py-2 text-sm text-gray-700 placeholder-gray-400"
+            />
+            <span className="text-xs text-gray-500 w-7">cm</span>
           </div>
 
           {/* Extra cost + margin */}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400 w-16">其他费用</span>
+              <span className="text-xs text-gray-400 w-14 sm:w-16 shrink-0">其他费用</span>
               <input
                 type="number" step="0.01" min="0"
                 value={extraCost}
                 onChange={e => setExtraCost(e.target.value)}
-                className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm text-white"
+                className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400"
               />
-              <span className="text-xs text-gray-500">¥</span>
+              <span className="text-xs text-gray-500 w-4">¥</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400">毛利率</span>
+              <span className="text-xs text-gray-400 shrink-0">毛利率</span>
               <input
                 type="number" step="1" min="0" max="99"
                 value={marginRate}
                 onChange={e => setMarginRate(e.target.value)}
-                className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm text-white"
+                className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700"
               />
-              <span className="text-xs text-gray-500">%</span>
+              <span className="text-xs text-gray-500 w-4">%</span>
             </div>
           </div>
 
@@ -330,7 +334,7 @@ export default function ProductDetail() {
           <button
             onClick={calcEstimate}
             disabled={estimating}
-            className="w-full bg-cyan-600 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+            className="w-full bg-cyan-600 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 active:bg-cyan-700 transition-colors"
           >
             {estimating ? '计算中...' : '🔄 计算'}
           </button>
@@ -357,7 +361,7 @@ export default function ProductDetail() {
                     <span className="text-gray-400">运费</span>
                     <span>¥{estimate.shippingEstimate.cost}</span>
                   </div>
-                  <p className="text-[10px] text-gray-500">{estimate.shippingEstimate.label}</p>
+                  <p className="text-[10px] text-gray-500 break-all">{estimate.shippingEstimate.label}</p>
                 </>
               )}
               <div className="flex justify-between">
@@ -391,7 +395,7 @@ export default function ProductDetail() {
 
               <button
                 onClick={copyResult}
-                className="w-full mt-2 bg-white/10 py-1.5 rounded text-xs text-gray-300 hover:bg-white/20"
+                className="w-full mt-2 bg-white/10 py-1.5 rounded text-xs text-gray-300 hover:bg-white/20 active:bg-white/25 transition-colors"
               >
                 📋 复制结果
               </button>

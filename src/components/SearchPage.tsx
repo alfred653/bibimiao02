@@ -236,11 +236,11 @@ export default function SearchPage() {
           <div className="flex rounded-lg bg-white/10 border border-white/20 overflow-hidden ml-auto shrink-0">
             <button
               onClick={() => setViewMode('list')}
-              className={`px-2.5 py-1.5 text-xs ${viewMode === 'list' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}`}
+              className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'list' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white active:bg-white/10'}`}
             >☰</button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-2.5 py-1.5 text-xs ${viewMode === 'grid' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}`}
+              className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'grid' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white active:bg-white/10'}`}
             >⊞</button>
           </div>
           {(brand || source || currency) && (
@@ -310,7 +310,7 @@ export default function SearchPage() {
                     <button
                       onClick={e => toggleFavorite(item.id, e)}
                       disabled={favToggling.has(item.id)}
-                      className={`shrink-0 text-lg px-1 transition-colors ${favoriteIds.has(item.id) ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
+                      className={`shrink-0 text-lg p-1.5 min-w-[36px] min-h-[36px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
                       title={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                     >
                       {favoriteIds.has(item.id) ? '♥' : '♡'}
@@ -360,7 +360,7 @@ export default function SearchPage() {
                     <button
                       onClick={e => toggleFavorite(item.id, e)}
                       disabled={favToggling.has(item.id)}
-                      className={`text-base px-0.5 transition-colors ${favoriteIds.has(item.id) ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
+                      className={`text-base p-1 min-w-[32px] min-h-[32px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
                       title={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                     >
                       {favoriteIds.has(item.id) ? '♥' : '♡'}

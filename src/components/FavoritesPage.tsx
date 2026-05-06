@@ -44,7 +44,7 @@ export default function FavoritesPage() {
        !items.length ? <div className="text-gray-400 text-center py-8">暂无收藏</div> :
         <div className="space-y-3">
           {items.map(item => (
-            <div key={item.id} className="bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 flex gap-3" onClick={() => nav(`/product/${item.id}`)}>
+            <div key={item.id} className="bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 active:bg-white/15 flex gap-3 transition-colors" onClick={() => nav(`/product/${item.id}`)}>
               <img
                 src={item.imageUrl || `https://placehold.co/112x112/1a2332/06b6d4?text=${encodeURIComponent((item.brand || '').slice(0, 8))}`}
                 alt=""
@@ -55,7 +55,7 @@ export default function FavoritesPage() {
                 }}
               />
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm">{item.title}</h3>
+                <h3 className="text-sm truncate">{item.title}</h3>
                 <div className="flex gap-2 mt-1 text-xs text-gray-400">
                   <span className="text-cyan-400">{item.brand}</span>
                   {item.price && <span>{item.currency} {item.price}</span>}
@@ -63,7 +63,7 @@ export default function FavoritesPage() {
               </div>
               <button
                 onClick={e => { e.stopPropagation(); removeFavorite(item.id) }}
-                className="shrink-0 text-gray-600 hover:text-red-400 text-lg px-1 transition-colors"
+                className="shrink-0 text-gray-600 hover:text-red-400 active:bg-red-600/10 text-lg min-w-[36px] min-h-[36px] transition-colors rounded-lg flex items-center justify-center"
                 title="取消收藏"
               >×</button>
             </div>
