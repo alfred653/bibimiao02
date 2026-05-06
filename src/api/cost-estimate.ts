@@ -1,7 +1,7 @@
 import { success, error } from '../lib/response';
 import { requireAuth } from '../lib/auth';
 import { getRate } from '../lib/exchange-rate';
-import { SHIPPING_PROFILES } from '../lib/constants';
+import { SHIPPING_PROFILES, FALLBACK_RATES } from '../lib/constants';
 
 export async function POST(req: Request) {
   try {
@@ -24,8 +24,7 @@ export async function POST(req: Request) {
         rate = result.rate;
         rateSource = result.source;
       } catch {
-        // Graceful fallback: try from constants directly
-        const { FALLBACK_RATES } = await import('../lib/constants');
+        // Graceful fallback from constants
         const direct = FALLBACK_RATES[`${currency}_${targetCurrency}`];
         const inverseKey = `${targetCurrency}_${currency}`;
         const inverse = FALLBACK_RATES[inverseKey];
