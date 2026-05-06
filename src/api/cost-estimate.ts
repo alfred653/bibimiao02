@@ -1,7 +1,7 @@
 import { success, error } from '../lib/response';
 import { requireAuth } from '../lib/auth';
-import { getRate } from '../lib/exchange-rate';
-import { SHIPPING_PROFILES, FALLBACK_RATES } from '../lib/constants';
+import { getRate, resolveFallback } from '../lib/exchange-rate';
+import { SHIPPING_PROFILES } from '../lib/constants';
 
 export async function POST(req: Request) {
   try {
@@ -24,15 +24,10 @@ export async function POST(req: Request) {
         rate = result.rate;
         rateSource = result.source;
       } catch {
-        // Graceful fallback from constants
-        const direct = FALLBACK_RATES[`${currency}_${targetCurrency}`];
-        const inverseKey = `${targetCurrency}_${currency}`;
-        const inverse = FALLBACK_RATES[inverseKey];
-        if (direct) {
-          rate = direct;
-          rateSource = 'fallback';
-        } else if (inverse) {
-          rate = Math.round((1 / inverse) * 10000) / 10000;
+        // Fallback via constants: direct → inverse → bridge CNY
+        const fb = resolveFallback(currency, targetCurrency);
+        if (fb !== null) {
+          rate = fb;
           rateSource = 'fallback';
         } else {
           return error('无法获取汇率', 500);

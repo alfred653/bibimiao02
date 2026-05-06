@@ -4,7 +4,7 @@ export const BRANDS = [
 ] as const;
 export type Brand = (typeof BRANDS)[number];
 
-export const CURRENCIES = ['CNY', 'USD', 'JPY', 'EUR', 'GBP'] as const;
+export const CURRENCIES = ['CNY', 'USD', 'JPY', 'EUR', 'GBP', 'HKD'] as const;
 export type Currency = (typeof CURRENCIES)[number];
 
 export const SEARCH_ALIAS_MAP: Record<string, string> = {
@@ -25,5 +25,5 @@ export const SHIPPING_PROFILES = {
 export type ShippingMode = keyof typeof SHIPPING_PROFILES;
 
 export const FALLBACK_RATES: Record<string, number> = {
-  USD_CNY: 7.23, JPY_CNY: 0.048, EUR_CNY: 7.85, GBP_CNY: 9.15, CNY_CNY: 1,
+  USD_CNY: 7.23, JPY_CNY: 0.048, EUR_CNY: 7.85, GBP_CNY: 9.15, HKD_CNY: 0.92, CNY_CNY: 1,
 };

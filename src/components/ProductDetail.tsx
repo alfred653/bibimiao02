@@ -11,7 +11,7 @@ const SHIPPING_MODES = [
   { value: 'large', label: '大货线', hint: '首重1.0kg ¥58, 续重0.5kg ¥11' },
 ]
 
-const TARGET_CURRENCIES = ['CNY', 'USD', 'JPY', 'EUR', 'GBP']
+const TARGET_CURRENCIES = ['CNY', 'USD', 'JPY', 'EUR', 'GBP', 'HKD']
 
 interface EstimateResult {
   convertedPriceFormatted: string
