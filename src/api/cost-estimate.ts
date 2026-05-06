@@ -101,7 +101,8 @@ export async function POST(req: Request) {
       profitTrial,
     });
   } catch (e) {
-    console.error('POST /api/cost-estimate:', e);
-    return error('成本估算失败', 500);
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('POST /api/cost-estimate:', msg);
+    return error(`成本估算失败: ${msg}`, 500);
   }
 }

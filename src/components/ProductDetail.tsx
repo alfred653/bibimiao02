@@ -114,7 +114,7 @@ export default function ProductDetail() {
         if (d.success) setEstimate(d.data)
         else setEstimateError(d.error?.message || '计算失败')
       })
-      .catch(() => setEstimateError('网络错误'))
+      .catch((e: Error) => setEstimateError(e.message || '网络错误'))
       .finally(() => setEstimating(false))
   }
 

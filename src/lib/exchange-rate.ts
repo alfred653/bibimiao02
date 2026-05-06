@@ -28,9 +28,12 @@ export async function getRate(from: string, to: string): Promise<RateResult> {
   }
 
   try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
     const resp = await fetch(`${FRANKFURTER_URL}?from=${from}&to=${to}`, {
-      signal: AbortSignal.timeout(8000),
+      signal: ctrl.signal,
     });
+    clearTimeout(timer);
     if (!resp.ok) throw new Error(`Frankfurter returned ${resp.status}`);
     const data = await resp.json() as { rates: Record<string, number> };
     const rate = data.rates[to];
