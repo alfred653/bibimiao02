@@ -39,7 +39,7 @@ export default function Layout() {
   const location = useLocation()
 
   return (
-    <div className="min-h-screen bg-[#121110] text-[#f0ede5] flex flex-col">
+    <div className="min-h-screen bg-[#141413] text-[#faf9f5] flex flex-col">
       <main className="flex-1 overflow-auto pb-16">
         <AnimatePresence mode="wait">
           <motion.div
@@ -53,13 +53,13 @@ export default function Layout() {
           </motion.div>
         </AnimatePresence>
       </main>
-      <nav className="fixed bottom-0 left-0 right-0 h-14 bg-[#0d0c0a] border-t border-white/[0.06] flex items-center justify-around z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <nav className="fixed bottom-0 left-0 right-0 h-14 bg-[#0D0D0C] border-t border-white/[0.06] flex items-center justify-around z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {tabs.map(({ to, label, Icon }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) =>
-              `flex flex-col items-center text-xs gap-0.5 transition-colors active:scale-95 ${isActive ? 'text-amber-500' : 'text-[#8b8a7e]'}`
+              `flex flex-col items-center text-xs gap-0.5 transition-colors active:scale-95 ${isActive ? 'text-[#d97757]' : 'text-[#b0aea5]'}`
             }
           >
             <Icon />

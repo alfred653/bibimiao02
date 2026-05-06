@@ -151,16 +151,16 @@ export default function ProductDetail() {
     navigator.clipboard.writeText(lines.join('\n')).then(() => toast('已复制到剪贴板', 'success')).catch(() => {})
   }
 
-  if (!isSignedIn) return <div className="p-8 text-center text-[#8b8a7e]">请先登录</div>
-  if (loading) return <div className="p-8 text-center text-[#8b8a7e]">加载中...</div>
-  if (!product) return <div className="p-8 text-center text-[#8b8a7e]">商品不存在</div>
+  if (!isSignedIn) return <div className="p-8 text-center text-[#b0aea5]">请先登录</div>
+  if (loading) return <div className="p-8 text-center text-[#b0aea5]">加载中...</div>
+  if (!product) return <div className="p-8 text-center text-[#b0aea5]">商品不存在</div>
 
   return (
     <div className="p-4">
-      <button onClick={() => nav(-1)} className="text-[#8b8a7e] text-sm mb-4 hover:text-[#f0ede5] transition-colors">← 返回</button>
+      <button onClick={() => nav(-1)} className="text-[#b0aea5] text-sm mb-4 hover:text-[#faf9f5] transition-colors">← 返回</button>
 
       <img
-        src={product.imageUrl || `https://placehold.co/800x400/1a1a17/d97706?text=${encodeURIComponent(product.brand || '')}`}
+        src={product.imageUrl || `https://placehold.co/800x400/1a1a17/d97757?text=${encodeURIComponent(product.brand || '')}`}
         alt=""
         className="w-full h-48 object-cover rounded-xl bg-white/[0.04] mb-4"
         loading="lazy"
@@ -172,26 +172,26 @@ export default function ProductDetail() {
 
       <h1 className="text-lg font-bold mb-2">{product.title}</h1>
       <div className="flex flex-wrap gap-2 mb-4 text-xs">
-        <span className="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded">{product.brand}</span>
-        {product.category && <span className="bg-white/[0.04] text-[#8b8a7e] px-2 py-0.5 rounded">{product.category}</span>}
-        {product.spec && <span className="bg-white/[0.04] text-[#8b8a7e] px-2 py-0.5 rounded">{product.spec}</span>}
+        <span className="bg-[#d97757]/10 text-[#d97757] px-2 py-0.5 rounded">{product.brand}</span>
+        {product.category && <span className="bg-white/[0.04] text-[#b0aea5] px-2 py-0.5 rounded">{product.category}</span>}
+        {product.spec && <span className="bg-white/[0.04] text-[#b0aea5] px-2 py-0.5 rounded">{product.spec}</span>}
       </div>
 
       {/* Basic info */}
       <div className="bg-white/[0.04] rounded-xl p-4 mb-4 space-y-2 text-sm">
         <div className="flex justify-between items-center">
-          <span className="text-[#8b8a7e]">价格</span>
-          <span className="text-amber-500 font-bold text-lg">{product.currency} {product.price}</span>
+          <span className="text-[#b0aea5]">价格</span>
+          <span className="text-[#d97757] font-bold text-lg">{product.currency} {product.price}</span>
         </div>
         {product.originalPrice && (
           <div className="flex justify-between">
-            <span className="text-[#8b8a7e]">原价</span>
-            <span className="text-[#8b8a7e] line-through">{product.currency} {product.originalPrice}</span>
+            <span className="text-[#b0aea5]">原价</span>
+            <span className="text-[#b0aea5] line-through">{product.currency} {product.originalPrice}</span>
           </div>
         )}
 
         <div className="flex justify-between items-center pt-1 border-t border-white/[0.06]">
-          <span className="text-[#8b8a7e] text-xs">切换币种</span>
+          <span className="text-[#b0aea5] text-xs">切换币种</span>
           <select
             value={displayCurrency}
             onChange={e => setDisplayCurrency(e.target.value)}
@@ -205,20 +205,20 @@ export default function ProductDetail() {
 
         {rateLoading && (
           <div className="flex justify-between text-xs">
-            <span className="text-[#8b8a7e]">获取汇率中...</span>
+            <span className="text-[#b0aea5]">获取汇率中...</span>
           </div>
         )}
         {dispRate && dispConverted !== null && !rateLoading && (
           <>
             <div className="flex justify-between">
-              <span className="text-[#8b8a7e] text-xs">换算价格</span>
-              <span className="text-emerald-400 font-bold">{displayCurrency} {dispConverted.toFixed(2)}</span>
+              <span className="text-[#b0aea5] text-xs">换算价格</span>
+              <span className="text-[#788c5d] font-bold">{displayCurrency} {dispConverted.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-[11px]">
-              <span className="text-[#8b8a7e]">汇率</span>
-              <span className="text-[#8b8a7e]">
+              <span className="text-[#b0aea5]">汇率</span>
+              <span className="text-[#b0aea5]">
                 1 {product.currency} = {dispRate.rate} {displayCurrency}
-                <span className="text-[#8b8a7e]/60 ml-1">
+                <span className="text-[#b0aea5]/60 ml-1">
                   · {dispRate.source === 'frankfurter' ? 'Frankfurter 实时' : dispRate.source === 'cache' ? '缓存' : '预设'}
                 </span>
               </span>
@@ -227,12 +227,12 @@ export default function ProductDetail() {
         )}
 
         <div className="flex justify-between pt-1 border-t border-white/[0.06]">
-          <span className="text-[#8b8a7e]">来源</span>
+          <span className="text-[#b0aea5]">来源</span>
           <span>{product.source}</span>
         </div>
         {product.country && (
           <div className="flex justify-between">
-            <span className="text-[#8b8a7e]">地区</span>
+            <span className="text-[#b0aea5]">地区</span>
             <span>{product.country}</span>
           </div>
         )}
@@ -240,15 +240,15 @@ export default function ProductDetail() {
 
       {/* Cost Estimate Panel */}
       <div className="bg-white/[0.04] rounded-xl p-4 mb-4">
-        <h2 className="text-sm font-bold mb-3 text-[#f0ede5]">
-          成本估算 <span className="text-xs text-[#8b8a7e] font-normal">(CNY)</span>
+        <h2 className="text-sm font-bold mb-3 text-[#faf9f5]">
+          成本估算 <span className="text-xs text-[#b0aea5] font-normal">(CNY)</span>
         </h2>
 
         <div className="space-y-3">
           {/* Shipping mode */}
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[#8b8a7e] w-12 sm:w-16 shrink-0">运费模板</span>
+              <span className="text-xs text-[#b0aea5] w-12 sm:w-16 shrink-0">运费模板</span>
               <select
                 value={shipMode}
                 onChange={e => setShipMode(e.target.value)}
@@ -259,77 +259,77 @@ export default function ProductDetail() {
                 ))}
               </select>
             </div>
-            <p className="text-[10px] text-[#8b8a7e] mt-0.5 pl-12 sm:pl-16">
+            <p className="text-[10px] text-[#b0aea5] mt-0.5 pl-12 sm:pl-16">
               {SHIPPING_MODES.find(m => m.value === shipMode)?.hint}
             </p>
           </div>
 
           {/* Weight */}
           <div className="flex items-center gap-1 sm:gap-2">
-            <span className="text-xs text-[#8b8a7e] w-12 sm:w-16 shrink-0">重量</span>
+            <span className="text-xs text-[#b0aea5] w-12 sm:w-16 shrink-0">重量</span>
             <input
               type="number" step="0.1" min="0"
               value={weight}
               onChange={e => setWeight(e.target.value)}
               placeholder="kg"
-              className="flex-1 min-w-0 bg-[#1a1a17] border border-white/[0.08] rounded-lg px-2 sm:px-3 py-2 text-sm text-[#f0ede5] placeholder-[#8b8a7e]"
+              className="flex-1 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-2 sm:px-3 py-2 text-sm text-[#faf9f5] placeholder-[#b0aea5]"
             />
-            <span className="text-xs text-[#8b8a7e] w-5 shrink-0">kg</span>
+            <span className="text-xs text-[#b0aea5] w-5 shrink-0">kg</span>
           </div>
 
           {/* Dimensions */}
           <div className="flex items-center gap-1 sm:gap-2">
-            <span className="text-xs text-[#8b8a7e] w-12 sm:w-16 shrink-0">尺寸</span>
-            <span className="text-[10px] text-[#8b8a7e] w-3 sm:w-4 shrink-0">长</span>
+            <span className="text-xs text-[#b0aea5] w-12 sm:w-16 shrink-0">尺寸</span>
+            <span className="text-[10px] text-[#b0aea5] w-3 sm:w-4 shrink-0">长</span>
             <input
               type="number" step="0.1" min="0"
               value={length}
               onChange={e => setLength(e.target.value)}
               placeholder="0"
-              className="flex-1 min-w-0 bg-[#1a1a17] border border-white/[0.08] rounded-lg px-1 sm:px-2 py-2 text-sm text-[#f0ede5] placeholder-[#8b8a7e]"
+              className="flex-1 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-1 sm:px-2 py-2 text-sm text-[#faf9f5] placeholder-[#b0aea5]"
             />
-            <span className="text-[#8b8a7e] text-xs shrink-0">×</span>
-            <span className="text-[10px] text-[#8b8a7e] w-3 sm:w-4 shrink-0">宽</span>
+            <span className="text-[#b0aea5] text-xs shrink-0">×</span>
+            <span className="text-[10px] text-[#b0aea5] w-3 sm:w-4 shrink-0">宽</span>
             <input
               type="number" step="0.1" min="0"
               value={width}
               onChange={e => setWidth(e.target.value)}
               placeholder="0"
-              className="flex-1 min-w-0 bg-[#1a1a17] border border-white/[0.08] rounded-lg px-1 sm:px-2 py-2 text-sm text-[#f0ede5] placeholder-[#8b8a7e]"
+              className="flex-1 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-1 sm:px-2 py-2 text-sm text-[#faf9f5] placeholder-[#b0aea5]"
             />
-            <span className="text-[#8b8a7e] text-xs shrink-0">×</span>
-            <span className="text-[10px] text-[#8b8a7e] w-3 sm:w-4 shrink-0">高</span>
+            <span className="text-[#b0aea5] text-xs shrink-0">×</span>
+            <span className="text-[10px] text-[#b0aea5] w-3 sm:w-4 shrink-0">高</span>
             <input
               type="number" step="0.1" min="0"
               value={height}
               onChange={e => setHeight(e.target.value)}
               placeholder="0"
-              className="flex-1 min-w-0 bg-[#1a1a17] border border-white/[0.08] rounded-lg px-1 sm:px-2 py-2 text-sm text-[#f0ede5] placeholder-[#8b8a7e]"
+              className="flex-1 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-1 sm:px-2 py-2 text-sm text-[#faf9f5] placeholder-[#b0aea5]"
             />
-            <span className="text-[10px] text-[#8b8a7e] w-5 sm:w-7 shrink-0">cm</span>
+            <span className="text-[10px] text-[#b0aea5] w-5 sm:w-7 shrink-0">cm</span>
           </div>
 
           {/* Extra cost + margin */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="flex items-center gap-1 sm:gap-2">
-              <span className="text-xs text-[#8b8a7e] w-12 sm:w-16 shrink-0">其他费用</span>
+              <span className="text-xs text-[#b0aea5] w-12 sm:w-16 shrink-0">其他费用</span>
               <input
                 type="number" step="0.01" min="0"
                 value={extraCost}
                 onChange={e => setExtraCost(e.target.value)}
-                className="flex-1 min-w-0 bg-[#1a1a17] border border-white/[0.08] rounded-lg px-2 sm:px-3 py-2 text-sm text-[#f0ede5]"
+                className="flex-1 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-2 sm:px-3 py-2 text-sm text-[#faf9f5]"
               />
-              <span className="text-xs text-[#8b8a7e] w-4 shrink-0">¥</span>
+              <span className="text-xs text-[#b0aea5] w-4 shrink-0">¥</span>
             </div>
             <div className="flex items-center gap-1 sm:gap-2">
-              <span className="text-xs text-[#8b8a7e] shrink-0">毛利率</span>
+              <span className="text-xs text-[#b0aea5] shrink-0">毛利率</span>
               <input
                 type="number" step="1" min="0" max="99"
                 value={marginRate}
                 onChange={e => setMarginRate(e.target.value)}
-                className="flex-1 min-w-0 bg-[#1a1a17] border border-white/[0.08] rounded-lg px-2 sm:px-3 py-2 text-sm text-[#f0ede5]"
+                className="flex-1 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-2 sm:px-3 py-2 text-sm text-[#faf9f5]"
               />
-              <span className="text-xs text-[#8b8a7e] w-4 shrink-0">%</span>
+              <span className="text-xs text-[#b0aea5] w-4 shrink-0">%</span>
             </div>
           </div>
 
@@ -337,58 +337,58 @@ export default function ProductDetail() {
           <button
             onClick={calcEstimate}
             disabled={estimating}
-            className="w-full bg-amber-600 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 active:bg-amber-700 transition-colors"
+            className="w-full bg-[#d97757] py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 active:bg-[#c45e3e] transition-colors"
           >
             {estimating ? '计算中...' : '计算'}
           </button>
 
           {estimateError && (
-            <p className="text-red-400 text-xs text-center">{estimateError}</p>
+            <p className="text-[#b53333] text-xs text-center">{estimateError}</p>
           )}
 
           {/* Results */}
           {estimate && (
             <div className="bg-white/[0.04] rounded-lg p-3 space-y-1.5 text-sm">
               <div className="flex justify-between">
-                <span className="text-[#8b8a7e]">换算价格</span>
-                <span className="text-amber-500 font-bold">{estimate.convertedPriceFormatted}</span>
+                <span className="text-[#b0aea5]">换算价格</span>
+                <span className="text-[#d97757] font-bold">{estimate.convertedPriceFormatted}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-[#8b8a7e]">汇率来源</span>
-                <span className="text-[#8b8a7e]">{estimate.exchangeRate.source} · {estimate.exchangeRate.rate}</span>
+                <span className="text-[#b0aea5]">汇率来源</span>
+                <span className="text-[#b0aea5]">{estimate.exchangeRate.source} · {estimate.exchangeRate.rate}</span>
               </div>
               {estimate.shippingEstimate && (
                 <>
                   <div className="flex justify-between">
-                    <span className="text-[#8b8a7e]">运费</span>
+                    <span className="text-[#b0aea5]">运费</span>
                     <span>¥{estimate.shippingEstimate.cost}</span>
                   </div>
-                  <p className="text-[10px] text-[#8b8a7e] break-all">{estimate.shippingEstimate.label}</p>
+                  <p className="text-[10px] text-[#b0aea5] break-all">{estimate.shippingEstimate.label}</p>
                 </>
               )}
               <div className="flex justify-between">
-                <span className="text-[#8b8a7e]">其他费用</span>
+                <span className="text-[#b0aea5]">其他费用</span>
                 <span>¥{estimate.extraCost}</span>
               </div>
               <hr className="border-white/[0.06] my-1" />
               <div className="flex justify-between font-bold">
                 <span>总成本</span>
-                <span className="text-amber-500">{estimate.estimatedCostFormatted}</span>
+                <span className="text-[#d97757]">{estimate.estimatedCostFormatted}</span>
               </div>
 
               {estimate.profitTrial && (
                 <div className="mt-2 pt-2 border-t border-white/[0.06] space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-[#8b8a7e]">目标毛利率</span>
+                    <span className="text-[#b0aea5]">目标毛利率</span>
                     <span>{estimate.profitTrial.estimatedMarginRate}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#8b8a7e]">建议售价</span>
-                    <span className="text-emerald-400 font-bold">{estimate.profitTrial.suggestedQuotePrice}</span>
+                    <span className="text-[#b0aea5]">建议售价</span>
+                    <span className="text-[#788c5d] font-bold">{estimate.profitTrial.suggestedQuotePrice}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#8b8a7e]">预估利润</span>
-                    <span className={estimate.profitTrial.status === 'positive' ? 'text-emerald-400' : 'text-red-400'}>
+                    <span className="text-[#b0aea5]">预估利润</span>
+                    <span className={estimate.profitTrial.status === 'positive' ? 'text-[#788c5d]' : 'text-[#b53333]'}>
                       {estimate.profitTrial.estimatedProfit}
                     </span>
                   </div>
@@ -397,7 +397,7 @@ export default function ProductDetail() {
 
               <button
                 onClick={copyResult}
-                className="w-full mt-2 bg-white/[0.06] py-1.5 rounded text-xs text-[#8b8a7e] hover:bg-white/[0.08] active:bg-white/[0.10] transition-colors"
+                className="w-full mt-2 bg-white/[0.06] py-1.5 rounded text-xs text-[#b0aea5] hover:bg-white/[0.08] active:bg-white/[0.10] transition-colors"
               >
                 复制结果
               </button>
@@ -410,7 +410,7 @@ export default function ProductDetail() {
       <button
         onClick={toggleFavorite}
         disabled={favToggling}
-        className={`w-full py-3 rounded-xl text-sm font-medium mb-2 transition-colors ${favorited ? 'bg-red-600/15 text-red-400 border border-red-600/20' : 'bg-amber-600 text-white active:bg-amber-700'}`}
+        className={`w-full py-3 rounded-xl text-sm font-medium mb-2 transition-colors ${favorited ? 'bg-[#b53333]/15 text-[#b53333] border border-[#b53333]/20' : 'bg-[#d97757] text-white active:bg-[#c45e3e]'}`}
       >
         {favorited ? '已收藏' : '收藏'}
       </button>

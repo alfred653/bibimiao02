@@ -35,18 +35,18 @@ export default function FavoritesPage() {
       .catch(() => toast('网络错误', 'error'))
   }
 
-  if (!isSignedIn) return <div className="p-8 text-center text-[#8b8a7e]">请先登录</div>
+  if (!isSignedIn) return <div className="p-8 text-center text-[#b0aea5]">请先登录</div>
 
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">我的收藏</h1>
-      {loading ? <div className="text-[#8b8a7e] text-center">加载中...</div> :
-       !items.length ? <div className="text-[#8b8a7e] text-center py-8">暂无收藏</div> :
+      {loading ? <div className="text-[#b0aea5] text-center">加载中...</div> :
+       !items.length ? <div className="text-[#b0aea5] text-center py-8">暂无收藏</div> :
         <div className="space-y-3">
           {items.map(item => (
             <div key={item.id} className="bg-white/[0.04] rounded-xl p-3 cursor-pointer hover:bg-white/[0.06] active:bg-white/[0.08] flex gap-3 transition-colors" onClick={() => nav(`/product/${item.id}`)}>
               <img
-                src={item.imageUrl || `https://placehold.co/112x112/1a1a17/d97706?text=${encodeURIComponent((item.brand || '').slice(0, 8))}`}
+                src={item.imageUrl || `https://placehold.co/112x112/1a1a17/#d97757?text=${encodeURIComponent((item.brand || '').slice(0, 8))}`}
                 alt=""
                 className="w-14 h-14 rounded-lg object-cover bg-white/[0.04] shrink-0"
                 loading="lazy"
@@ -57,14 +57,14 @@ export default function FavoritesPage() {
               />
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm truncate">{item.title}</h3>
-                <div className="flex gap-2 mt-1 text-xs text-[#8b8a7e]">
-                  <span className="text-amber-400">{item.brand}</span>
+                <div className="flex gap-2 mt-1 text-xs text-[#b0aea5]">
+                  <span className="text-[#d97757]">{item.brand}</span>
                   {item.price && <span>{item.currency} {item.price}</span>}
                 </div>
               </div>
               <button
                 onClick={e => { e.stopPropagation(); removeFavorite(item.id) }}
-                className="shrink-0 text-[#8b8a7e] hover:text-red-400 active:bg-red-600/10 text-lg min-w-[36px] min-h-[36px] transition-colors rounded-lg flex items-center justify-center"
+                className="shrink-0 text-[#b0aea5] hover:text-[#b53333] active:bg-[#b53333]/10 text-lg min-w-[36px] min-h-[36px] transition-colors rounded-lg flex items-center justify-center"
                 title="取消收藏"
               >×</button>
             </div>

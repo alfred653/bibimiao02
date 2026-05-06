@@ -31,30 +31,30 @@ function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => v
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[#1a1a17] rounded-xl p-6 w-full max-w-md border border-white/[0.06]">
+      <div className="bg-[#1C1C1A] rounded-xl p-6 w-full max-w-md border border-white/[0.06]">
         <h3 className="text-lg font-bold mb-4">编辑用户</h3>
         <div className="space-y-3 text-sm">
           <div>
-            <span className="text-[#8b8a7e] text-xs">邮箱</span>
-            <p className="text-[#f0ede5]">{user.email || '—'}</p>
+            <span className="text-[#b0aea5] text-xs">邮箱</span>
+            <p className="text-[#faf9f5]">{user.email || '—'}</p>
           </div>
           <div>
-            <label className="text-[#8b8a7e] text-xs block mb-1">会员等级</label>
-            <select value={tier} onChange={e => setTier(e.target.value)} className="w-full bg-[#1a1a17] border border-white/[0.08] rounded-lg px-3 py-2 text-[#f0ede5]">
-              {TIERS.map(t => <option key={t} value={t} className="bg-[#1a1a17] text-[#f0ede5]">{t}</option>)}
+            <label className="text-[#b0aea5] text-xs block mb-1">会员等级</label>
+            <select value={tier} onChange={e => setTier(e.target.value)} className="w-full bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-3 py-2 text-[#faf9f5]">
+              {TIERS.map(t => <option key={t} value={t} className="bg-[#1C1C1A] text-[#faf9f5]">{t}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-[#8b8a7e] text-xs block mb-1">状态</label>
-            <select value={status} onChange={e => setStatus(e.target.value)} className="w-full bg-[#1a1a17] border border-white/[0.08] rounded-lg px-3 py-2 text-[#f0ede5]">
-              {STATUSES.map(s => <option key={s} value={s} className="bg-[#1a1a17] text-[#f0ede5]">{s}</option>)}
+            <label className="text-[#b0aea5] text-xs block mb-1">状态</label>
+            <select value={status} onChange={e => setStatus(e.target.value)} className="w-full bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-3 py-2 text-[#faf9f5]">
+              {STATUSES.map(s => <option key={s} value={s} className="bg-[#1C1C1A] text-[#faf9f5]">{s}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-[#8b8a7e] text-xs block mb-1">配置品牌（付费用户专属）</label>
+            <label className="text-[#b0aea5] text-xs block mb-1">配置品牌（付费用户专属）</label>
             <div className="flex flex-wrap gap-2">
               {BRANDS.map(b => (
-                <label key={b} className={`px-2 py-1 rounded text-xs cursor-pointer transition-colors ${brands.includes(b) ? 'bg-amber-600 text-white' : 'bg-white/[0.04] text-[#8b8a7e]'}`}>
+                <label key={b} className={`px-2 py-1 rounded text-xs cursor-pointer transition-colors ${brands.includes(b) ? 'bg-[#d97757] text-white' : 'bg-white/[0.04] text-[#b0aea5]'}`}>
                   <input type="checkbox" className="hidden" checked={brands.includes(b)} onChange={() => toggleBrand(b)} />
                   {b}
                 </label>
@@ -64,7 +64,7 @@ function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => v
         </div>
         <div className="flex gap-2 mt-6">
           <button onClick={onClose} className="flex-1 bg-white/[0.04] py-2 rounded-lg text-sm">取消</button>
-          <button onClick={save} disabled={saving} className="flex-1 bg-amber-600 py-2 rounded-lg text-sm disabled:opacity-50 active:bg-amber-700 transition-colors">
+          <button onClick={save} disabled={saving} className="flex-1 bg-[#d97757] py-2 rounded-lg text-sm disabled:opacity-50 active:bg-[#c45e3e] transition-colors">
             {saving ? '保存中...' : '保存'}
           </button>
         </div>
@@ -125,24 +125,24 @@ function ProductEditModal({ product, onClose, onSaved }: { product?: any; onClos
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[#1a1a17] rounded-xl p-6 w-full max-w-md border border-white/[0.06] max-h-[90vh] overflow-auto">
+      <div className="bg-[#1C1C1A] rounded-xl p-6 w-full max-w-md border border-white/[0.06] max-h-[90vh] overflow-auto">
         <h3 className="text-lg font-bold mb-4">{isEdit ? '编辑商品' : '添加商品'}</h3>
         <div className="space-y-2">
           {PRODUCT_FIELDS.map(f => (
             <div key={f.key}>
-              <label className="text-[#8b8a7e] text-xs block mb-0.5">{f.label}{'required' in f && f.required ? ' *' : ''}</label>
+              <label className="text-[#b0aea5] text-xs block mb-0.5">{f.label}{'required' in f && f.required ? ' *' : ''}</label>
               <input
                 value={form[f.key]}
                 onChange={e => set(f.key, e.target.value)}
                 placeholder={'placeholder' in f ? f.placeholder : undefined}
-                className="w-full bg-[#1a1a17] border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm text-[#f0ede5]"
+                className="w-full bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm text-[#faf9f5]"
               />
             </div>
           ))}
         </div>
         <div className="flex gap-2 mt-4">
           <button onClick={onClose} className="flex-1 bg-white/[0.04] py-2 rounded-lg text-sm">取消</button>
-          <button onClick={save} disabled={saving} className="flex-1 bg-amber-600 py-2 rounded-lg text-sm disabled:opacity-50 active:bg-amber-700 transition-colors">
+          <button onClick={save} disabled={saving} className="flex-1 bg-[#d97757] py-2 rounded-lg text-sm disabled:opacity-50 active:bg-[#c45e3e] transition-colors">
             {saving ? '保存中...' : isEdit ? '更新' : '添加'}
           </button>
         </div>
@@ -210,46 +210,46 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[#1a1a17] rounded-xl p-6 w-full max-w-lg border border-white/[0.06] max-h-[90vh] overflow-auto">
+      <div className="bg-[#1C1C1A] rounded-xl p-6 w-full max-w-lg border border-white/[0.06] max-h-[90vh] overflow-auto">
         <h3 className="text-lg font-bold mb-4">导入 Excel</h3>
         {!rows ? (
           <div className="space-y-4">
-            <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-3">
-              <p className="text-xs text-[#8b8a7e] mb-2">请按照模板格式准备数据，必填列为 <b className="text-amber-400">title</b> 和 <b className="text-amber-400">brand</b></p>
-              <button onClick={downloadTemplate} className="bg-amber-600 text-white px-4 py-2 rounded-lg text-xs hover:bg-amber-700 active:bg-amber-800 transition-colors">
+            <div className="bg-[#d97757]/5 border border-[#d97757]/20 rounded-lg p-3">
+              <p className="text-xs text-[#b0aea5] mb-2">请按照模板格式准备数据，必填列为 <b className="text-[#d97757]">title</b> 和 <b className="text-[#d97757]">brand</b></p>
+              <button onClick={downloadTemplate} className="bg-[#d97757] text-white px-4 py-2 rounded-lg text-xs hover:bg-[#c45e3e] active:bg-[#b04d2e] transition-colors">
                 下载模板文件
               </button>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-[#8b8a7e]">选择文件：</span>
-              <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFile} className="text-sm text-[#8b8a7e] file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-white/[0.04] file:text-[#f0ede5] hover:file:bg-white/[0.06]" />
+              <span className="text-xs text-[#b0aea5]">选择文件：</span>
+              <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFile} className="text-sm text-[#b0aea5] file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-white/[0.04] file:text-[#faf9f5] hover:file:bg-white/[0.06]" />
             </div>
-            {uploading && <p className="text-[#8b8a7e] text-sm">解析中...</p>}
+            {uploading && <p className="text-[#b0aea5] text-sm">解析中...</p>}
           </div>
         ) : (
           <div className="space-y-3">
             <div className="flex gap-4 text-sm">
-              <span className="text-[#8b8a7e]">总行数: <b className="text-[#f0ede5]">{rows.length}</b></span>
-              <span className="text-emerald-400">有效: <b>{rows.length - errors.filter(e => e.includes('缺少')).length}</b></span>
-              <span className="text-red-400">错误: <b>{errors.filter(e => e.includes('缺少')).length}</b></span>
+              <span className="text-[#b0aea5]">总行数: <b className="text-[#faf9f5]">{rows.length}</b></span>
+              <span className="text-[#788c5d]">有效: <b>{rows.length - errors.filter(e => e.includes('缺少')).length}</b></span>
+              <span className="text-[#b53333]">错误: <b>{errors.filter(e => e.includes('缺少')).length}</b></span>
             </div>
 
             {errors.length > 0 && (
-              <div className="bg-red-600/10 rounded-lg p-2 text-xs text-red-400 space-y-0.5 max-h-32 overflow-auto">
+              <div className="bg-[#b53333]/10 rounded-lg p-2 text-xs text-[#b53333] space-y-0.5 max-h-32 overflow-auto">
                 {errors.map((e, i) => <p key={i}>⚠ {e}</p>)}
               </div>
             )}
 
-            <p className="text-xs text-[#8b8a7e]">前 5 行预览：</p>
+            <p className="text-xs text-[#b0aea5]">前 5 行预览：</p>
             <div className="bg-white/[0.04] rounded-lg p-2 text-xs max-h-32 overflow-auto">
               {preview.map((row, i) => (
-                <p key={i} className="text-[#f0ede5] py-0.5">{row.title} | {row.brand} | {row.currency} {row.price}</p>
+                <p key={i} className="text-[#faf9f5] py-0.5">{row.title} | {row.brand} | {row.currency} {row.price}</p>
               ))}
             </div>
 
             <div className="flex gap-2">
               <button onClick={onClose} className="flex-1 bg-white/[0.04] py-2 rounded-lg text-sm">取消</button>
-              <button onClick={confirmImport} disabled={importing} className="flex-1 bg-amber-600 py-2 rounded-lg text-sm disabled:opacity-50 active:bg-amber-700 transition-colors">
+              <button onClick={confirmImport} disabled={importing} className="flex-1 bg-[#d97757] py-2 rounded-lg text-sm disabled:opacity-50 active:bg-[#c45e3e] transition-colors">
                 {importing ? '导入中...' : `确认导入 ${rows.length - errors.filter(e => e.includes('缺少')).length} 条`}
               </button>
             </div>
@@ -363,14 +363,14 @@ export default function AdminPage() {
   useEffect(() => { setPage(1); fetchData(1) }, [loc.pathname, search, tierFilter, statusFilter, brandFilter])
   useEffect(() => { fetchData(page) }, [page])
 
-  if (!isSignedIn) return <div className="text-[#8b8a7e] p-4">请用管理员账号登录</div>
-  if (loading) return <div className="text-[#8b8a7e] p-4">加载中...</div>
+  if (!isSignedIn) return <div className="text-[#b0aea5] p-4">请用管理员账号登录</div>
+  if (loading) return <div className="text-[#b0aea5] p-4">加载中...</div>
 
   if (!isUsers && !isProducts) {
     return (
       <div>
         <h1 className="text-xl font-bold mb-4">管理仪表板</h1>
-        <p className="text-[#8b8a7e]">欢迎使用管理后台。选择左侧菜单管理用户或商品。</p>
+        <p className="text-[#b0aea5]">欢迎使用管理后台。选择左侧菜单管理用户或商品。</p>
       </div>
     )
   }
@@ -381,7 +381,7 @@ export default function AdminPage() {
         <h1 className="text-xl font-bold">{isUsers ? '用户管理' : '商品管理'}</h1>
         {isProducts && (
           <div className="flex gap-2">
-            <button onClick={() => setShowAddProduct(true)} className="bg-amber-600 px-3 py-1.5 rounded text-xs active:bg-amber-700 transition-colors">+ 添加商品</button>
+            <button onClick={() => setShowAddProduct(true)} className="bg-[#d97757] px-3 py-1.5 rounded text-xs active:bg-[#c45e3e] transition-colors">+ 添加商品</button>
             <button onClick={() => setShowImport(true)} className="bg-white/[0.04] px-3 py-1.5 rounded text-xs active:bg-white/[0.06] transition-colors">导入 Excel</button>
           </div>
         )}
@@ -393,7 +393,7 @@ export default function AdminPage() {
           placeholder="搜索..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="bg-[#1a1a17] border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm w-40 text-[#f0ede5] placeholder-[#8b8a7e]"
+          className="bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm w-40 text-[#faf9f5] placeholder-[#b0aea5]"
         />
         {isUsers && (
           <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-700">
@@ -417,15 +417,15 @@ export default function AdminPage() {
       {isUsers && (
         <div className="overflow-x-auto -mx-4 px-4">
           <table className="w-full text-sm min-w-[480px]">
-            <thead><tr className="text-left text-[#8b8a7e] border-b border-white/[0.06]"><th className="py-2">邮箱</th><th>等级</th><th>品牌</th><th>状态</th><th>操作</th></tr></thead>
+            <thead><tr className="text-left text-[#b0aea5] border-b border-white/[0.06]"><th className="py-2">邮箱</th><th>等级</th><th>品牌</th><th>状态</th><th>操作</th></tr></thead>
             <tbody>
               {data.map(u => (
                 <tr key={u.id} className="border-b border-white/[0.04]">
                   <td className="py-2 text-xs">{u.email}</td>
-                  <td><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-white/[0.04] text-[#8b8a7e]' : 'bg-amber-500/10 text-amber-400'}`}>{u.membershipTier}</span></td>
-                  <td className="text-xs text-[#8b8a7e]">{(u.configuredBrands || []).join(', ') || '—'}</td>
-                  <td><span className={`text-xs ${u.status === 'active' ? 'text-emerald-400' : 'text-red-400'}`}>{u.status}</span></td>
-                  <td><button onClick={() => setEditUser(u)} className="text-amber-400 text-xs hover:underline active:text-amber-300">编辑</button></td>
+                  <td><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-white/[0.04] text-[#b0aea5]' : 'bg-[#d97757]/10 text-[#d97757]'}`}>{u.membershipTier}</span></td>
+                  <td className="text-xs text-[#b0aea5]">{(u.configuredBrands || []).join(', ') || '—'}</td>
+                  <td><span className={`text-xs ${u.status === 'active' ? 'text-[#788c5d]' : 'text-[#b53333]'}`}>{u.status}</span></td>
+                  <td><button onClick={() => setEditUser(u)} className="text-[#d97757] text-xs hover:underline active:text-[#d97757]">编辑</button></td>
                 </tr>
               ))}
             </tbody>
@@ -437,14 +437,14 @@ export default function AdminPage() {
       {isProducts && (
         <div className="overflow-x-auto -mx-4 px-4">
           <table className="w-full text-sm min-w-[640px]">
-            <thead><tr className="text-left text-[#8b8a7e] border-b border-white/[0.06]"><th className="py-2 w-8"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-amber-600 cursor-pointer" /></th><th className="py-2 w-10"></th><th className="py-2">标题</th><th>品牌</th><th>价格</th><th>来源</th><th>状态</th><th>操作</th></tr></thead>
+            <thead><tr className="text-left text-[#b0aea5] border-b border-white/[0.06]"><th className="py-2 w-8"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-[#d97757] cursor-pointer" /></th><th className="py-2 w-10"></th><th className="py-2">标题</th><th>品牌</th><th>价格</th><th>来源</th><th>状态</th><th>操作</th></tr></thead>
           <tbody>
             {data.map(p => (
               <tr key={p.id} className="border-b border-white/[0.04]">
-                <td className="py-2"><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} className="w-3.5 h-3.5 accent-amber-600 cursor-pointer" /></td>
+                <td className="py-2"><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} className="w-3.5 h-3.5 accent-[#d97757] cursor-pointer" /></td>
                 <td className="py-2">
                   <img
-                    src={p.imageUrl || `https://placehold.co/64x64/1a1a17/d97706?text=${encodeURIComponent((p.brand || '').slice(0, 6))}`}
+                    src={p.imageUrl || `https://placehold.co/64x64/1a1a17/d97757?text=${encodeURIComponent((p.brand || '').slice(0, 6))}`}
                     alt=""
                     className="w-8 h-8 rounded object-cover bg-white/[0.04]"
                     loading="lazy"
@@ -455,12 +455,12 @@ export default function AdminPage() {
                   />
                 </td>
                 <td className="py-2 text-xs max-w-48 truncate">{p.title}</td>
-                <td className="text-amber-400 text-xs">{p.brand}</td>
+                <td className="text-[#d97757] text-xs">{p.brand}</td>
                 <td className="text-xs">{p.currency} {p.price}</td>
-                <td className="text-xs text-[#8b8a7e]">{p.source}</td>
-                <td><span className={`text-xs ${p.status === 'active' ? 'text-emerald-400' : 'text-red-400'}`}>{p.status}</span></td>
+                <td className="text-xs text-[#b0aea5]">{p.source}</td>
+                <td><span className={`text-xs ${p.status === 'active' ? 'text-[#788c5d]' : 'text-[#b53333]'}`}>{p.status}</span></td>
                 <td className="flex gap-2">
-                  <button onClick={() => setEditProduct(p)} className="text-amber-400 text-xs hover:underline">编辑</button>
+                  <button onClick={() => setEditProduct(p)} className="text-[#d97757] text-xs hover:underline">编辑</button>
                   <button onClick={() => {
                     if (!confirm('确认删除该商品？')) return
                     apiDelete('/api/admin/products', { id: p.id })
@@ -470,7 +470,7 @@ export default function AdminPage() {
                         else toast(d.error?.message || '删除失败', 'error')
                       })
                       .catch(() => toast('网络错误', 'error'))
-                  }} className="text-red-400 text-xs hover:underline">删除</button>
+                  }} className="text-[#b53333] text-xs hover:underline">删除</button>
                 </td>
               </tr>
             ))}
@@ -483,12 +483,12 @@ export default function AdminPage() {
       {pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 mt-6">
           <button disabled={page <= 1} onClick={() => setPage(page - 1)}
-            className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#8b8a7e] hover:bg-white/[0.06] disabled:opacity-30">
+            className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30">
             上一页
           </button>
-          <span className="text-xs text-[#8b8a7e]">{page} / {pagination.totalPages}</span>
+          <span className="text-xs text-[#b0aea5]">{page} / {pagination.totalPages}</span>
           <button disabled={page >= pagination.totalPages} onClick={() => setPage(page + 1)}
-            className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#8b8a7e] hover:bg-white/[0.06] disabled:opacity-30">
+            className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30">
             下一页
           </button>
         </div>
@@ -496,9 +496,9 @@ export default function AdminPage() {
 
       {/* Batch action bar */}
       {selectedIds.size > 0 && isProducts && (
-        <div className="fixed bottom-4 left-2 right-2 sm:bottom-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-40 bg-[#0d0c0a] border border-white/[0.08] rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 flex flex-wrap items-center gap-2 shadow-2xl shadow-black/50 max-w-full">
-          <span className="text-xs text-[#8b8a7e]">已选 <b className="text-[#f0ede5]">{selectedIds.size}</b> 项</span>
-          <button onClick={handleBatchDelete} disabled={batchLoading} className="bg-red-600/15 text-red-400 px-3 py-1 rounded text-xs hover:bg-red-600/20 disabled:opacity-50 whitespace-nowrap">
+        <div className="fixed bottom-4 left-2 right-2 sm:bottom-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-40 bg-[#0D0D0C] border border-white/[0.08] rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 flex flex-wrap items-center gap-2 shadow-2xl shadow-black/50 max-w-full">
+          <span className="text-xs text-[#b0aea5]">已选 <b className="text-[#faf9f5]">{selectedIds.size}</b> 项</span>
+          <button onClick={handleBatchDelete} disabled={batchLoading} className="bg-[#b53333]/15 text-[#b53333] px-3 py-1 rounded text-xs hover:bg-[#b53333]/20 disabled:opacity-50 whitespace-nowrap">
             批量删除
           </button>
           <select
@@ -522,7 +522,7 @@ export default function AdminPage() {
               <option key={b} value={b}>{b}</option>
             ))}
           </select>
-          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} className="text-xs text-[#8b8a7e] hover:text-[#f0ede5] active:text-[#f0ede5] disabled:opacity-50 py-0.5">
+          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} className="text-xs text-[#b0aea5] hover:text-[#faf9f5] active:text-[#faf9f5] disabled:opacity-50 py-0.5">
             取消选择
           </button>
         </div>
