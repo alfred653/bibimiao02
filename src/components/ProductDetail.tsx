@@ -62,6 +62,35 @@ export default function ProductDetail() {
       .finally(() => setLoading(false))
   }, [id, isSignedIn])
 
+  // Currency switcher for price display
+  const [displayCurrency, setDisplayCurrency] = useState('')
+  const [dispRate, setDispRate] = useState<{ rate: number; source: string } | null>(null)
+  const [dispConverted, setDispConverted] = useState<number | null>(null)
+  const [rateLoading, setRateLoading] = useState(false)
+
+  useEffect(() => {
+    if (product) setDisplayCurrency(product.currency || 'CNY')
+  }, [product])
+
+  useEffect(() => {
+    if (!product || !displayCurrency || displayCurrency === (product.currency || 'CNY')) {
+      setDispRate(null)
+      setDispConverted(null)
+      return
+    }
+    setRateLoading(true)
+    api(`/api/exchange-rate?from=${encodeURIComponent(product.currency || 'CNY')}&to=${encodeURIComponent(displayCurrency)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          setDispRate({ rate: d.data.rate, source: d.data.source })
+          setDispConverted(Math.round((parseFloat(product.price) || 0) * d.data.rate * 100) / 100)
+        }
+      })
+      .catch(() => { setDispRate(null); setDispConverted(null) })
+      .finally(() => setRateLoading(false))
+  }, [displayCurrency, product])
+
   function calcEstimate() {
     if (!product) return
     setEstimating(true)
@@ -149,7 +178,7 @@ export default function ProductDetail() {
 
       {/* Basic info */}
       <div className="bg-white/5 rounded-xl p-4 mb-4 space-y-2 text-sm">
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center">
           <span className="text-gray-400">价格</span>
           <span className="text-cyan-400 font-bold text-lg">{product.currency} {product.price}</span>
         </div>
@@ -159,13 +188,44 @@ export default function ProductDetail() {
             <span className="text-gray-500 line-through">{product.currency} {product.originalPrice}</span>
           </div>
         )}
-        {product.exchangeRate && (
-          <div className="flex justify-between">
-            <span className="text-gray-400">参考汇率</span>
-            <span className="text-xs">1 {product.currency} = {product.exchangeRate.rate} CNY</span>
+
+        {/* Currency switcher */}
+        <div className="flex justify-between items-center pt-1 border-t border-white/5">
+          <span className="text-gray-400 text-xs">切换币种</span>
+          <select
+            value={displayCurrency}
+            onChange={e => setDisplayCurrency(e.target.value)}
+            className="bg-white border border-gray-300 rounded-lg px-2 py-1 text-xs text-gray-700"
+          >
+            {TARGET_CURRENCIES.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Converted price */}
+        {rateLoading && (
+          <div className="flex justify-between text-xs">
+            <span className="text-gray-500">获取汇率中...</span>
           </div>
         )}
-        <div className="flex justify-between">
+        {dispRate && dispConverted !== null && !rateLoading && (
+          <>
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-xs">换算价格</span>
+              <span className="text-green-400 font-bold">{displayCurrency} {dispConverted.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-[11px]">
+              <span className="text-gray-500">汇率</span>
+              <span className="text-gray-400">
+                1 {product.currency} = {dispRate.rate} {displayCurrency}
+                <span className="text-gray-600 ml-1">· {dispRate.source === 'frankfurter' ? 'Frankfurter 实时' : dispRate.source === 'cache' ? '缓存' : '预设'}</span>
+              </span>
+            </div>
+          </>
+        )}
+
+        <div className="flex justify-between pt-1 border-t border-white/5">
           <span className="text-gray-400">来源</span>
           <span>{product.source}</span>
         </div>
@@ -188,10 +248,10 @@ export default function ProductDetail() {
             <select
               value={targetCurrency}
               onChange={e => setTargetCurrency(e.target.value)}
-              className={`flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm ${!targetCurrency ? 'text-gray-500' : 'text-white'}`}
+              className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700"
             >
               {TARGET_CURRENCIES.map(c => (
-                <option key={c} value={c} className="bg-[#1a2332] text-white">{c}</option>
+                <option key={c} value={c}>{c}</option>
               ))}
             </select>
           </div>
@@ -203,10 +263,10 @@ export default function ProductDetail() {
               <select
                 value={shipMode}
                 onChange={e => setShipMode(e.target.value)}
-                className={`flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm ${!shipMode ? 'text-gray-500' : 'text-white'}`}
+                className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700"
               >
                 {SHIPPING_MODES.map(m => (
-                  <option key={m.value} value={m.value} className="bg-[#1a2332] text-white">{m.label}</option>
+                  <option key={m.value} value={m.value}>{m.label}</option>
                 ))}
               </select>
             </div>

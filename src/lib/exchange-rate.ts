@@ -39,9 +39,19 @@ export async function getRate(from: string, to: string): Promise<RateResult> {
     cache.set(key, { rate, ts: now });
     return { from, to, rate, source: 'frankfurter', updatedAt: new Date().toISOString() };
   } catch {
+    // Try direct fallback
     const fallback = FALLBACK_RATES[key];
     if (fallback) {
+      cache.set(key, { rate: fallback, ts: now });
       return { from, to, rate: fallback, source: 'fallback', updatedAt: new Date().toISOString() };
+    }
+    // Try inverse: if we have `to_from`, compute `from_to = 1 / rate`
+    const inverseKey = `${to}_${from}`;
+    const inverseRate = FALLBACK_RATES[inverseKey];
+    if (inverseRate) {
+      const rate = Math.round((1 / inverseRate) * 10000) / 10000;
+      cache.set(key, { rate, ts: now });
+      return { from, to, rate, source: 'fallback', updatedAt: new Date().toISOString() };
     }
     throw new Error(`Unable to get exchange rate for ${key}`);
   }

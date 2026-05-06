@@ -24,7 +24,20 @@ export async function POST(req: Request) {
         rate = result.rate;
         rateSource = result.source;
       } catch {
-        return error('无法获取汇率', 500);
+        // Graceful fallback: try from constants directly
+        const { FALLBACK_RATES } = await import('../lib/constants');
+        const direct = FALLBACK_RATES[`${currency}_${targetCurrency}`];
+        const inverseKey = `${targetCurrency}_${currency}`;
+        const inverse = FALLBACK_RATES[inverseKey];
+        if (direct) {
+          rate = direct;
+          rateSource = 'fallback';
+        } else if (inverse) {
+          rate = Math.round((1 / inverse) * 10000) / 10000;
+          rateSource = 'fallback';
+        } else {
+          return error('无法获取汇率', 500);
+        }
       }
     } else if (currency === targetCurrency) {
       rate = 1;
