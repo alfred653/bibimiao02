@@ -2,7 +2,7 @@ import { db } from '../../lib/db';
 import { products } from '../../db/schema';
 import { getUserId, getBrandLimit } from '../../lib/auth';
 import { success, error } from '../../lib/response';
-import { and, eq, ilike, or } from 'drizzle-orm';
+import { and, eq, ilike, or, sql, desc } from 'drizzle-orm';
 
 export async function POST(req: Request) {
   try {
@@ -22,31 +22,58 @@ export async function POST(req: Request) {
     const userId = await getUserId(req);
     const limit = userId ? await getBrandLimit(userId).catch(() => null) : null;
 
-    const whereConditions = [eq(products.status, 'active')];
+    let rows: any[];
 
-    // ILIKE search across multiple columns
-    const words = keyword.split(/\s+/);
-    for (const w of words) {
-      whereConditions.push(
-        or(
-          ilike(products.title, `%${w}%`),
-          ilike(products.brand, `%${w}%`),
-          ilike(products.category, `%${w}%`),
-          ilike(products.spec, `%${w}%`),
-          ilike(products.source, `%${w}%`),
-        )!
+    if (sortBy === 'relevance') {
+      // Full-text search with ts_rank scoring via raw SQL for relevance ranking
+      const words = keyword.split(/\s+/).filter((w: string) => w.length > 0);
+      const tsquery = words.map((w: string) => `${sanitizeTsquery(w)}:*`).join(' & ');
+      const conditions = [`p.status = 'active'`, `p.search_vector @@ to_tsquery('simple', $1)`];
+      const params: string[] = [tsquery];
+
+      let pi = 2;
+      if (brand) { conditions.push(`p.brand = $${pi}`); params.push(brand); pi++; }
+      if (category) { conditions.push(`p.category = $${pi}`); params.push(category); pi++; }
+      if (currency) { conditions.push(`p.currency = $${pi}`); params.push(currency); pi++; }
+      if (source) { conditions.push(`p.source = $${pi}`); params.push(source); pi++; }
+
+      const result = await db.execute(
+        sql`SELECT p.*, ts_rank(p.search_vector, to_tsquery('simple', ${tsquery})) AS _rank
+          FROM products p
+          WHERE ${sql.raw(conditions.join(' AND '))}
+          ORDER BY _rank DESC`
       );
+      rows = result.rows as any[];
+    } else {
+      // ILIKE for filtering, sort in-memory for price or by DB for newest
+      const whereConditions = [eq(products.status, 'active')];
+
+      const words = keyword.split(/\s+/);
+      for (const w of words) {
+        whereConditions.push(
+          or(
+            ilike(products.title, `%${w}%`),
+            ilike(products.brand, `%${w}%`),
+            ilike(products.category, `%${w}%`),
+            ilike(products.spec, `%${w}%`),
+            ilike(products.source, `%${w}%`),
+          )!
+        );
+      }
+
+      if (brand) whereConditions.push(eq(products.brand, brand));
+      if (category) whereConditions.push(eq(products.category, category));
+      if (currency) whereConditions.push(eq(products.currency, currency));
+      if (source) whereConditions.push(eq(products.source, source));
+
+      const query = db.select().from(products).where(and(...whereConditions));
+
+      if (sortBy === 'newest') {
+        query.orderBy(desc(products.createdAt));
+      }
+
+      rows = await query;
     }
-
-    if (brand) whereConditions.push(eq(products.brand, brand));
-    if (category) whereConditions.push(eq(products.category, category));
-    if (currency) whereConditions.push(eq(products.currency, currency));
-    if (source) whereConditions.push(eq(products.source, source));
-
-    const rows = await db
-      .select()
-      .from(products)
-      .where(and(...whereConditions));
 
     // Apply brand-level quotas
     let filtered = rows;
@@ -70,7 +97,7 @@ export async function POST(req: Request) {
       filtered = filtered.slice(0, 10);
     }
 
-    // Sort
+    // Sort for price (in-memory)
     if (sortBy === 'price') {
       filtered.sort((a, b) => {
         const pa = parseFloat(a.price as string) || 0;
@@ -86,10 +113,11 @@ export async function POST(req: Request) {
     const isAnon = !userId;
     const items = paged.map((item) => {
       if (isAnon) {
-        const { price, originalPrice, sourceUrl, ...rest } = item;
+        const { price, originalPrice, sourceUrl, _rank, ...rest } = item;
         return rest;
       }
-      return item;
+      const { _rank, ...clean } = item;
+      return clean;
     });
 
     // Summary
@@ -113,4 +141,9 @@ export async function POST(req: Request) {
     console.error('POST /api/products/search:', e);
     return error('搜索失败', 500);
   }
+}
+
+function sanitizeTsquery(w: string): string {
+  // Remove characters that break tsquery syntax
+  return w.replace(/['"\\&|!:()*<>]/g, '').slice(0, 100);
 }

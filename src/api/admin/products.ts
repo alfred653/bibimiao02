@@ -2,7 +2,7 @@ import { db } from '../../lib/db';
 import { products } from '../../db/schema';
 import { success, error } from '../../lib/response';
 import { requireAdmin } from '../../lib/auth';
-import { and, eq, ilike, or } from 'drizzle-orm';
+import { and, eq, ilike, or, inArray } from 'drizzle-orm';
 
 const VALID_STATUSES = ['active', 'inactive'];
 const MAX_IMPORT_ROWS = 1000;
@@ -253,5 +253,47 @@ export async function DELETE(req: Request) {
   } catch (e) {
     console.error('DELETE /api/admin/products:', e);
     return error('删除商品失败', 500);
+  }
+}
+
+export async function batchDelete(req: Request) {
+  try {
+    const authResult = await requireAdmin(req);
+    if (typeof authResult !== 'string') return authResult;
+
+    const body = await req.json();
+    const ids: number[] = body.ids;
+    if (!Array.isArray(ids) || ids.length === 0) return error('ids 不能为空', 400);
+    if (ids.length > 200) return error('单次最多删除 200 条', 400);
+
+    await db.delete(products).where(inArray(products.id, ids));
+    return success({ deleted: ids.length });
+  } catch (e) {
+    console.error('POST /api/admin/products/batch-delete:', e);
+    return error('批量删除失败', 500);
+  }
+}
+
+export async function batchUpdate(req: Request) {
+  try {
+    const authResult = await requireAdmin(req);
+    if (typeof authResult !== 'string') return authResult;
+
+    const body = await req.json();
+    const ids: number[] = body.ids;
+    const field = body.field;
+    const value = body.value;
+
+    if (!Array.isArray(ids) || ids.length === 0) return error('ids 不能为空', 400);
+    if (ids.length > 200) return error('单次最多修改 200 条', 400);
+    if (field !== 'status' && field !== 'brand') return error('field 必须为 status 或 brand', 400);
+    if (!value || typeof value !== 'string') return error('value 不能为空', 400);
+    if (field === 'status' && !['active', 'inactive'].includes(value)) return error('status 值无效', 400);
+
+    await db.update(products).set({ [field]: value, updatedAt: new Date() }).where(inArray(products.id, ids));
+    return success({ updated: ids.length });
+  } catch (e) {
+    console.error('POST /api/admin/products/batch-update:', e);
+    return error('批量修改失败', 500);
   }
 }
