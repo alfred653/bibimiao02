@@ -4,6 +4,94 @@ import { success, error } from '../../lib/response';
 import { requireAdmin } from '../../lib/auth';
 import { and, eq, ilike, or } from 'drizzle-orm';
 
+const VALID_STATUSES = ['active', 'inactive'];
+const MAX_IMPORT_ROWS = 1000;
+const MAX_TAG_LENGTH = 50;
+const MAX_TAGS = 20;
+
+function sanitizeTags(raw: unknown): string[] {
+  if (Array.isArray(raw)) {
+    return (raw as unknown[])
+      .map(t => String(t).trim())
+      .filter(Boolean)
+      .slice(0, MAX_TAGS)
+      .map(t => t.slice(0, MAX_TAG_LENGTH));
+  }
+  if (typeof raw === 'string' && raw.trim()) {
+    return raw.split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+      .slice(0, MAX_TAGS)
+      .map(t => t.slice(0, MAX_TAG_LENGTH));
+  }
+  return [];
+}
+
+function sanitizePrice(raw: unknown): string | null {
+  if (raw == null) return null;
+  const t = typeof raw;
+  if (t === 'string' || t === 'number') return String(raw);
+  return null;
+}
+
+function sanitizeUrl(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null;
+  const s = raw.trim();
+  if (!s) return null;
+  if (s.startsWith('https://') || s.startsWith('http://')) return s;
+  return null;
+}
+
+function sanitizeStatus(raw: unknown): string {
+  if (typeof raw === 'string' && VALID_STATUSES.includes(raw)) return raw;
+  return 'active';
+}
+
+function mapDbError(e: unknown): string {
+  const msg = (e as any)?.message || '';
+  if (msg.includes('not-null') || msg.includes('violates not-null')) return '必填字段缺失';
+  if (msg.includes('unique constraint') || msg.includes('duplicate key')) return '数据重复';
+  if (msg.includes('foreign key') || msg.includes('violates foreign key')) return '关联数据不存在';
+  return '数据格式错误';
+}
+
+export interface NormalizedRow {
+  title: unknown;
+  brand: unknown;
+  category: string | null;
+  spec: string | null;
+  price: string | null;
+  originalPrice: string | null;
+  currency: string;
+  source: string | null;
+  sourceUrl: string | null;
+  imageUrl: string | null;
+  country: string | null;
+  tags: string[];
+  status: string;
+}
+
+export function normalizeRow(row: Record<string, unknown>): NormalizedRow {
+  const price = sanitizePrice(row.price);
+  const originalPrice = sanitizePrice(row.originalPrice) ?? price;
+
+  return {
+    title: row.title,
+    brand: row.brand,
+    category: typeof row.category === 'string' ? row.category : null,
+    spec: typeof row.spec === 'string' ? row.spec : null,
+    price,
+    originalPrice,
+    currency: typeof row.currency === 'string' && row.currency ? row.currency : 'CNY',
+    source: typeof row.source === 'string' ? row.source : null,
+    sourceUrl: sanitizeUrl(row.sourceUrl),
+    imageUrl: sanitizeUrl(row.imageUrl),
+    country: typeof row.country === 'string' ? row.country : null,
+    tags: sanitizeTags(row.tags),
+    status: sanitizeStatus(row.status),
+  };
+}
+
 export async function GET(req: Request) {
   try {
     const authResult = await requireAdmin(req);
@@ -47,35 +135,45 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     if (body.import === 'confirm') {
-      // Bulk confirm import
       if (!Array.isArray(body.rows) || body.rows.length === 0) {
         return error('rows 不能为空', 400);
       }
-      await db.insert(products).values(body.rows);
-      return success({ imported: body.rows.length });
+      if (body.rows.length > MAX_IMPORT_ROWS) {
+        return error(`单次导入不能超过 ${MAX_IMPORT_ROWS} 条`, 400);
+      }
+
+      const processed: NormalizedRow[] = [];
+      const failures: { row: number; reason: string }[] = [];
+
+      for (let i = 0; i < body.rows.length; i++) {
+        const row = normalizeRow(body.rows[i]);
+        if (!row.title || !row.brand) {
+          failures.push({ row: i + 1, reason: 'title 和 brand 为必填' });
+          continue;
+        }
+        processed.push(row);
+      }
+
+      const imported: unknown[] = [];
+      for (let i = 0; i < processed.length; i++) {
+        try {
+          const [row] = await db.insert(products).values(processed[i]).returning();
+          imported.push(row);
+        } catch (e) {
+          failures.push({ row: i + 1, reason: mapDbError(e) });
+        }
+      }
+
+      return success({ imported: imported.length, total: body.rows.length, failures });
     }
 
-    // Single product
-    if (!body.title || !body.brand) {
+    // Single product — use normalizeRow for consistent preprocessing
+    const row = normalizeRow(body);
+    if (!row.title || !row.brand) {
       return error('title 和 brand 为必填', 400);
     }
 
-    const [inserted] = await db.insert(products).values({
-      title: body.title,
-      brand: body.brand,
-      category: body.category ?? null,
-      spec: body.spec ?? null,
-      price: body.price?.toString() ?? null,
-      originalPrice: body.originalPrice?.toString() ?? body.price?.toString() ?? null,
-      currency: body.currency ?? 'CNY',
-      source: body.source ?? null,
-      sourceUrl: body.sourceUrl ?? null,
-      imageUrl: body.imageUrl ?? null,
-      country: body.country ?? null,
-      tags: body.tags ?? [],
-      status: body.status ?? 'active',
-    }).returning();
-
+    const [inserted] = await db.insert(products).values(row).returning();
     return success(inserted);
   } catch (e) {
     console.error('POST /api/admin/products:', e);
