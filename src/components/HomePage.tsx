@@ -50,7 +50,7 @@ export default function HomePage() {
           <h2 className="text-sm text-gray-400 mb-3">支持品牌</h2>
           <div className="grid grid-cols-2 gap-2">
             {overview.brands.map(b => (
-              <button key={b.name} onClick={() => nav(`/search?brand=${encodeURIComponent(b.name)}`)}
+              <button key={b.name} onClick={() => nav(`/search?q=${encodeURIComponent(b.name)}&brand=${encodeURIComponent(b.name)}`)}
                 className="bg-white/5 hover:bg-white/10 rounded-lg p-3 flex items-center gap-3 text-left"
               >
                 <img src={b.logo} alt={b.name} className="w-8 h-8 rounded" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />

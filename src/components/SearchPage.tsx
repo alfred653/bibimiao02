@@ -19,6 +19,7 @@ function highlightText(text: string, keyword: string): React.ReactNode {
 
 const SORT_OPTIONS = [
   { value: 'relevance:desc', label: '相关度' },
+  { value: 'newest:desc', label: '最新' },
   { value: 'price:asc', label: '价格 ↑' },
   { value: 'price:desc', label: '价格 ↓' },
 ]
@@ -47,6 +48,41 @@ export default function SearchPage() {
   const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set())
   const [favToggling, setFavToggling] = useState<Set<number>>(new Set())
 
+  // Autocomplete
+  const [suggestions, setSuggestions] = useState<{ id: number; title: string; brand: string }[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const abortRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    const q = keyword.trim()
+    if (!q || q.length < 2) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+    abortRef.current?.abort()
+    const ctrl = new AbortController()
+    abortRef.current = ctrl
+    const timer = setTimeout(() => {
+      fetch(`/api/products/suggest?q=${encodeURIComponent(q)}&limit=5`, { signal: ctrl.signal })
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) {
+            setSuggestions(d.data)
+            setShowSuggestions(true)
+          }
+        })
+        .catch(() => {})
+    }, 300)
+    return () => { clearTimeout(timer); ctrl.abort() }
+  }, [keyword])
+
+  function selectSuggestion(item: { id: number; title: string; brand: string }) {
+    setKeyword(item.title)
+    setShowSuggestions(false)
+    doSearch(1, { keyword: item.title })
+  }
+
   // Ref to always have latest filter values without triggering re-renders
   const filtersRef = useRef({ keyword, brand, source, currency, sortBy, sortOrder })
   filtersRef.current = { keyword, brand, source, currency, sortBy, sortOrder }
@@ -56,14 +92,15 @@ export default function SearchPage() {
     if (!f.keyword.trim()) return
     setLoading(true)
     setSearched(true)
-    const [sb, so] = f.sortBy === 'price' ? [f.sortBy, f.sortOrder] : ['relevance', 'desc']
+    const sortByParam = f.sortBy === 'relevance' ? 'relevance' : f.sortBy
+    const sortOrderParam = f.sortBy === 'relevance' ? 'desc' : f.sortOrder
     apiPost('/api/products/search', {
         keyword: f.keyword.trim(),
         brand: f.brand || undefined,
         source: f.source || undefined,
         currency: f.currency || undefined,
-        sortBy: sb,
-        sortOrder: so,
+        sortBy: sortByParam,
+        sortOrder: sortOrderParam,
         page: p,
         pageSize: 10,
       })
@@ -133,6 +170,24 @@ export default function SearchPage() {
         <button onClick={() => doSearch(1)} className="bg-cyan-600 px-4 rounded-xl text-sm">搜索</button>
       </div>
 
+      {/* Autocomplete dropdown */}
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="relative -mt-2 mb-3 mx-1">
+          <div className="absolute top-0 left-0 right-0 bg-[#1a2a3a] border border-white/20 rounded-lg overflow-hidden z-10 shadow-lg">
+            {suggestions.map(item => (
+              <button
+                key={item.id}
+                className="w-full text-left px-4 py-2.5 text-sm hover:bg-white/10 transition-colors border-b border-white/5 last:border-0"
+                onMouseDown={e => { e.preventDefault(); selectSuggestion(item) }}
+              >
+                <span className="text-white">{item.title}</span>
+                <span className="text-cyan-400 text-xs ml-2">{item.brand}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Filters + Sort */}
       {showFilters && (
         <div className="flex gap-2 mb-4 overflow-x-auto">
@@ -172,7 +227,7 @@ export default function SearchPage() {
               const [sb, so] = e.target.value.split(':')
               setSortBy(sb); setSortOrder(so); doSearch(1, { sortBy: sb, sortOrder: so })
             }}
-            className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-xs text-white"
+            className={`bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-xs ${!sortBy ? 'text-gray-500' : 'text-white'}`}
           >
             {SORT_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
