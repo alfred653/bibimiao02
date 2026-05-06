@@ -53,7 +53,7 @@ export default function HomePage() {
               <button key={b.name} onClick={() => nav(`/search?q=${encodeURIComponent(b.name)}&brand=${encodeURIComponent(b.name)}`)}
                 className="bg-white/[0.04] hover:bg-white/[0.06] active:bg-white/[0.08] rounded-xl p-3 sm:p-4 flex items-center gap-3 text-left transition-colors min-h-[56px]"
               >
-                <img src={b.logo} alt={b.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                <img src={b.logo} alt={b.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0" loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                 <div className="min-w-0">
                   <div className="text-sm font-medium truncate">{b.name}</div>
                   <div className="text-xs text-[#8b8a7e]">{b.count} 件</div>

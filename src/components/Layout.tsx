@@ -1,4 +1,5 @@
-import { Outlet, NavLink } from 'react-router-dom'
+import { Outlet, NavLink, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 
 const HomeIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -35,10 +36,22 @@ const tabs = [
 ]
 
 export default function Layout() {
+  const location = useLocation()
+
   return (
     <div className="min-h-screen bg-[#121110] text-[#f0ede5] flex flex-col">
       <main className="flex-1 overflow-auto pb-16">
-        <Outlet />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
       <nav className="fixed bottom-0 left-0 right-0 h-14 bg-[#0d0c0a] border-t border-white/[0.06] flex items-center justify-around z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {tabs.map(({ to, label, Icon }) => (

@@ -447,6 +447,7 @@ export default function AdminPage() {
                     src={p.imageUrl || `https://placehold.co/64x64/1a1a17/d97706?text=${encodeURIComponent((p.brand || '').slice(0, 6))}`}
                     alt=""
                     className="w-8 h-8 rounded object-cover bg-white/[0.04]"
+                    loading="lazy"
                     onError={e => {
                       const el = e.target as HTMLImageElement
                       el.src = 'https://placehold.co/64x64/1a1a17/666?text=N%2FA'

@@ -49,6 +49,7 @@ export default function FavoritesPage() {
                 src={item.imageUrl || `https://placehold.co/112x112/1a1a17/d97706?text=${encodeURIComponent((item.brand || '').slice(0, 8))}`}
                 alt=""
                 className="w-14 h-14 rounded-lg object-cover bg-white/[0.04] shrink-0"
+                loading="lazy"
                 onError={e => {
                   const el = e.target as HTMLImageElement
                   el.src = `https://placehold.co/112x112/1a1a17/666?text=N%2FA`
