@@ -45,9 +45,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             className={`px-4 py-2.5 rounded-xl text-sm shadow-lg pointer-events-auto transition-all duration-300 ${
               t.leaving ? 'opacity-0 translate-y-2' : 'opacity-100'
             } ${
-              t.type === 'success' ? 'bg-green-600 text-white' :
+              t.type === 'success' ? 'bg-emerald-600 text-white' :
               t.type === 'error' ? 'bg-red-600 text-white' :
-              'bg-[#1a2332] text-gray-200 border border-white/10'
+              'bg-[#1a1a17] text-[#f0ede5] border border-white/[0.08]'
             }`}
           >
             {t.type === 'success' && '✓ '}

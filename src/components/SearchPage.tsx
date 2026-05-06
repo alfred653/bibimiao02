@@ -12,7 +12,7 @@ function highlightText(text: string, keyword: string): React.ReactNode {
   const parts = text.split(regex)
   return parts.map((part, i) =>
     escaped.some(w => part.toLowerCase() === w.toLowerCase())
-      ? <mark key={i} className="bg-yellow-500/30 text-yellow-200 rounded px-0.5">{part}</mark>
+      ? <mark key={i} className="bg-amber-500/30 text-amber-300 rounded px-0.5">{part}</mark>
       : part
   )
 }
@@ -48,7 +48,6 @@ export default function SearchPage() {
   const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set())
   const [favToggling, setFavToggling] = useState<Set<number>>(new Set())
 
-  // Autocomplete
   const [suggestions, setSuggestions] = useState<{ id: number; title: string; brand: string }[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
@@ -83,7 +82,6 @@ export default function SearchPage() {
     doSearch(1, { keyword: item.title })
   }
 
-  // Ref to always have latest filter values without triggering re-renders
   const filtersRef = useRef({ keyword, brand, source, currency, sortBy, sortOrder })
   filtersRef.current = { keyword, brand, source, currency, sortBy, sortOrder }
 
@@ -161,27 +159,27 @@ export default function SearchPage() {
       {/* Search bar */}
       <div className="flex gap-2 mb-3">
         <input
-          className="flex-1 h-12 rounded-xl bg-white/10 border border-white/20 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
+          className="flex-1 h-12 rounded-xl bg-[#1a1a17] border border-white/[0.08] px-4 text-[#f0ede5] placeholder-[#8b8a7e] focus:outline-none focus:border-amber-500/50 transition-colors"
           placeholder="搜索品牌或商品..."
           value={keyword}
           onChange={e => setKeyword(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button onClick={() => doSearch(1)} className="bg-cyan-600 px-4 rounded-xl text-sm">搜索</button>
+        <button onClick={() => doSearch(1)} className="bg-amber-600 px-4 rounded-xl text-sm active:bg-amber-700 transition-colors">搜索</button>
       </div>
 
-      {/* Autocomplete dropdown */}
+      {/* Autocomplete */}
       {showSuggestions && suggestions.length > 0 && (
         <div className="relative -mt-2 mb-3 mx-1">
-          <div className="absolute top-0 left-0 right-0 bg-[#1a2a3a] border border-white/20 rounded-lg overflow-hidden z-10 shadow-lg">
+          <div className="absolute top-0 left-0 right-0 bg-[#1a1a17] border border-white/[0.08] rounded-lg overflow-hidden z-10 shadow-xl">
             {suggestions.map(item => (
               <button
                 key={item.id}
-                className="w-full text-left px-4 py-2.5 text-sm hover:bg-white/10 transition-colors border-b border-white/5 last:border-0"
+                className="w-full text-left px-4 py-2.5 text-sm hover:bg-white/[0.04] transition-colors border-b border-white/[0.04] last:border-0"
                 onMouseDown={e => { e.preventDefault(); selectSuggestion(item) }}
               >
-                <span className="text-white">{item.title}</span>
-                <span className="text-cyan-400 text-xs ml-2">{item.brand}</span>
+                <span className="text-[#f0ede5]">{item.title}</span>
+                <span className="text-amber-400 text-xs ml-2">{item.brand}</span>
               </button>
             ))}
           </div>
@@ -233,14 +231,14 @@ export default function SearchPage() {
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
-          <div className="flex rounded-lg bg-white/10 border border-white/20 overflow-hidden ml-auto shrink-0">
+          <div className="flex rounded-lg bg-white/[0.04] border border-white/[0.06] overflow-hidden ml-auto shrink-0">
             <button
               onClick={() => setViewMode('list')}
-              className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'list' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white active:bg-white/10'}`}
+              className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'list' ? 'bg-amber-600 text-white' : 'text-[#8b8a7e] hover:text-[#f0ede5] active:bg-white/[0.06]'}`}
             >☰</button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'grid' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white active:bg-white/10'}`}
+              className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'grid' ? 'bg-amber-600 text-white' : 'text-[#8b8a7e] hover:text-[#f0ede5] active:bg-white/[0.06]'}`}
             >⊞</button>
           </div>
           {(brand || source || currency) && (
@@ -249,7 +247,7 @@ export default function SearchPage() {
                 setBrand(''); setSource(''); setCurrency('')
                 doSearch(page, { brand: '', source: '', currency: '' })
               }}
-              className="text-xs text-gray-500 hover:text-red-400 transition-colors px-2 py-1.5 shrink-0"
+              className="text-xs text-[#8b8a7e] hover:text-red-400 transition-colors px-2 py-1.5 shrink-0"
             >
               清除筛选
             </button>
@@ -259,21 +257,21 @@ export default function SearchPage() {
 
       {/* Summary */}
       {summary && (
-        <div className="text-xs text-gray-400 mb-4">
+        <div className="text-xs text-[#8b8a7e] mb-4">
           找到 {summary.totalResults} 条 · {summary.brands.length} 品牌 · {summary.sources.length} 站点
         </div>
       )}
 
       {/* Loading */}
-      {loading && <div className="text-center text-gray-500 py-8">搜索中...</div>}
+      {loading && <div className="text-center text-[#8b8a7e] py-8">搜索中...</div>}
 
-      {/* Results — List View */}
+      {/* List View */}
       {viewMode === 'list' && (
         <div className="space-y-3">
           {results.map(item => (
             <div
               key={item.id}
-              className="bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors"
+              className="bg-white/[0.04] rounded-xl p-3 cursor-pointer hover:bg-white/[0.06] active:bg-white/[0.08] transition-colors"
               onClick={() => {
                 if (!isSignedIn) { openLogin(); return }
                 nav(`/product/${item.id}`)
@@ -281,12 +279,12 @@ export default function SearchPage() {
             >
               <div className="flex gap-3">
                 <img
-                  src={item.imageUrl || `https://placehold.co/112x112/1a2332/06b6d4?text=${encodeURIComponent((item.brand || '').slice(0, 8))}`}
+                  src={item.imageUrl || `https://placehold.co/112x112/1a1a17/d97706?text=${encodeURIComponent((item.brand || '').slice(0, 8))}`}
                   alt=""
-                  className="w-14 h-14 rounded-lg object-cover bg-white/5 shrink-0"
+                  className="w-14 h-14 rounded-lg object-cover bg-white/[0.04] shrink-0"
                   onError={e => {
                     const el = e.target as HTMLImageElement
-                    el.src = `https://placehold.co/112x112/1a2332/666?text=${encodeURIComponent('N/A')}`
+                    el.src = `https://placehold.co/112x112/1a1a17/666?text=${encodeURIComponent('N/A')}`
                   }}
                 />
                 <div className="flex-1 min-w-0">
@@ -295,22 +293,22 @@ export default function SearchPage() {
                       <h3 className="text-sm font-medium leading-snug">
                         {highlightText(item.title, keyword)}
                       </h3>
-                      <div className="flex flex-wrap gap-1.5 mt-1.5 text-xs text-gray-400">
-                        <span className="bg-cyan-600/20 text-cyan-400 px-1.5 rounded">{item.brand}</span>
+                      <div className="flex flex-wrap gap-1.5 mt-1.5 text-xs text-[#8b8a7e]">
+                        <span className="bg-amber-500/10 text-amber-400 px-1.5 rounded">{item.brand}</span>
                         {item.source && <span>{item.source}</span>}
                         {item.currency && <span>{item.currency}</span>}
-                        {item.spec && <span className="text-gray-500">{item.spec}</span>}
+                        {item.spec && <span className="text-[#8b8a7e]">{item.spec}</span>}
                       </div>
                     </div>
                     {item.price && (
                       <div className="text-right shrink-0">
-                        <div className="text-cyan-400 font-bold">{item.currency || ''} {item.price}</div>
+                        <div className="text-amber-500 font-bold">{item.currency || ''} {item.price}</div>
                       </div>
                     )}
                     <button
                       onClick={e => toggleFavorite(item.id, e)}
                       disabled={favToggling.has(item.id)}
-                      className={`shrink-0 text-lg p-1.5 min-w-[36px] min-h-[36px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
+                      className={`shrink-0 text-lg p-1.5 min-w-[36px] min-h-[36px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-red-400' : 'text-[#8b8a7e] hover:text-red-400'}`}
                       title={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                     >
                       {favoriteIds.has(item.id) ? '♥' : '♡'}
@@ -323,44 +321,44 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* Results — Grid View */}
+      {/* Grid View */}
       {viewMode === 'grid' && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {results.map(item => (
             <div
               key={item.id}
-              className="bg-white/5 rounded-xl overflow-hidden cursor-pointer hover:bg-white/10 transition-colors"
+              className="bg-white/[0.04] rounded-xl overflow-hidden cursor-pointer hover:bg-white/[0.06] active:bg-white/[0.08] transition-colors"
               onClick={() => {
                 if (!isSignedIn) { openLogin(); return }
                 nav(`/product/${item.id}`)
               }}
             >
               <img
-                src={item.imageUrl || `https://placehold.co/400x300/1a2332/06b6d4?text=${encodeURIComponent((item.brand || '').slice(0, 12))}`}
+                src={item.imageUrl || `https://placehold.co/400x300/1a1a17/d97706?text=${encodeURIComponent((item.brand || '').slice(0, 12))}`}
                 alt=""
-                className="w-full aspect-[4/3] object-cover bg-white/5"
+                className="w-full aspect-[4/3] object-cover bg-white/[0.04]"
                 onError={e => {
                   const el = e.target as HTMLImageElement
-                  el.src = `https://placehold.co/400x300/1a2332/666?text=${encodeURIComponent('N/A')}`
+                  el.src = `https://placehold.co/400x300/1a1a17/666?text=${encodeURIComponent('N/A')}`
                 }}
               />
               <div className="p-2.5">
-                <span className="inline-block bg-cyan-600/20 text-cyan-400 text-[10px] px-1.5 py-0.5 rounded mb-1.5">{item.brand}</span>
-                <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1.5 text-gray-200">
+                <span className="inline-block bg-amber-500/10 text-amber-400 text-[10px] px-1.5 py-0.5 rounded mb-1.5">{item.brand}</span>
+                <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1.5 text-[#f0ede5]">
                   {highlightText(item.title, keyword)}
                 </h3>
                 <div className="flex items-center justify-between">
                   {item.price ? (
-                    <span className="text-cyan-400 font-bold text-sm">{item.currency || ''} {item.price}</span>
+                    <span className="text-amber-500 font-bold text-sm">{item.currency || ''} {item.price}</span>
                   ) : (
-                    <span className="text-gray-600 text-xs">登录查看价格</span>
+                    <span className="text-[#8b8a7e] text-xs">登录查看价格</span>
                   )}
                   <div className="flex items-center gap-1">
-                    {item.source && <span className="text-[10px] text-gray-500">{item.source}</span>}
+                    {item.source && <span className="text-[10px] text-[#8b8a7e]">{item.source}</span>}
                     <button
                       onClick={e => toggleFavorite(item.id, e)}
                       disabled={favToggling.has(item.id)}
-                      className={`text-base p-1 min-w-[32px] min-h-[32px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
+                      className={`text-base p-1 min-w-[32px] min-h-[32px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-red-400' : 'text-[#8b8a7e] hover:text-red-400'}`}
                       title={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                     >
                       {favoriteIds.has(item.id) ? '♥' : '♡'}
@@ -373,9 +371,9 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Empty */}
       {!results.length && !loading && searched && (
-        <div className="text-center text-gray-500 py-8">无搜索结果</div>
+        <div className="text-center text-[#8b8a7e] py-8">无搜索结果</div>
       )}
 
       {/* Pagination */}
@@ -384,7 +382,7 @@ export default function SearchPage() {
           <button
             disabled={page <= 1}
             onClick={() => doSearch(page - 1)}
-            className="px-3 py-1.5 rounded-lg text-xs bg-white/10 text-gray-400 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#8b8a7e] hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed"
           >
             上一页
           </button>
@@ -403,7 +401,7 @@ export default function SearchPage() {
               <button
                 key={pageNum}
                 onClick={() => doSearch(pageNum)}
-                className={`w-8 h-8 rounded-lg text-xs ${pageNum === page ? 'bg-cyan-600 text-white' : 'bg-white/10 text-gray-400 hover:bg-white/20'}`}
+                className={`w-8 h-8 rounded-lg text-xs ${pageNum === page ? 'bg-amber-600 text-white' : 'bg-white/[0.04] text-[#8b8a7e] hover:bg-white/[0.06]'}`}
               >
                 {pageNum}
               </button>
@@ -412,18 +410,18 @@ export default function SearchPage() {
           <button
             disabled={page >= pagination.totalPages}
             onClick={() => doSearch(page + 1)}
-            className="px-3 py-1.5 rounded-lg text-xs bg-white/10 text-gray-400 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#8b8a7e] hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed"
           >
             下一页
           </button>
         </div>
       )}
 
-      {/* Login prompt for anonymous */}
+      {/* Login prompt */}
       {isAnon && (
-        <div className="text-center mt-6 p-4 bg-cyan-600/10 rounded-xl">
-          <p className="text-sm text-gray-300 mb-2">登录查看更多结果和实时价格</p>
-          <button onClick={openLogin} className="bg-cyan-600 text-white px-6 py-2 rounded-lg text-sm">登录</button>
+        <div className="text-center mt-6 p-4 bg-amber-500/5 rounded-xl border border-amber-500/10">
+          <p className="text-sm text-[#8b8a7e] mb-2">登录查看更多结果和实时价格</p>
+          <button onClick={openLogin} className="bg-amber-600 text-white px-6 py-2 rounded-lg text-sm active:bg-amber-700 transition-colors">登录</button>
         </div>
       )}
     </div>
