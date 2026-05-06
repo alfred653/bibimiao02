@@ -12,6 +12,8 @@ import {
   webhookPost,
   adminUsersGet, adminUsersPut,
   adminProductsGet, adminProductsPost, adminProductsPut, adminProductsDelete,
+  adminProductsBatchDelete, adminProductsBatchUpdate,
+  suggestGet,
 } from '../dist-api/handlers.js';
 
 const ROUTES = {
@@ -34,7 +36,10 @@ const ROUTES = {
   'GET /api/admin/products':     adminProductsGet,
   'POST /api/admin/products':    adminProductsPost,
   'PUT /api/admin/products':     adminProductsPut,
-  'DELETE /api/admin/products':  adminProductsDelete,
+  'DELETE /api/admin/products':            adminProductsDelete,
+  'POST /api/admin/products/batch-delete': adminProductsBatchDelete,
+  'POST /api/admin/products/batch-update': adminProductsBatchUpdate,
+  'GET /api/products/suggest':             suggestGet,
 };
 
 function matchHandler(method, path) {

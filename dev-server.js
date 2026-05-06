@@ -47,6 +47,9 @@ const ROUTES = [
   { method: 'post',   path: '/api/admin/products',     handler: './src/api/admin/products.ts',      export: 'POST' },
   { method: 'put',    path: '/api/admin/products',     handler: './src/api/admin/products.ts',      export: 'PUT' },
   { method: 'delete', path: '/api/admin/products',     handler: './src/api/admin/products.ts',      export: 'DELETE' },
+  { method: 'post',   path: '/api/admin/products/batch-delete', handler: './src/api/admin/products.ts', export: 'batchDelete' },
+  { method: 'post',   path: '/api/admin/products/batch-update', handler: './src/api/admin/products.ts', export: 'batchUpdate' },
+  { method: 'get',    path: '/api/products/suggest',            handler: './src/api/products/suggest.ts', export: 'GET' },
 ];
 
 function buildRequest(expressReq, expressRes) {
