@@ -194,7 +194,7 @@ export default function SearchPage() {
           <select
             value={brand}
             onChange={e => { const v = e.target.value; setBrand(v); doSearch(1, { brand: v }) }}
-            className={`bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-xs ${!brand ? 'text-gray-500' : 'text-white'}`}
+            className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs text-gray-700"
           >
             <option value="">全部品牌</option>
             {(summary?.brands || (brand ? [brand] : [])).map((b: string) => (
@@ -204,7 +204,7 @@ export default function SearchPage() {
           <select
             value={source}
             onChange={e => { const v = e.target.value; setSource(v); doSearch(1, { source: v }) }}
-            className={`bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-xs ${!source ? 'text-gray-500' : 'text-white'}`}
+            className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs text-gray-700"
           >
             <option value="">全部来源</option>
             {(summary?.sources || []).map((s: string) => (
@@ -214,7 +214,7 @@ export default function SearchPage() {
           <select
             value={currency}
             onChange={e => { const v = e.target.value; setCurrency(v); doSearch(1, { currency: v }) }}
-            className={`bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-xs ${!currency ? 'text-gray-500' : 'text-white'}`}
+            className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs text-gray-700"
           >
             <option value="">全部币种</option>
             {(summary?.currencies || []).map((c: string) => (
@@ -227,7 +227,7 @@ export default function SearchPage() {
               const [sb, so] = e.target.value.split(':')
               setSortBy(sb); setSortOrder(so); doSearch(1, { sortBy: sb, sortOrder: so })
             }}
-            className={`bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-xs ${!sortBy ? 'text-gray-500' : 'text-white'}`}
+            className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs text-gray-700"
           >
             {SORT_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>

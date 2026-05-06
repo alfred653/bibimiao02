@@ -3,8 +3,7 @@ import { useUser } from '@clerk/clerk-react'
 import { useLocation } from 'react-router-dom'
 import { api, apiPut, apiPost, apiDelete } from '../../lib/api-client'
 import { useToast } from '../Toast'
-
-const BRANDS = ['Osprey', 'Gregory', 'Mystery Ranch', 'The North Face', 'Stussy', 'Vivienne Westwood']
+import { BRANDS } from '../../lib/constants'
 const TIERS = ['free', 'monthly', 'annual', 'lifetime']
 const STATUSES = ['active', 'disabled']
 
@@ -288,6 +287,56 @@ export default function AdminPage() {
   const [page, setPage] = useState(1)
   const [pagination, setPagination] = useState<{ totalPages: number; total: number } | null>(null)
 
+  // Batch selection
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [batchLoading, setBatchLoading] = useState(false)
+
+  const allCurrentIds = data.map((p: any) => p.id)
+  const allSelected = allCurrentIds.length > 0 && allCurrentIds.every((id: number) => selectedIds.has(id))
+
+  function toggleSelect(id: number) {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(allCurrentIds))
+    }
+  }
+
+  function handleBatchDelete() {
+    const ids = [...selectedIds]
+    if (!confirm(`确认删除选中的 ${ids.length} 条商品？`)) return
+    setBatchLoading(true)
+    apiPost('/api/admin/products/batch-delete', { ids })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) { setSelectedIds(new Set()); fetchData(page); toast(`已删除 ${d.data.deleted} 条`, 'success') }
+        else toast(d.error?.message || '批量删除失败', 'error')
+      })
+      .finally(() => setBatchLoading(false))
+  }
+
+  function handleBatchUpdate(field: string, value: string) {
+    const ids = [...selectedIds]
+    const label = field === 'status' ? '状态' : '品牌'
+    if (!confirm(`确认将选中的 ${ids.length} 条商品的${label}改为「${value}」？`)) return
+    setBatchLoading(true)
+    apiPost('/api/admin/products/batch-update', { ids, field, value })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) { setSelectedIds(new Set()); fetchData(page); toast(`已更新 ${d.data.updated} 条`, 'success') }
+        else toast(d.error?.message || '批量修改失败', 'error')
+      })
+      .finally(() => setBatchLoading(false))
+  }
+
   const fetchData = useCallback((p = 1) => {
     setLoading(true)
     let url: string
@@ -358,18 +407,18 @@ export default function AdminPage() {
           className={`bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-sm w-40 ${!search ? 'text-gray-500' : 'text-white'}`}
         />
         {isUsers && (
-          <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className={`bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-xs ${!tierFilter ? 'text-gray-500' : 'text-white'}`}>
+          <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-700">
             <option value="">全部等级</option>
             {TIERS.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
         )}
         {isProducts && (
-          <select value={brandFilter} onChange={e => setBrandFilter(e.target.value)} className={`bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-xs ${!brandFilter ? 'text-gray-500' : 'text-white'}`}>
+          <select value={brandFilter} onChange={e => setBrandFilter(e.target.value)} className="bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-700">
             <option value="">全部品牌</option>
             {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
         )}
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={`bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-xs ${!statusFilter ? 'text-gray-500' : 'text-white'}`}>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-700">
           <option value="">全部状态</option>
           {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -396,10 +445,11 @@ export default function AdminPage() {
       {/* Product Table */}
       {isProducts && (
         <table className="w-full text-sm">
-          <thead><tr className="text-left text-gray-400 border-b border-white/10"><th className="py-2 w-10"></th><th className="py-2">标题</th><th>品牌</th><th>价格</th><th>来源</th><th>状态</th><th>操作</th></tr></thead>
+          <thead><tr className="text-left text-gray-400 border-b border-white/10"><th className="py-2 w-8"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-cyan-600 cursor-pointer" /></th><th className="py-2 w-10"></th><th className="py-2">标题</th><th>品牌</th><th>价格</th><th>来源</th><th>状态</th><th>操作</th></tr></thead>
           <tbody>
             {data.map(p => (
               <tr key={p.id} className="border-b border-white/5">
+                <td className="py-2"><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} className="w-3.5 h-3.5 accent-cyan-600 cursor-pointer" /></td>
                 <td className="py-2">
                   <img
                     src={p.imageUrl || `https://placehold.co/64x64/1a2332/06b6d4?text=${encodeURIComponent((p.brand || '').slice(0, 6))}`}
@@ -446,6 +496,40 @@ export default function AdminPage() {
           <button disabled={page >= pagination.totalPages} onClick={() => setPage(page + 1)}
             className="px-3 py-1.5 rounded-lg text-xs bg-white/10 text-gray-400 hover:bg-white/20 disabled:opacity-30">
             下一页
+          </button>
+        </div>
+      )}
+
+      {/* Batch action bar */}
+      {selectedIds.size > 0 && isProducts && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#0d1621] border border-white/20 rounded-xl px-4 py-3 flex items-center gap-3 shadow-2xl shadow-black/50">
+          <span className="text-xs text-gray-300">已选 <b className="text-white">{selectedIds.size}</b> 项</span>
+          <button onClick={handleBatchDelete} disabled={batchLoading} className="bg-red-600/20 text-red-400 px-3 py-1 rounded text-xs hover:bg-red-600/30 disabled:opacity-50 whitespace-nowrap">
+            批量删除
+          </button>
+          <select
+            defaultValue=""
+            onChange={e => { const v = e.target.value; if (v) { handleBatchUpdate('status', v); e.target.value = '' } }}
+            disabled={batchLoading}
+            className="bg-white border border-gray-300 rounded px-2 py-1 text-xs text-gray-700 disabled:opacity-50"
+          >
+            <option value="" disabled>修改状态</option>
+            <option value="active">active</option>
+            <option value="inactive">inactive</option>
+          </select>
+          <select
+            defaultValue=""
+            onChange={e => { const v = e.target.value; if (v) { handleBatchUpdate('brand', v); e.target.value = '' } }}
+            disabled={batchLoading}
+            className="bg-white border border-gray-300 rounded px-2 py-1 text-xs text-gray-700 disabled:opacity-50"
+          >
+            <option value="" disabled>修改品牌</option>
+            {BRANDS.filter(b => typeof b === 'string').map(b => (
+              <option key={b} value={b}>{b}</option>
+            ))}
+          </select>
+          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} className="text-xs text-gray-500 hover:text-gray-300 disabled:opacity-50">
+            取消选择
           </button>
         </div>
       )}

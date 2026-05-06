@@ -28,19 +28,19 @@ export async function POST(req: Request) {
       // Full-text search with ts_rank scoring via raw SQL for relevance ranking
       const words = keyword.split(/\s+/).filter((w: string) => w.length > 0);
       const tsquery = words.map((w: string) => `${sanitizeTsquery(w)}:*`).join(' & ');
-      const conditions = [`p.status = 'active'`, `p.search_vector @@ to_tsquery('simple', $1)`];
-      const params: string[] = [tsquery];
-
-      let pi = 2;
-      if (brand) { conditions.push(`p.brand = $${pi}`); params.push(brand); pi++; }
-      if (category) { conditions.push(`p.category = $${pi}`); params.push(category); pi++; }
-      if (currency) { conditions.push(`p.currency = $${pi}`); params.push(currency); pi++; }
-      if (source) { conditions.push(`p.source = $${pi}`); params.push(source); pi++; }
+      const chunks = [
+        sql`p.status = 'active'`,
+        sql`p.search_vector @@ to_tsquery('simple', ${tsquery})`,
+      ];
+      if (brand) chunks.push(sql`p.brand = ${brand}`);
+      if (category) chunks.push(sql`p.category = ${category}`);
+      if (currency) chunks.push(sql`p.currency = ${currency}`);
+      if (source) chunks.push(sql`p.source = ${source}`);
 
       const result = await db.execute(
         sql`SELECT p.*, ts_rank(p.search_vector, to_tsquery('simple', ${tsquery})) AS _rank
           FROM products p
-          WHERE ${sql.raw(conditions.join(' AND '))}
+          WHERE ${sql.join(chunks, sql` AND `)}
           ORDER BY _rank DESC`
       );
       rows = result.rows as any[];
