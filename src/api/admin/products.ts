@@ -12,6 +12,7 @@ const MAX_TAGS = 20;
 function sanitizeTags(raw: unknown): string[] {
   if (Array.isArray(raw)) {
     return (raw as unknown[])
+      .filter(t => t != null)
       .map(t => String(t).trim())
       .filter(Boolean)
       .slice(0, MAX_TAGS)
@@ -56,8 +57,8 @@ function mapDbError(e: unknown): string {
 }
 
 export interface NormalizedRow {
-  title: unknown;
-  brand: unknown;
+  title: string;
+  brand: string;
   category: string | null;
   spec: string | null;
   price: string | null;
@@ -76,17 +77,17 @@ export function normalizeRow(row: Record<string, unknown>): NormalizedRow {
   const originalPrice = sanitizePrice(row.originalPrice) ?? price;
 
   return {
-    title: row.title,
-    brand: row.brand,
-    category: typeof row.category === 'string' ? row.category : null,
-    spec: typeof row.spec === 'string' ? row.spec : null,
+    title: String(row.title ?? ''),
+    brand: String(row.brand ?? ''),
+    category: typeof row.category === 'string' && row.category ? row.category : null,
+    spec: typeof row.spec === 'string' && row.spec ? row.spec : null,
     price,
     originalPrice,
     currency: typeof row.currency === 'string' && row.currency ? row.currency : 'CNY',
-    source: typeof row.source === 'string' ? row.source : null,
+    source: typeof row.source === 'string' && row.source ? row.source : null,
     sourceUrl: sanitizeUrl(row.sourceUrl),
     imageUrl: sanitizeUrl(row.imageUrl),
-    country: typeof row.country === 'string' ? row.country : null,
+    country: typeof row.country === 'string' && row.country ? row.country : null,
     tags: sanitizeTags(row.tags),
     status: sanitizeStatus(row.status),
   };
