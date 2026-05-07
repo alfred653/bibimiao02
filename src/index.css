@@ -1,8 +1,204 @@
 @import "tailwindcss";
 
+/* ===== Font ===== */
+:root {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "PingFang SC",
+    "Microsoft YaHei",
+    "Noto Sans SC",
+    sans-serif;
+}
+
+/* ===== Theme transition ===== */
+* {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+/* ===== Warm Dark Theme (default) ===== */
+:root,
+[data-theme="dark"] {
+  --bg-page: #171512;
+  --bg-page-soft: #1C1915;
+  --bg-nav: #13110E;
+  --bg-surface: #1D1A16;
+  --bg-card: #231F1A;
+  --bg-card-raised: #2A241E;
+  --bg-input: #181511;
+  --bg-hover: #2C261F;
+
+  --border-subtle: #342E27;
+  --border-strong: #4A4036;
+
+  --text-primary: #F5EEE6;
+  --text-body: #D9CFC4;
+  --text-secondary: #A99E92;
+  --text-muted: #766D64;
+
+  --brand: #D87A59;
+  --brand-hover: #E38969;
+  --brand-soft: rgba(216,122,89,0.12);
+
+  --success: #7BAE7F;
+  --warning: #D6A85B;
+  --danger: #D66A5C;
+
+  --shadow-card: none;
+  --button-on-brand: #171512;
+
+  /* Admin */
+  --admin-bg-page: #141516;
+  --admin-bg-sidebar: #101112;
+  --admin-bg-card: #1B1C1D;
+  --admin-bg-row: #18191A;
+  --admin-bg-row-hover: #222426;
+  --admin-border: #2D3033;
+}
+
+/* ===== Warm Light Theme ===== */
+[data-theme="light"] {
+  --bg-page: #F7F1EA;
+  --bg-page-soft: #F3EAE1;
+  --bg-nav: #FFF8F1;
+  --bg-surface: #FFFDF9;
+  --bg-card: #FFFDF9;
+  --bg-card-raised: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --bg-hover: #F1E7DC;
+
+  --border-subtle: #E2D6CA;
+  --border-strong: #CDBDAE;
+
+  --text-primary: #241F1A;
+  --text-body: #4B423A;
+  --text-secondary: #82766B;
+  --text-muted: #A99D91;
+
+  --brand: #C96F50;
+  --brand-hover: #B96145;
+  --brand-soft: rgba(201,111,80,0.12);
+
+  --success: #4F8F5A;
+  --warning: #B9852E;
+  --danger: #C8584E;
+
+  --shadow-card: 0 1px 2px rgba(36,31,26,0.04), 0 8px 24px rgba(36,31,26,0.04);
+  --button-on-brand: #FFFDF9;
+
+  /* Admin */
+  --admin-bg-page: #F4F1ED;
+  --admin-bg-sidebar: #FFFDF9;
+  --admin-bg-card: #FFFFFF;
+  --admin-bg-row: #FFFFFF;
+  --admin-bg-row-hover: #F1ECE6;
+  --admin-border: #E2D6CA;
+}
+
+/* ===== Shared utility classes ===== */
+
+.card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0)),
+    var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+}
+
+[data-theme="light"] .card {
+  background: var(--bg-card);
+}
+
+.card-raised {
+  background:
+    radial-gradient(circle at top left, var(--brand-soft), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0)),
+    var(--bg-card-raised);
+  border: 1px solid var(--brand-soft);
+  border-radius: 18px;
+}
+
+[data-theme="light"] .card-raised {
+  background:
+    linear-gradient(135deg, var(--brand-soft), rgba(255,255,255,0.85)),
+    #FFFFFF;
+  box-shadow: 0 10px 30px rgba(98,70,48,0.08);
+}
+
+.product-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+}
+
+.product-card:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+[data-theme="light"] .product-card:hover {
+  transform: translateY(-1px);
+}
+
+.price {
+  color: var(--brand);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.price .currency {
+  font-size: 0.78em;
+  margin-right: 4px;
+  opacity: 0.9;
+}
+
+.table-number {
+  font-variant-numeric: tabular-nums;
+}
+
+.cost-result-card {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid var(--brand-soft);
+  background:
+    radial-gradient(circle at top right, rgba(216,122,89,0.14), transparent 36%),
+    var(--bg-card-raised);
+}
+
+[data-theme="light"] .cost-result-card {
+  border: 1px solid rgba(201,111,80,0.16);
+  background:
+    linear-gradient(135deg, rgba(201,111,80,0.09), rgba(255,255,255,0.96)),
+    #FFFFFF;
+  box-shadow: 0 14px 36px rgba(98,70,48,0.08);
+}
+
+.cost-total {
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 780;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.image-placeholder {
+  background:
+    linear-gradient(135deg, var(--brand-soft), transparent),
+    var(--bg-surface);
+  color: var(--brand);
+}
+
+/* ===== Lamp animation vars (preserved) ===== */
 :root {
   --lamp-hue: 40;
   --on: 0;
   --shade-hue: 220;
-  --color-bg: #141413;
 }

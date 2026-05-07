@@ -22,7 +22,7 @@ function highlightText(text: string, keyword: string): React.ReactNode {
   const parts = text.split(regex)
   return parts.map((part, i) =>
     escaped.some(w => part.toLowerCase() === w.toLowerCase())
-      ? <mark key={i} className="bg-[#d97757]/30 text-[#d97757] rounded px-0.5">{part}</mark>
+      ? <mark key={i} className="bg-[var(--brand)]/30 text-[var(--brand)] rounded px-0.5">{part}</mark>
       : part
   )
 }
@@ -36,14 +36,14 @@ const SORT_OPTIONS = [
 
 function SkeletonCard() {
   return (
-    <div className="bg-white/[0.04] rounded-xl p-3 animate-pulse">
+    <div className="bg-[var(--bg-card)] rounded-xl p-3 animate-pulse">
       <div className="flex gap-3">
-        <div className="w-14 h-14 rounded-lg bg-white/[0.04] shrink-0" />
+        <div className="w-14 h-14 rounded-lg bg-[var(--bg-card)] shrink-0" />
         <div className="flex-1 space-y-2">
-          <div className="h-4 bg-white/[0.04] rounded w-3/4" />
+          <div className="h-4 bg-[var(--bg-card)] rounded w-3/4" />
           <div className="flex gap-1.5">
-            <div className="h-3 bg-white/[0.04] rounded w-16" />
-            <div className="h-3 bg-white/[0.04] rounded w-10" />
+            <div className="h-3 bg-[var(--bg-card)] rounded w-16" />
+            <div className="h-3 bg-[var(--bg-card)] rounded w-10" />
           </div>
         </div>
       </div>
@@ -67,10 +67,10 @@ function PaginationJumper({ current, max, onJump }: { current: number; max: numb
   }
 
   return (
-    <div className="flex items-center gap-1.5 text-xs text-[#b0aea5]">
+    <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
       <span>跳至</span>
       <input
-        className="w-12 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-2 py-1 text-center text-[#faf9f5] text-xs focus:outline-none focus:border-[#d97757]/50"
+        className="w-12 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg px-2 py-1 text-center text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--brand)]"
         value={input}
         onChange={e => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -78,11 +78,11 @@ function PaginationJumper({ current, max, onJump }: { current: number; max: numb
       />
       <button
         onClick={handleJump}
-        className="bg-white/[0.04] hover:bg-white/[0.06] text-[#b0aea5] rounded-lg px-2 py-1 transition-colors"
+        className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] rounded-lg px-2 py-1 transition-colors"
       >
         跳转
       </button>
-      <span className="text-[#b0aea5]/70">/ {max} 页</span>
+      <span className="text-[var(--text-secondary)]/70">/ {max} 页</span>
     </div>
   )
 }
@@ -233,25 +233,25 @@ export default function SearchPage() {
       {/* Search bar */}
       <div className="flex gap-2 mb-3">
         <input
-          className="flex-1 h-12 rounded-xl bg-[#1C1C1A] border border-white/[0.08] px-4 text-[#faf9f5] placeholder-[#b0aea5] focus:outline-none focus:border-[#d97757]/50 transition-colors"
+          className="flex-1 h-12 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] px-4 text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors"
           placeholder="搜索品牌或商品..."
           value={keyword}
           onChange={e => setKeyword(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button onClick={() => doSearch(1)} className="bg-[#d97757] px-4 rounded-xl text-sm active:bg-[#c45e3e] transition-colors">搜索</button>
+        <button onClick={() => doSearch(1)} className="bg-[var(--brand)] px-4 rounded-xl text-sm active:bg-[var(--brand-hover)] transition-colors">搜索</button>
       </div>
 
       {/* Search history */}
       {showHistory && (
         <div className="mb-3">
-          <div className="text-[10px] text-[#b0aea5] mb-2">最近搜索</div>
+          <div className="text-[10px] text-[var(--text-secondary)] mb-2">最近搜索</div>
           <div className="flex flex-wrap gap-1.5">
             {searchHistory.map((q, i) => (
               <button
                 key={i}
                 onClick={() => { setKeyword(q); doSearch(1, { keyword: q }) }}
-                className="bg-white/[0.04] hover:bg-white/[0.06] active:bg-white/[0.08] rounded-lg px-3 py-1.5 text-xs text-[#b0aea5] transition-colors"
+                className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors"
               >
                 {q}
               </button>
@@ -263,15 +263,15 @@ export default function SearchPage() {
       {/* Autocomplete */}
       {showSuggestions && suggestions.length > 0 && (
         <div className="relative -mt-2 mb-3 mx-1">
-          <div className="absolute top-0 left-0 right-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg overflow-hidden z-10 shadow-xl">
+          <div className="absolute top-0 left-0 right-0 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg overflow-hidden z-10 shadow-xl">
             {suggestions.map(item => (
               <button
                 key={item.id}
-                className="w-full text-left px-4 py-2.5 text-sm hover:bg-white/[0.04] transition-colors border-b border-white/[0.04] last:border-0"
+                className="w-full text-left px-4 py-2.5 text-sm hover:bg-[var(--bg-hover)] transition-colors border-b border-[var(--border-subtle)] last:border-0"
                 onMouseDown={e => { e.preventDefault(); selectSuggestion(item) }}
               >
-                <span className="text-[#faf9f5]">{item.title}</span>
-                <span className="text-[#d97757] text-xs ml-2">{item.brand}</span>
+                <span className="text-[var(--text-primary)]">{item.title}</span>
+                <span className="text-[var(--brand)] text-xs ml-2">{item.brand}</span>
               </button>
             ))}
           </div>
@@ -281,42 +281,42 @@ export default function SearchPage() {
       {/* Filters + Sort */}
       {showFilters && (
         <div className="flex gap-2 mb-4 overflow-x-auto">
-          <select value={brand} onChange={e => { const v = e.target.value; setBrand(v); doSearch(1, { brand: v }) }} className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs text-gray-700">
+          <select value={brand} onChange={e => { const v = e.target.value; setBrand(v); doSearch(1, { brand: v }) }} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-primary)]">
             <option value="">全部品牌</option>
             {(summary?.brands || (brand ? [brand] : [])).map((b: string) => (
               <option key={b} value={b}>{b}</option>
             ))}
           </select>
-          <select value={source} onChange={e => { const v = e.target.value; setSource(v); doSearch(1, { source: v }) }} className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs text-gray-700">
+          <select value={source} onChange={e => { const v = e.target.value; setSource(v); doSearch(1, { source: v }) }} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-primary)]">
             <option value="">全部来源</option>
             {(summary?.sources || []).map((s: string) => (
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
-          <select value={currency} onChange={e => { const v = e.target.value; setCurrency(v); doSearch(1, { currency: v }) }} className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs text-gray-700">
+          <select value={currency} onChange={e => { const v = e.target.value; setCurrency(v); doSearch(1, { currency: v }) }} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-primary)]">
             <option value="">全部币种</option>
             {(summary?.currencies || []).map((c: string) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
-          <select value={`${sortBy}:${sortOrder}`} onChange={e => { const [sb, so] = e.target.value.split(':'); setSortBy(sb); setSortOrder(so); doSearch(1, { sortBy: sb, sortOrder: so }) }} className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs text-gray-700">
+          <select value={`${sortBy}:${sortOrder}`} onChange={e => { const [sb, so] = e.target.value.split(':'); setSortBy(sb); setSortOrder(so); doSearch(1, { sortBy: sb, sortOrder: so }) }} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-primary)]">
             {SORT_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
-          <div className="flex rounded-lg bg-white/[0.04] border border-white/[0.06] overflow-hidden ml-auto shrink-0">
-            <button onClick={() => setViewMode('list')} className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'list' ? 'bg-[#d97757] text-white' : 'text-[#b0aea5] hover:text-[#faf9f5] active:bg-white/[0.06]'}`}>☰</button>
-            <button onClick={() => setViewMode('grid')} className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'grid' ? 'bg-[#d97757] text-white' : 'text-[#b0aea5] hover:text-[#faf9f5] active:bg-white/[0.06]'}`}>⊞</button>
+          <div className="flex rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] overflow-hidden ml-auto shrink-0">
+            <button onClick={() => setViewMode('list')} className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'list' ? 'bg-[var(--brand)] text-[var(--button-on-brand)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-[var(--bg-hover)]'}`}>☰</button>
+            <button onClick={() => setViewMode('grid')} className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'grid' ? 'bg-[var(--brand)] text-[var(--button-on-brand)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-[var(--bg-hover)]'}`}>⊞</button>
           </div>
           {(brand || source || currency) && (
-            <button onClick={() => { setBrand(''); setSource(''); setCurrency(''); doSearch(page, { brand: '', source: '', currency: '' }) }} className="text-xs text-[#b0aea5] hover:text-[#b53333] transition-colors px-2 py-1.5 shrink-0">清除筛选</button>
+            <button onClick={() => { setBrand(''); setSource(''); setCurrency(''); doSearch(page, { brand: '', source: '', currency: '' }) }} className="text-xs text-[var(--text-secondary)] hover:text-[var(--danger)] transition-colors px-2 py-1.5 shrink-0">清除筛选</button>
           )}
         </div>
       )}
 
       {/* Summary */}
       {summary && (
-        <div className="text-xs text-[#b0aea5] mb-4">
+        <div className="text-xs text-[var(--text-secondary)] mb-4">
           找到 {summary.totalResults} 条 · {summary.brands.length} 品牌 · {summary.sources.length} 站点
         </div>
       )}
@@ -331,14 +331,14 @@ export default function SearchPage() {
       {/* Empty state */}
       {!results.length && !loading && searched && (
         <div className="text-center py-8">
-          <p className="text-[#b0aea5] mb-3">无搜索结果</p>
-          <p className="text-xs text-[#b0aea5]/70 mb-4">试试搜索这些品牌：</p>
+          <p className="text-[var(--text-secondary)] mb-3">无搜索结果</p>
+          <p className="text-xs text-[var(--text-secondary)]/70 mb-4">试试搜索这些品牌：</p>
           <div className="flex flex-wrap justify-center gap-2">
             {SUGGESTED_BRANDS.map(b => (
               <button
                 key={b}
                 onClick={() => { setKeyword(b); doSearch(1, { keyword: b }) }}
-                className="bg-white/[0.04] hover:bg-white/[0.06] active:bg-white/[0.08] rounded-lg px-3 py-1.5 text-xs text-[#d97757] transition-colors"
+                className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] rounded-lg px-3 py-1.5 text-xs text-[var(--brand)] transition-colors"
               >
                 {b}
               </button>
@@ -357,7 +357,7 @@ export default function SearchPage() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: i * 0.04 }}
-                className="bg-white/[0.04] rounded-xl p-3 cursor-pointer hover:bg-white/[0.06] active:bg-white/[0.08] transition-colors"
+                className="bg-[var(--bg-card)] rounded-xl p-3 cursor-pointer hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
                 onClick={() => {
                   if (!isSignedIn) { openLogin(); return }
                   nav(`/product/${item.id}`)
@@ -368,7 +368,7 @@ export default function SearchPage() {
                     src={item.imageUrl || `https://placehold.co/112x112/1a1a17/d97757?text=${encodeURIComponent((item.brand || '').slice(0, 8))}`}
                     alt=""
                     loading="lazy"
-                    className="w-14 h-14 rounded-lg object-cover bg-white/[0.04] shrink-0"
+                    className="w-14 h-14 rounded-lg object-cover bg-[var(--bg-card)] shrink-0"
                     onError={e => {
                       const el = e.target as HTMLImageElement
                       el.src = `https://placehold.co/112x112/1a1a17/666?text=${encodeURIComponent('N/A')}`
@@ -380,22 +380,22 @@ export default function SearchPage() {
                         <h3 className="text-sm font-medium leading-snug">
                           {highlightText(item.title, keyword)}
                         </h3>
-                        <div className="flex flex-wrap gap-1.5 mt-1.5 text-xs text-[#b0aea5]">
-                          <span className="bg-[#d97757]/10 text-[#d97757] px-1.5 rounded">{item.brand}</span>
+                        <div className="flex flex-wrap gap-1.5 mt-1.5 text-xs text-[var(--text-secondary)]">
+                          <span className="bg-[var(--brand)]/10 text-[var(--brand)] px-1.5 rounded">{item.brand}</span>
                           {item.source && <span>{item.source}</span>}
                           {item.currency && <span>{item.currency}</span>}
-                          {item.spec && <span className="text-[#b0aea5]">{item.spec}</span>}
+                          {item.spec && <span className="text-[var(--text-secondary)]">{item.spec}</span>}
                         </div>
                       </div>
                       {item.price && (
                         <div className="text-right shrink-0">
-                          <div className="text-[#d97757] font-bold">{item.currency || ''} {item.price}</div>
+                          <div className="text-[var(--brand)] font-bold">{item.currency || ''} {item.price}</div>
                         </div>
                       )}
                       <button
                         onClick={e => toggleFavorite(item.id, e)}
                         disabled={favToggling.has(item.id)}
-                        className={`shrink-0 text-lg p-1.5 min-w-[36px] min-h-[36px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-[#b53333]' : 'text-[#b0aea5] hover:text-[#b53333]'}`}
+                        className={`shrink-0 text-lg p-1.5 min-w-[36px] min-h-[36px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)]' : 'text-[var(--text-secondary)] hover:text-[var(--danger)]'}`}
                         title={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                       >
                         {favoriteIds.has(item.id) ? '♥' : '♡'}
@@ -419,7 +419,7 @@ export default function SearchPage() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: i * 0.04 }}
-                className="bg-white/[0.04] rounded-xl overflow-hidden cursor-pointer hover:bg-white/[0.06] active:bg-white/[0.08] transition-colors"
+                className="bg-[var(--bg-card)] rounded-xl overflow-hidden cursor-pointer hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
                 onClick={() => {
                   if (!isSignedIn) { openLogin(); return }
                   nav(`/product/${item.id}`)
@@ -429,29 +429,29 @@ export default function SearchPage() {
                   src={item.imageUrl || `https://placehold.co/400x300/1a1a17/d97757?text=${encodeURIComponent((item.brand || '').slice(0, 12))}`}
                   alt=""
                   loading="lazy"
-                  className="w-full aspect-[4/3] object-cover bg-white/[0.04]"
+                  className="w-full aspect-[4/3] object-cover bg-[var(--bg-card)]"
                   onError={e => {
                     const el = e.target as HTMLImageElement
                     el.src = `https://placehold.co/400x300/1a1a17/666?text=${encodeURIComponent('N/A')}`
                   }}
                 />
                 <div className="p-2.5">
-                  <span className="inline-block bg-[#d97757]/10 text-[#d97757] text-[10px] px-1.5 py-0.5 rounded mb-1.5">{item.brand}</span>
-                  <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1.5 text-[#faf9f5]">
+                  <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] text-[10px] px-1.5 py-0.5 rounded mb-1.5">{item.brand}</span>
+                  <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1.5 text-[var(--text-primary)]">
                     {highlightText(item.title, keyword)}
                   </h3>
                   <div className="flex items-center justify-between">
                     {item.price ? (
-                      <span className="text-[#d97757] font-bold text-sm">{item.currency || ''} {item.price}</span>
+                      <span className="text-[var(--brand)] font-bold text-sm">{item.currency || ''} {item.price}</span>
                     ) : (
-                      <span className="text-[#b0aea5] text-xs">登录查看价格</span>
+                      <span className="text-[var(--text-secondary)] text-xs">登录查看价格</span>
                     )}
                     <div className="flex items-center gap-1">
-                      {item.source && <span className="text-[10px] text-[#b0aea5]">{item.source}</span>}
+                      {item.source && <span className="text-[10px] text-[var(--text-secondary)]">{item.source}</span>}
                       <button
                         onClick={e => toggleFavorite(item.id, e)}
                         disabled={favToggling.has(item.id)}
-                        className={`text-base p-1 min-w-[32px] min-h-[32px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-[#b53333]' : 'text-[#b0aea5] hover:text-[#b53333]'}`}
+                        className={`text-base p-1 min-w-[32px] min-h-[32px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)]' : 'text-[var(--text-secondary)] hover:text-[var(--danger)]'}`}
                         title={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                       >
                         {favoriteIds.has(item.id) ? '♥' : '♡'}
@@ -469,7 +469,7 @@ export default function SearchPage() {
       {pagination && pagination.totalPages > 1 && (
         <div className="flex flex-col items-center gap-2 mt-6">
           <div className="flex items-center justify-center gap-1.5 flex-wrap">
-            <button disabled={page <= 1} onClick={() => doSearch(page - 1)} className="px-2.5 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">上一页</button>
+            <button disabled={page <= 1} onClick={() => doSearch(page - 1)} className="px-2.5 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">上一页</button>
             {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
               let pageNum: number
               if (pagination.totalPages <= 5) { pageNum = i + 1 }
@@ -477,10 +477,10 @@ export default function SearchPage() {
               else if (page >= pagination.totalPages - 2) { pageNum = pagination.totalPages - 4 + i }
               else { pageNum = page - 2 + i }
               return (
-                <button key={pageNum} onClick={() => doSearch(pageNum)} className={`w-8 h-8 rounded-lg text-xs transition-colors ${pageNum === page ? 'bg-[#d97757] text-white' : 'bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06]'}`}>{pageNum}</button>
+                <button key={pageNum} onClick={() => doSearch(pageNum)} className={`w-8 h-8 rounded-lg text-xs transition-colors ${pageNum === page ? 'bg-[var(--brand)] text-[var(--button-on-brand)]' : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'}`}>{pageNum}</button>
               )
             })}
-            <button disabled={page >= pagination.totalPages} onClick={() => doSearch(page + 1)} className="px-2.5 py-1.5 rounded-lg text-xs bg-white/[0.04] text-[#b0aea5] hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">下一页</button>
+            <button disabled={page >= pagination.totalPages} onClick={() => doSearch(page + 1)} className="px-2.5 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">下一页</button>
           </div>
           <PaginationJumper
             current={page}
@@ -492,9 +492,9 @@ export default function SearchPage() {
 
       {/* Login prompt */}
       {isAnon && (
-        <div className="text-center mt-6 p-4 bg-[#d97757]/5 rounded-xl border border-[#d97757]/10">
-          <p className="text-sm text-[#b0aea5] mb-2">登录查看更多结果和实时价格</p>
-          <button onClick={openLogin} className="bg-[#d97757] text-white px-6 py-2 rounded-lg text-sm active:bg-[#c45e3e] transition-colors">登录</button>
+        <div className="text-center mt-6 p-4 bg-[var(--brand)]/5 rounded-xl border border-[var(--brand-soft)]">
+          <p className="text-sm text-[var(--text-secondary)] mb-2">登录查看更多结果和实时价格</p>
+          <button onClick={openLogin} className="bg-[var(--brand)] text-[var(--button-on-brand)] px-6 py-2 rounded-lg text-sm active:bg-[var(--brand-hover)] transition-colors">登录</button>
         </div>
       )}
     </div>

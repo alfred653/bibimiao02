@@ -18,7 +18,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#141413] flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--bg-page)] flex flex-col items-center justify-center p-4">
       <div style={{ '--lamp-hue': hue, '--on': isOn ? '1' : '0' } as React.CSSProperties}>
         <svg viewBox="0 0 200 260" className="w-40 h-auto mx-auto mb-8">
           <ellipse cx="100" cy="250" rx="44" ry="10" fill="#2a2a24" />
@@ -61,7 +61,7 @@ export default function LoginPage() {
                 boxShadow: `0 0 40px hsla(${hue}, 70%, 60%, 0.2)`,
               }}
             >
-              <div className="bg-[#1C1C1A] rounded-xl p-6 border" style={{ borderColor: 'inherit' }}>
+              <div className="bg-[var(--bg-card)] rounded-xl p-6 border" style={{ borderColor: 'inherit' }}>
                 <SignIn />
               </div>
             </motion.div>
@@ -69,7 +69,7 @@ export default function LoginPage() {
         </AnimatePresence>
       </div>
 
-      <p className="text-[#b0aea5] text-xs mt-8">下拉拉绳开灯 → 登录</p>
+      <p className="text-[var(--text-secondary)] text-xs mt-8">下拉拉绳开灯 → 登录</p>
     </div>
   )
 }

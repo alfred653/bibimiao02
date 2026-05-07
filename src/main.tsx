@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/clerk-react'
 import { LoginModalProvider } from './components/LoginModal'
 import { ToastProvider } from './components/Toast'
+import { useThemeSource, ThemeProvider } from './hooks/useTheme'
 import App from './App'
 import './index.css'
 
@@ -27,17 +28,24 @@ function AuthInit({ children }: { children: React.ReactNode }) {
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
+function ThemeInit({ children }: { children: React.ReactNode }) {
+  const themeSource = useThemeSource()
+  return <ThemeProvider source={themeSource}>{children}</ThemeProvider>
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
       <AuthInit>
-        <LoginModalProvider>
-          <ToastProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </ToastProvider>
-        </LoginModalProvider>
+        <ThemeInit>
+          <LoginModalProvider>
+            <ToastProvider>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </ToastProvider>
+          </LoginModalProvider>
+        </ThemeInit>
       </AuthInit>
     </ClerkProvider>
   </StrictMode>,

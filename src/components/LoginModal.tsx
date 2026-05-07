@@ -20,8 +20,8 @@ export function LoginModalProvider({ children }: { children: ReactNode }) {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
           onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}
         >
-          <div className="bg-[#1C1C1A] rounded-xl p-6 w-full max-w-md border border-white/[0.06]">
-            <button className="text-[#b0aea5] float-right text-xl p-1 min-w-[36px] min-h-[36px] hover:text-[#faf9f5] active:text-[#faf9f5] transition-colors flex items-center justify-center rounded-lg" onClick={() => setOpen(false)}>✕</button>
+          <div className="bg-[var(--bg-card)] rounded-xl p-6 w-full max-w-md border border-[var(--border-subtle)]">
+            <button className="text-[var(--text-secondary)] float-right text-xl p-1 min-w-[36px] min-h-[36px] hover:text-[var(--text-primary)] active:text-[var(--text-primary)] transition-colors flex items-center justify-center rounded-lg" onClick={() => setOpen(false)}>✕</button>
             <SignIn />
           </div>
         </div>
