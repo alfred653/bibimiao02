@@ -22,7 +22,7 @@ export default function HomePage() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold text-center mt-4 mb-1">比比喵</h1>
-      <p className="text-xs text-[var(--text-secondary)] text-center mb-4">全球商品价格与到手成本查询工具</p>
+      <p className="text-xs text-[var(--text-secondary)] text-center mb-4">全球商品价格与到手成本查询</p>
       <form onSubmit={search} className="mb-6">
         <input
           className="w-full h-12 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] px-4 text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors"
@@ -49,17 +49,27 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* Quick start guide */}
+          <div className="mb-6 bg-[var(--bg-card)] rounded-xl p-4">
+            <h2 className="text-xs font-medium text-[var(--text-primary)] mb-2">快速开始</h2>
+            <div className="space-y-1.5 text-xs text-[var(--text-secondary)]">
+              <p className="flex items-center gap-2"><span className="w-4 h-4 rounded-full bg-[var(--brand-soft)] text-[var(--brand)] text-[10px] flex items-center justify-center shrink-0">1</span> 搜索全球品牌的商品</p>
+              <p className="flex items-center gap-2"><span className="w-4 h-4 rounded-full bg-[var(--brand-soft)] text-[var(--brand)] text-[10px] flex items-center justify-center shrink-0">2</span> 查看各平台实时价格</p>
+              <p className="flex items-center gap-2"><span className="w-4 h-4 rounded-full bg-[var(--brand-soft)] text-[var(--brand)] text-[10px] flex items-center justify-center shrink-0">3</span> 计算含运费+关税的到手成本</p>
+            </div>
+          </div>
+
           {overview.recentProducts?.length > 0 && (
             <div className="mb-6">
               <h2 className="text-sm text-[var(--text-secondary)] mb-3">最近更新</h2>
               <div className="space-y-2">
-                {overview.recentProducts.map(p => (
+                {overview.recentProducts.map((p, i) => (
                   <button key={p.id} onClick={() => nav(`/product/${p.id}`)}
                     className="w-full bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-xl p-3 flex items-center gap-3 text-left transition-colors min-h-[48px]"
                   >
                     <img
                       src={p.imageUrl || `https://placehold.co/56x56/1a1a17/666?text=${encodeURIComponent(p.brand.slice(0, 4))}`}
-                      alt="" className="w-9 h-9 rounded-lg object-cover bg-[var(--bg-card)] shrink-0" loading="lazy"
+                      alt="" className="w-9 h-9 rounded-lg object-cover bg-[var(--bg-card)] shrink-0" loading={i < 3 ? 'eager' : 'lazy'}
                       onError={e => { (e.target as HTMLImageElement).src = `https://placehold.co/56x56/1a1a17/666?text=${encodeURIComponent(p.brand.slice(0, 2))}` }}
                     />
                     <div className="flex-1 min-w-0">

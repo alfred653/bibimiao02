@@ -69,7 +69,7 @@ export async function PUT(req: Request) {
     if (!userId) return error('userId 不能为空', 400);
 
     // Validate
-    if (membershipTier && !['free', 'monthly', 'annual', 'lifetime'].includes(membershipTier)) {
+    if (membershipTier && !['free', 'monthly', 'annual'].includes(membershipTier)) {
       return error('无效的 membershipTier', 400);
     }
     if (brands && !Array.isArray(brands)) return error('brands 必须是数组', 400);

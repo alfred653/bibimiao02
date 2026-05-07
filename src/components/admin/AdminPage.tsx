@@ -6,11 +6,11 @@ import { useToast } from '../Toast'
 import ConfirmModal from '../ConfirmModal'
 import { BRANDS } from '../../lib/constants'
 import { formatPrice } from '../../lib/format'
-const TIERS = ['free', 'monthly', 'annual', 'lifetime']
+const TIERS = ['free', 'monthly', 'annual']
 const STATUSES = ['active', 'disabled']
 
 function statusLabel(s: string) { return s === 'active' ? '已启用' : s === 'disabled' ? '已停用' : s === 'inactive' ? '已停用' : s }
-function tierLabel(t: string) { const m: Record<string, string> = { free: '铁牌', monthly: '月度', annual: '年度', lifetime: '终身' }; return m[t] || t }
+function tierLabel(t: string) { const m: Record<string, string> = { free: '铁牌', monthly: '月度', annual: '年度' }; return m[t] || t }
 
 function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => void; onSaved: () => void }) {
   const [tier, setTier] = useState(user.membershipTier || 'free')

@@ -15,7 +15,7 @@ export const users = pgTable('users', {
   name:           text('name'),
   avatarUrl:      text('avatar_url'),
   role:           text('role').default('user'),               // 'user' | 'admin'
-  membershipTier: text('membership_tier').default('free'),    // 'free' | 'monthly' | 'annual' | 'lifetime'
+  membershipTier: text('membership_tier').default('free'),    // 'free' | 'monthly' | 'annual'
   status:         text('status').default('active'),           // 'active' | 'disabled'
   createdAt:      timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt:      timestamp('updated_at', { withTimezone: true }).defaultNow(),

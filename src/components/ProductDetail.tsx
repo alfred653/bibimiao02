@@ -212,7 +212,7 @@ export default function ProductDetail() {
       .finally(() => setFavToggling(false))
   }
 
-  function copyResult() {
+  function shareResult() {
     if (!estimate || !product) return
     const lines = [
       `${product.title}`,
@@ -230,7 +230,14 @@ export default function ProductDetail() {
       lines.push(`预估利润: ${estimate.profitTrial.estimatedProfit}`)
       lines.push(`毛利率: ${estimate.profitTrial.estimatedMarginRate}`)
     }
-    navigator.clipboard.writeText(lines.join('\n')).then(() => toast('已复制到剪贴板', 'success')).catch(() => {})
+    const text = lines.join('\n')
+    if (navigator.share) {
+      navigator.share({ title: product.title, text }).catch(() => {
+        navigator.clipboard.writeText(text).then(() => toast('已复制到剪贴板', 'success')).catch(() => {})
+      })
+    } else {
+      navigator.clipboard.writeText(text).then(() => toast('已复制到剪贴板', 'success')).catch(() => {})
+    }
   }
 
   if (!isSignedIn) return <div className="p-8 text-center text-[var(--text-secondary)]">请先登录</div>
@@ -250,7 +257,7 @@ export default function ProductDetail() {
         src={product.imageUrl || `https://placehold.co/800x400/1a1a17/d97757?text=${encodeURIComponent(product.brand || '')}`}
         alt=""
         className="w-full h-48 object-cover rounded-xl bg-[var(--bg-card)] mb-4"
-        loading="lazy"
+        loading="eager"
         onError={e => {
           const el = e.target as HTMLImageElement
           el.src = `https://placehold.co/800x400/1a1a17/666?text=${encodeURIComponent('No Image')}`
@@ -552,10 +559,10 @@ export default function ProductDetail() {
               )}
 
               <button
-                onClick={copyResult}
+                onClick={shareResult}
                 className="w-full mt-2 bg-[var(--bg-card)] py-1.5 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
               >
-                复制结果
+                分享结果
               </button>
             </motion.div>
           )}
@@ -611,18 +618,29 @@ export default function ProductDetail() {
       >
         {favorited ? '已收藏' : '收藏'}
       </button>
-      <button
-        onClick={() => {
-          if (!product?.sourceUrl) return
-          navigator.clipboard.writeText(product.sourceUrl).then(() => {
-            setSourceCopied(true)
-            setTimeout(() => setSourceCopied(false), 2000)
-          }).catch(() => {})
-        }}
-        className="w-full bg-[var(--bg-card)] py-3 rounded-xl text-sm hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
-      >
-        {sourceCopied ? '已复制链接' : '复制来源链接'}
-      </button>
+      <div className="flex gap-2 mb-2">
+        <button
+          onClick={() => {
+            if (!product?.sourceUrl) return
+            window.open(product.sourceUrl, '_blank', 'noopener,noreferrer')
+          }}
+          className="flex-1 bg-[var(--bg-card)] py-3 rounded-xl text-sm hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
+        >
+          打开来源
+        </button>
+        <button
+          onClick={() => {
+            if (!product?.sourceUrl) return
+            navigator.clipboard.writeText(product.sourceUrl).then(() => {
+              setSourceCopied(true)
+              setTimeout(() => setSourceCopied(false), 2000)
+            }).catch(() => {})
+          }}
+          className="flex-1 bg-[var(--bg-card)] py-3 rounded-xl text-sm hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
+        >
+          {sourceCopied ? '已复制' : '复制链接'}
+        </button>
+      </div>
 
       {/* Cross-source comparison */}
       {crossSource && crossSource.length > 0 && (

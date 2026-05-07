@@ -8,7 +8,9 @@ function isStatic(url) {
 }
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(self.skipWaiting());
+  event.waitUntil(
+    caches.open(CACHE_PAGES).then((cache) => cache.add('/offline.html')).then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (event) => {
@@ -57,6 +59,6 @@ self.addEventListener('fetch', (event) => {
         caches.open(CACHE_PAGES).then((cache) => cache.put(event.request, clone));
       }
       return response;
-    }).catch(() => caches.match(event.request))
+    }).catch(() => caches.match(event.request).then((cached) => cached || caches.match('/offline.html')))
   );
 });
