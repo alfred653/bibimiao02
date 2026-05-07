@@ -14,6 +14,8 @@ import {
   adminProductsGet, adminProductsPost, adminProductsPut, adminProductsDelete,
   adminProductsBatchDelete, adminProductsBatchUpdate,
   suggestGet,
+  shippingCarriersGet,
+  adminShippingCarriersGet, adminShippingCarriersPost, adminShippingCarriersPut, adminShippingCarriersDelete,
 } from '../dist-api/handlers.js';
 
 const ROUTES = {
@@ -40,6 +42,11 @@ const ROUTES = {
   'POST /api/admin/products/batch-delete': adminProductsBatchDelete,
   'POST /api/admin/products/batch-update': adminProductsBatchUpdate,
   'GET /api/products/suggest':             suggestGet,
+  'GET /api/shipping-carriers':                         shippingCarriersGet,
+  'GET /api/admin/shipping-carriers':                   adminShippingCarriersGet,
+  'POST /api/admin/shipping-carriers':                  adminShippingCarriersPost,
+  'PUT /api/admin/shipping-carriers':                   adminShippingCarriersPut,
+  'DELETE /api/admin/shipping-carriers':                adminShippingCarriersDelete,
 };
 
 function matchHandler(method, path) {

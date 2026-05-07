@@ -260,6 +260,98 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
   )
 }
 
+function CarrierEditModal({ carrier, onClose, onSaved }: { carrier?: any; onClose: () => void; onSaved: () => void }) {
+  const isEdit = !!carrier
+  const [name, setName] = useState(carrier?.name || '')
+  const [firstWeight, setFW] = useState(String(carrier?.firstWeight ?? '1.0'))
+  const [firstCost, setFC] = useState(String(carrier?.firstCost ?? '23'))
+  const [additionalWeight, setAW] = useState(String(carrier?.additionalWeight ?? '0.5'))
+  const [additionalCost, setAC] = useState(String(carrier?.additionalCost ?? '5'))
+  const [volumeDivisor, setVD] = useState(String(carrier?.volumeDivisor ?? '6000'))
+  const [isActive, setIsActive] = useState(carrier?.isActive ?? 'active')
+  const [saving, setSaving] = useState(false)
+  const { toast } = useToast()
+
+  function save() {
+    if (!name.trim()) { toast('快递名称不能为空', 'error'); return }
+    setSaving(true)
+    const body = isEdit
+      ? { id: carrier.id, name, firstWeight, firstCost, additionalWeight, additionalCost, volumeDivisor, isActive }
+      : { name, firstWeight, firstCost, additionalWeight, additionalCost, volumeDivisor, isActive }
+    const fetcher = isEdit
+      ? apiPut('/api/admin/shipping-carriers', body)
+      : apiPost('/api/admin/shipping-carriers', body)
+    fetcher
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) { onSaved(); toast(isEdit ? '快递已更新' : '快递已添加', 'success') }
+        else toast(d.error?.message || '保存失败', 'error')
+      })
+      .catch((e: Error) => toast(e.message || '网络错误', 'error'))
+      .finally(() => setSaving(false))
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="bg-[#1C1C1A] rounded-xl p-6 w-full max-w-sm border border-white/[0.06]">
+        <h3 className="text-lg font-bold mb-4">{isEdit ? '编辑快递' : '添加快递'}</h3>
+        <div className="space-y-2.5 text-sm">
+          <div>
+            <label className="text-[#b0aea5] text-xs block mb-0.5">名称 *</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="顺丰"
+              className="w-full bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-3 py-1.5 text-[#faf9f5] text-sm" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[#b0aea5] text-xs block mb-0.5">首重 (kg)</label>
+              <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFW(e.target.value)}
+                className="w-full bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-3 py-1.5 text-[#faf9f5] text-sm" />
+            </div>
+            <div>
+              <label className="text-[#b0aea5] text-xs block mb-0.5">首重价格 (元)</label>
+              <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFC(e.target.value)}
+                className="w-full bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-3 py-1.5 text-[#faf9f5] text-sm" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[#b0aea5] text-xs block mb-0.5">续重 (kg)</label>
+              <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAW(e.target.value)}
+                className="w-full bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-3 py-1.5 text-[#faf9f5] text-sm" />
+            </div>
+            <div>
+              <label className="text-[#b0aea5] text-xs block mb-0.5">续重价格 (元)</label>
+              <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAC(e.target.value)}
+                className="w-full bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-3 py-1.5 text-[#faf9f5] text-sm" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[#b0aea5] text-xs block mb-0.5">体积除数</label>
+              <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVD(e.target.value)}
+                className="w-full bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-3 py-1.5 text-[#faf9f5] text-sm" />
+            </div>
+            <div>
+              <label className="text-[#b0aea5] text-xs block mb-0.5">状态</label>
+              <select value={isActive} onChange={e => setIsActive(e.target.value)}
+                className="w-full bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-sm text-gray-700">
+                <option value="active">启用</option>
+                <option value="inactive">禁用</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-2 mt-5">
+          <button onClick={onClose} className="flex-1 bg-white/[0.04] py-2 rounded-lg text-sm">取消</button>
+          <button onClick={save} disabled={saving} className="flex-1 bg-[#d97757] py-2 rounded-lg text-sm disabled:opacity-50 active:bg-[#c45e3e] transition-colors">
+            {saving ? '保存中...' : isEdit ? '更新' : '添加'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function PaginationBar({ page, totalPages, onChange }: { page: number; totalPages: number; onChange: (p: number) => void }) {
   const [input, setInput] = useState(String(page))
 
@@ -315,6 +407,7 @@ export default function AdminPage() {
   const loc = useLocation()
   const isUsers = loc.pathname.includes('users')
   const isProducts = loc.pathname.includes('products')
+  const isCarriers = loc.pathname.includes('carriers')
 
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -332,6 +425,10 @@ export default function AdminPage() {
 
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [batchLoading, setBatchLoading] = useState(false)
+
+  // Carrier state
+  const [editCarrier, setEditCarrier] = useState<any>(null)
+  const [showAddCarrier, setShowAddCarrier] = useState(false)
 
   const allCurrentIds = data.map((p: any) => p.id)
   const allSelected = allCurrentIds.length > 0 && allCurrentIds.every((id: number) => selectedIds.has(id))
@@ -393,6 +490,8 @@ export default function AdminPage() {
       if (statusFilter) params.set('status', statusFilter)
       params.set('page', String(p))
       url = `/api/admin/products?${params}`
+    } else if (isCarriers) {
+      url = '/api/admin/shipping-carriers'
     } else {
       url = '/api/products/overview'
     }
@@ -400,14 +499,17 @@ export default function AdminPage() {
       .then(r => r.json())
       .then(d => {
         if (d.success) {
-          if (isUsers || isProducts) {
+          if (isCarriers) {
+            setData(d.data)
+            setPagination(null)
+          } else if (isUsers || isProducts) {
             setData(d.data.items)
             setPagination(d.data.pagination)
           }
         }
       })
       .finally(() => setLoading(false))
-  }, [isUsers, isProducts, search, tierFilter, statusFilter, brandFilter])
+  }, [isUsers, isProducts, isCarriers, search, tierFilter, statusFilter, brandFilter])
 
   useEffect(() => { setPage(1); fetchData(1) }, [loc.pathname, search, tierFilter, statusFilter, brandFilter])
   useEffect(() => { fetchData(page) }, [page])
@@ -415,7 +517,7 @@ export default function AdminPage() {
   if (!isSignedIn) return <div className="text-[#b0aea5] p-4">请用管理员账号登录</div>
   if (loading) return <div className="text-[#b0aea5] p-4">加载中...</div>
 
-  if (!isUsers && !isProducts) {
+  if (!isUsers && !isProducts && !isCarriers) {
     return (
       <div>
         <h1 className="text-xl font-bold mb-4">管理仪表板</h1>
@@ -427,12 +529,15 @@ export default function AdminPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold">{isUsers ? '用户管理' : '商品管理'}</h1>
+        <h1 className="text-xl font-bold">{isUsers ? '用户管理' : isCarriers ? '快递管理' : '商品管理'}</h1>
         {isProducts && (
           <div className="flex gap-2">
             <button onClick={() => setShowAddProduct(true)} className="bg-[#d97757] px-3 py-1.5 rounded text-xs active:bg-[#c45e3e] transition-colors">+ 添加商品</button>
             <button onClick={() => setShowImport(true)} className="bg-white/[0.04] px-3 py-1.5 rounded text-xs active:bg-white/[0.06] transition-colors">导入 Excel</button>
           </div>
+        )}
+        {isCarriers && (
+          <button onClick={() => setShowAddCarrier(true)} className="bg-[#d97757] px-3 py-1.5 rounded text-xs active:bg-[#c45e3e] transition-colors">+ 添加快递</button>
         )}
       </div>
 
@@ -475,6 +580,41 @@ export default function AdminPage() {
                   <td className="text-xs text-[#b0aea5]">{(u.configuredBrands || []).join(', ') || '—'}</td>
                   <td><span className={`text-xs ${u.status === 'active' ? 'text-[#788c5d]' : 'text-[#b53333]'}`}>{u.status}</span></td>
                   <td><button onClick={() => setEditUser(u)} className="text-[#d97757] text-xs hover:underline active:text-[#d97757]">编辑</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Carrier Table */}
+      {isCarriers && (
+        <div className="overflow-x-auto -mx-4 px-4">
+          <table className="w-full text-sm min-w-[600px]">
+            <thead><tr className="text-left text-[#b0aea5] border-b border-white/[0.06]"><th className="py-2">名称</th><th>首重(kg)</th><th>首重价格</th><th>续重(kg)</th><th>续重价格</th><th>体积除数</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              {data.map((c: any) => (
+                <tr key={c.id} className="border-b border-white/[0.04]">
+                  <td className="py-2 text-xs font-medium">{c.name}</td>
+                  <td className="text-xs">{c.firstWeight}</td>
+                  <td className="text-xs">¥{c.firstCost}</td>
+                  <td className="text-xs">{c.additionalWeight}</td>
+                  <td className="text-xs">¥{c.additionalCost}</td>
+                  <td className="text-xs">{c.volumeDivisor}</td>
+                  <td><span className={`text-xs ${c.isActive === 'active' ? 'text-[#788c5d]' : 'text-[#b53333]'}`}>{c.isActive === 'active' ? '启用' : '禁用'}</span></td>
+                  <td className="flex gap-2">
+                    <button onClick={() => setEditCarrier(c)} className="text-[#d97757] text-xs hover:underline">编辑</button>
+                    <button onClick={() => {
+                      if (!confirm('确认删除该快递？')) return
+                      apiDelete('/api/admin/shipping-carriers', { id: c.id })
+                        .then(r => r.json())
+                        .then(d => {
+                          if (d.success) { fetchData(page); toast('已删除', 'success') }
+                          else toast(d.error?.message || '删除失败', 'error')
+                        })
+                        .catch(() => toast('网络错误', 'error'))
+                    }} className="text-[#b53333] text-xs hover:underline">删除</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -581,6 +721,13 @@ export default function AdminPage() {
         />
       )}
       {showImport && <ImportModal onClose={() => setShowImport(false)} onImported={() => fetchData(page)} />}
+      {(editCarrier || showAddCarrier) && (
+        <CarrierEditModal
+          carrier={editCarrier || undefined}
+          onClose={() => { setEditCarrier(null); setShowAddCarrier(false) }}
+          onSaved={() => { setEditCarrier(null); setShowAddCarrier(false); fetchData(page) }}
+        />
+      )}
     </div>
   )
 }

@@ -25,6 +25,7 @@ export default function App() {
         <Route index element={<AdminPage />} />
         <Route path="users" element={<AdminPage />} />
         <Route path="products" element={<AdminPage />} />
+        <Route path="carriers" element={<AdminPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="/login" element={<LoginPage />} />

@@ -82,3 +82,17 @@ export const searchHistory = pgTable('search_history', {
   keyword:    text('keyword').notNull(),
   searchedAt: timestamp('searched_at', { withTimezone: true }).defaultNow(),
 });
+
+// ─── 快递运费表 ───
+export const shippingCarriers = pgTable('shipping_carriers', {
+  id:               integer('id').primaryKey().generatedByDefaultAsIdentity(),
+  name:             text('name').notNull(),
+  firstWeight:      numeric('first_weight', { precision: 6, scale: 2 }).notNull().default('1.0'),
+  firstCost:        numeric('first_cost', { precision: 8, scale: 2 }).notNull().default('23'),
+  additionalWeight: numeric('additional_weight', { precision: 6, scale: 2 }).notNull().default('0.5'),
+  additionalCost:   numeric('additional_cost', { precision: 8, scale: 2 }).notNull().default('5'),
+  volumeDivisor:    integer('volume_divisor').notNull().default(6000),
+  isActive:         text('is_active').default('active'), // 'active' | 'inactive'
+  createdAt:        timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt:        timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});

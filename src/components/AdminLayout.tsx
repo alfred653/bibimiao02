@@ -5,6 +5,7 @@ const links = [
   { to: '/admin', label: '仪表板', end: true },
   { to: '/admin/users', label: '用户管理' },
   { to: '/admin/products', label: '商品管理' },
+  { to: '/admin/carriers', label: '快递管理' },
 ]
 
 export default function AdminLayout() {

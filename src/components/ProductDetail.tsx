@@ -5,11 +5,16 @@ import { useLoginModal } from './LoginModal'
 import { useToast } from './Toast'
 import { api, apiPost, apiDelete } from '../lib/api-client'
 
-const SHIPPING_PRESETS = [
-  { label: '普通线', firstWeight: '0.5', firstCost: '32', additionalWeight: '0.5', additionalCost: '10', volumeDivisor: '6000' },
-  { label: '特货线', firstWeight: '0.5', firstCost: '42', additionalWeight: '0.5', additionalCost: '12', volumeDivisor: '6000' },
-  { label: '大货线', firstWeight: '1.0', firstCost: '58', additionalWeight: '0.5', additionalCost: '11', volumeDivisor: '5000' },
-]
+interface Carrier {
+  id: number
+  name: string
+  firstWeight: number
+  firstCost: number
+  additionalWeight: number
+  additionalCost: number
+  volumeDivisor: number
+  isActive: string
+}
 
 const TARGET_CURRENCIES = ['CNY', 'USD', 'JPY', 'EUR', 'GBP', 'HKD']
 
@@ -53,6 +58,17 @@ export default function ProductDetail() {
   const [estimate, setEstimate] = useState<EstimateResult | null>(null)
   const [estimateError, setEstimateError] = useState('')
   const [sourceCopied, setSourceCopied] = useState(false)
+
+  // Carrier dropdown
+  const [carriers, setCarriers] = useState<Carrier[]>([])
+  const [selectedCarrierId, setSelectedCarrierId] = useState<number | null>(null)
+
+  useEffect(() => {
+    api('/api/shipping-carriers')
+      .then(r => r.json())
+      .then(d => { if (d.success) setCarriers(d.data) })
+      .catch((e) => console.warn('Failed to load carriers:', e))
+  }, [])
 
   useEffect(() => {
     if (!isSignedIn) { openLogin(); return }
@@ -257,22 +273,28 @@ export default function ProductDetail() {
           {/* Shipping params */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs text-[#b0aea5] w-12 sm:w-16 shrink-0">运费参数</span>
-              <div className="flex gap-1">
-                {SHIPPING_PRESETS.map(p => (
-                  <button
-                    key={p.label}
-                    onClick={() => {
-                      setFirstWeight(p.firstWeight); setFirstCost(p.firstCost)
-                      setAdditionalWeight(p.additionalWeight); setAdditionalCost(p.additionalCost)
-                      setVolumeDivisor(p.volumeDivisor)
-                    }}
-                    className="text-[10px] sm:text-xs bg-white/[0.04] hover:bg-white/[0.06] active:bg-white/[0.08] rounded-lg px-2 py-1 text-[#b0aea5] transition-colors"
-                  >
-                    {p.label}
-                  </button>
+              <span className="text-xs text-[#b0aea5] w-12 sm:w-16 shrink-0">快递</span>
+              <select
+                value={selectedCarrierId ?? ''}
+                onChange={e => {
+                  const id = parseInt(e.target.value, 10)
+                  setSelectedCarrierId(id)
+                  const c = carriers.find(x => x.id === id)
+                  if (c) {
+                    setFirstWeight(String(c.firstWeight))
+                    setFirstCost(String(c.firstCost))
+                    setAdditionalWeight(String(c.additionalWeight))
+                    setAdditionalCost(String(c.additionalCost))
+                    setVolumeDivisor(String(c.volumeDivisor))
+                  }
+                }}
+                className="flex-1 min-w-0 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-700"
+              >
+                <option value="">自定义参数</option>
+                {carriers.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
-              </div>
+              </select>
             </div>
             <div className="pl-12 sm:pl-16 space-y-2">
               <div className="flex items-center gap-1 sm:gap-2">

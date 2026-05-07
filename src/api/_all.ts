@@ -11,3 +11,5 @@ export { POST as webhookPost } from './webhook.js';
 export { GET as adminUsersGet, PUT as adminUsersPut } from './admin/users.js';
 export { GET as adminProductsGet, POST as adminProductsPost, PUT as adminProductsPut, DELETE as adminProductsDelete, batchDelete as adminProductsBatchDelete, batchUpdate as adminProductsBatchUpdate } from './admin/products.js';
 export { GET as suggestGet } from './products/suggest.js';
+export { GET as shippingCarriersGet } from './shipping-carriers.js';
+export { GET as adminShippingCarriersGet, POST as adminShippingCarriersPost, PUT as adminShippingCarriersPut, DELETE as adminShippingCarriersDelete } from './admin/shipping-carriers.js';

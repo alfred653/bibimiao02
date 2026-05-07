@@ -50,6 +50,11 @@ const ROUTES = [
   { method: 'post',   path: '/api/admin/products/batch-delete', handler: './src/api/admin/products.ts', export: 'batchDelete' },
   { method: 'post',   path: '/api/admin/products/batch-update', handler: './src/api/admin/products.ts', export: 'batchUpdate' },
   { method: 'get',    path: '/api/products/suggest',            handler: './src/api/products/suggest.ts', export: 'GET' },
+  { method: 'get',    path: '/api/shipping-carriers',              handler: './src/api/shipping-carriers.ts',          export: 'GET' },
+  { method: 'get',    path: '/api/admin/shipping-carriers',        handler: './src/api/admin/shipping-carriers.ts',    export: 'GET' },
+  { method: 'post',   path: '/api/admin/shipping-carriers',        handler: './src/api/admin/shipping-carriers.ts',    export: 'POST' },
+  { method: 'put',    path: '/api/admin/shipping-carriers',        handler: './src/api/admin/shipping-carriers.ts',    export: 'PUT' },
+  { method: 'delete', path: '/api/admin/shipping-carriers',        handler: './src/api/admin/shipping-carriers.ts',    export: 'DELETE' },
 ];
 
 function buildRequest(expressReq, expressRes) {
