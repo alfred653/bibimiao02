@@ -278,6 +278,42 @@ export default function SearchPage() {
         </div>
       )}
 
+      {/* Active filter pills */}
+      {(brand || source || currency) && (
+        <div className="flex flex-wrap items-center gap-1.5 mb-2">
+          {brand && (
+            <button
+              onClick={() => { setBrand(''); doSearch(1, { brand: '' }) }}
+              className="inline-flex items-center gap-1 bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-1 rounded-full hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors"
+            >
+              {brand} <span className="text-[10px]">×</span>
+            </button>
+          )}
+          {source && (
+            <button
+              onClick={() => { setSource(''); doSearch(1, { source: '' }) }}
+              className="inline-flex items-center gap-1 bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-1 rounded-full hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors"
+            >
+              {source} <span className="text-[10px]">×</span>
+            </button>
+          )}
+          {currency && (
+            <button
+              onClick={() => { setCurrency(''); doSearch(1, { currency: '' }) }}
+              className="inline-flex items-center gap-1 bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-1 rounded-full hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors"
+            >
+              {currency} <span className="text-[10px]">×</span>
+            </button>
+          )}
+          <button
+            onClick={() => { setBrand(''); setSource(''); setCurrency(''); doSearch(page, { brand: '', source: '', currency: '' }) }}
+            className="text-[10px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors ml-1"
+          >
+            清除全部
+          </button>
+        </div>
+      )}
+
       {/* Filters + Sort */}
       {showFilters && (
         <div className="flex gap-2 mb-4 overflow-x-auto">
@@ -308,9 +344,6 @@ export default function SearchPage() {
             <button onClick={() => setViewMode('list')} className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'list' ? 'bg-[var(--brand)] text-[var(--button-on-brand)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-[var(--bg-hover)]'}`}>☰</button>
             <button onClick={() => setViewMode('grid')} className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'grid' ? 'bg-[var(--brand)] text-[var(--button-on-brand)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-[var(--bg-hover)]'}`}>⊞</button>
           </div>
-          {(brand || source || currency) && (
-            <button onClick={() => { setBrand(''); setSource(''); setCurrency(''); doSearch(page, { brand: '', source: '', currency: '' }) }} className="text-xs text-[var(--text-secondary)] hover:text-[var(--danger)] transition-colors px-2 py-1.5 shrink-0">清除筛选</button>
-          )}
         </div>
       )}
 

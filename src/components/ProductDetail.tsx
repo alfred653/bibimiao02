@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useLoginModal } from './LoginModal'
 import { useToast } from './Toast'
 import { api, apiPost, apiDelete } from '../lib/api-client'
@@ -58,6 +59,7 @@ export default function ProductDetail() {
   const [estimate, setEstimate] = useState<EstimateResult | null>(null)
   const [estimateError, setEstimateError] = useState('')
   const [sourceCopied, setSourceCopied] = useState(false)
+  const [crossSource, setCrossSource] = useState<any[] | null>(null)
 
   // Carrier dropdown
   const [carriers, setCarriers] = useState<Carrier[]>([])
@@ -78,6 +80,18 @@ export default function ProductDetail() {
         if (d.success) {
           setProduct(d.data)
           setFavorited(d.data.favorited)
+          // Fetch cross-source comparison
+          const titleWords = (d.data.title || '').split(/\s+/).slice(0, 3).join(' ')
+          if (titleWords) {
+            apiPost('/api/products/search', { keyword: titleWords, pageSize: 10 })
+              .then(r => r.json())
+              .then(sd => {
+                if (sd.success) {
+                  setCrossSource(sd.data.items.filter((i: any) => i.id !== d.data.id && i.source !== d.data.source))
+                }
+              })
+              .catch(() => {})
+          }
         }
       })
       .finally(() => setLoading(false))
@@ -388,8 +402,15 @@ export default function ProductDetail() {
           )}
 
           {/* Results - Enhanced */}
+          <AnimatePresence>
           {estimate && (
-            <div className="bg-[var(--bg-input)] rounded-xl p-4 space-y-2">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+              className="bg-[var(--bg-input)] rounded-xl p-4 space-y-2"
+            >
               {/* Total cost - prominent */}
               <div className="text-center">
                 <p className="text-[10px] text-[var(--text-muted)] mb-1">预计到手成本</p>
@@ -448,8 +469,9 @@ export default function ProductDetail() {
               >
                 复制结果
               </button>
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -473,6 +495,34 @@ export default function ProductDetail() {
       >
         {sourceCopied ? '已复制链接' : '复制来源链接'}
       </button>
+
+      {/* Cross-source comparison */}
+      {crossSource && crossSource.length > 0 && (
+        <div className="mt-4 bg-[var(--bg-card)] rounded-xl p-4">
+          <h3 className="text-xs text-[var(--text-secondary)] mb-3">其他来源比价</h3>
+          <div className="space-y-2">
+            {crossSource.slice(0, 5).map((item: any) => (
+              <button
+                key={item.id}
+                onClick={() => nav(`/product/${item.id}`)}
+                className="w-full flex items-center gap-3 text-left bg-[var(--bg-input)] rounded-lg p-2.5 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
+              >
+                <img
+                  src={item.imageUrl || `https://placehold.co/40x40/1a1a17/666?text=${encodeURIComponent((item.brand || '').slice(0, 4))}`}
+                  alt="" className="w-8 h-8 rounded object-cover bg-[var(--bg-card)] shrink-0"
+                  loading="lazy"
+                  onError={e => { (e.target as HTMLImageElement).src = `https://placehold.co/40x40/1a1a17/666?text=${encodeURIComponent((item.brand || '').slice(0, 2))}` }}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs truncate">{item.title}</div>
+                  <div className="text-[10px] text-[var(--text-secondary)]">{item.source}</div>
+                </div>
+                <div className="text-xs font-bold text-[var(--brand)] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{item.currency} {item.price}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

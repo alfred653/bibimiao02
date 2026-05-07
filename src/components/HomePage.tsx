@@ -80,10 +80,11 @@ export default function HomePage() {
                 className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-xl p-3 sm:p-4 flex items-center gap-3 text-left transition-colors min-h-[56px]"
               >
                 <img src={b.logo} alt={b.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0" loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="text-sm font-medium truncate">{b.name}</div>
                   <div className="text-xs text-[var(--text-secondary)]">{b.count} 件</div>
                 </div>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] shrink-0"><path d="M5 3l4 4-4 4"/></svg>
               </button>
             ))}
           </div>

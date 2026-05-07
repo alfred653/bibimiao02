@@ -423,6 +423,7 @@ export default function AdminPage() {
   const [tierFilter, setTierFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [brandFilter, setBrandFilter] = useState('')
+  const [quickFilter, setQuickFilter] = useState('')
   const [page, setPage] = useState(1)
   const [pagination, setPagination] = useState<{ totalPages: number; total: number } | null>(null)
 
@@ -544,7 +545,7 @@ export default function AdminPage() {
               <div className="text-xs text-[var(--text-secondary)] mt-1">品牌数量</div>
             </div>
             <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
-              <div className="text-2xl font-bold text-[var(--brand)]">{overview.currencyCount}</div>
+              <div className="text-2xl font-bold text-[var(--brand)]">{overview.sourceCount}</div>
               <div className="text-xs text-[var(--text-secondary)] mt-1">来源站点</div>
             </div>
             <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
@@ -601,14 +602,21 @@ export default function AdminPage() {
           </select>
         )}
         {isProducts && (
-          <select value={brandFilter} onChange={e => setBrandFilter(e.target.value)} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]">
-            <option value="">全部品牌</option>
-            {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
-          </select>
+          <>
+            <select value={brandFilter} onChange={e => setBrandFilter(e.target.value)} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]">
+              <option value="">全部品牌</option>
+              {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+            <select value={quickFilter} onChange={e => setQuickFilter(e.target.value)} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]">
+              <option value="">快捷筛选</option>
+              <option value="noImage">缺图商品</option>
+              <option value="noSource">缺来源商品</option>
+            </select>
+          </>
         )}
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]">
           <option value="">全部状态</option>
-          {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+          {STATUSES.map(s => <option key={s} value={s}>{statusLabel(s)}</option>)}
         </select>
       </div>
 
@@ -616,7 +624,7 @@ export default function AdminPage() {
       {isUsers && (
         <div className="overflow-x-auto -mx-4 px-4">
           <table className="w-full text-sm min-w-[480px]">
-            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">邮箱</th><th className="py-2.5 font-medium">等级</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">操作</th></tr></thead>
+            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">邮箱</th><th className="py-2.5 font-medium">等级</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
             <tbody>
               {data.map(u => (
                 <tr key={u.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
@@ -624,6 +632,7 @@ export default function AdminPage() {
                   <td className="py-3"><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-[var(--bg-hover)] text-[var(--text-secondary)]' : 'bg-[var(--brand-soft)] text-[var(--brand)]'}`}>{tierLabel(u.membershipTier)}</span></td>
                   <td className="py-3 text-xs text-[var(--text-secondary)]">{(u.configuredBrands || []).join(', ') || '—'}</td>
                   <td className="py-3"><span className={`text-xs ${u.status === 'active' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>{statusLabel(u.status)}</span></td>
+                  <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{u.updatedAt ? new Date(u.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
                   <td className="py-3"><button onClick={() => setEditUser(u)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button></td>
                 </tr>
               ))}
@@ -636,7 +645,7 @@ export default function AdminPage() {
       {isCarriers && (
         <div className="overflow-x-auto -mx-4 px-4">
           <table className="w-full text-sm min-w-[600px]">
-            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">名称</th><th className="py-2.5 font-medium">首重(kg)</th><th className="py-2.5 font-medium">首重价格</th><th className="py-2.5 font-medium">续重(kg)</th><th className="py-2.5 font-medium">续重价格</th><th className="py-2.5 font-medium">体积除数</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">操作</th></tr></thead>
+            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">名称</th><th className="py-2.5 font-medium">首重(kg)</th><th className="py-2.5 font-medium">首重价格</th><th className="py-2.5 font-medium">续重(kg)</th><th className="py-2.5 font-medium">续重价格</th><th className="py-2.5 font-medium">体积除数</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
             <tbody>
               {data.map((c: any) => (
                 <tr key={c.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
@@ -647,6 +656,7 @@ export default function AdminPage() {
                   <td className="py-3 text-xs">¥{c.additionalCost}</td>
                   <td className="py-3 text-xs">{c.volumeDivisor}</td>
                   <td className="py-3"><span className={`text-xs px-2 py-0.5 rounded ${c.isActive === 'active' ? 'bg-[var(--brand-soft)] text-[var(--success)]' : 'bg-[var(--bg-hover)] text-[var(--danger)]'}`}>{c.isActive === 'active' ? '已启用' : '已停用'}</span></td>
+                  <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
                   <td className="py-3 whitespace-nowrap">
                     <button onClick={() => setEditCarrier(c)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button>
                     <button onClick={() => {
@@ -668,12 +678,16 @@ export default function AdminPage() {
       )}
 
       {/* Product Table */}
-      {isProducts && (
+      {isProducts && (() => {
+        const displayData = quickFilter === 'noImage' ? data.filter((p: any) => !p.imageUrl)
+          : quickFilter === 'noSource' ? data.filter((p: any) => !p.source)
+          : data
+        return (
         <div className="overflow-x-auto -mx-4 px-4">
-          <table className="w-full text-sm min-w-[640px]">
-            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 w-8 font-medium"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></th><th className="py-2.5 w-10 font-medium"></th><th className="py-2.5 font-medium">标题</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">价格</th><th className="py-2.5 font-medium">来源</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">操作</th></tr></thead>
+          <table className="w-full text-sm min-w-[700px]">
+            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 w-8 font-medium"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></th><th className="py-2.5 w-10 font-medium"></th><th className="py-2.5 font-medium">标题</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">价格</th><th className="py-2.5 font-medium">来源</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
           <tbody>
-            {data.map(p => (
+            {displayData.map(p => (
               <tr key={p.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
                 <td className="py-3"><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></td>
                 <td className="py-3">
@@ -684,7 +698,7 @@ export default function AdminPage() {
                     loading="lazy"
                     onError={e => {
                       const el = e.target as HTMLImageElement
-                      el.src = 'https://placehold.co/64x64/1a1a17/666?text=N%2FA'
+                      el.src = `https://placehold.co/64x64/1a1a17/666?text=${encodeURIComponent('暂无')}`
                     }}
                   />
                 </td>
@@ -693,6 +707,7 @@ export default function AdminPage() {
                 <td className="py-3 text-xs font-mono tabular-nums">{p.currency} {p.price}</td>
                 <td className="py-3 text-xs text-[var(--text-secondary)]">{p.source}</td>
                 <td className="py-3"><span className={`text-xs px-2 py-0.5 rounded ${p.status === 'active' ? 'bg-[var(--brand-soft)] text-[var(--success)]' : 'bg-[var(--bg-hover)] text-[var(--danger)]'}`}>{statusLabel(p.status)}</span></td>
+                <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
                 <td className="py-3 whitespace-nowrap">
                   <button onClick={() => setEditProduct(p)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button>
                   <button onClick={() => {
@@ -711,7 +726,7 @@ export default function AdminPage() {
           </tbody>
         </table>
         </div>
-      )}
+        )})()}
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
