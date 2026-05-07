@@ -24,6 +24,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
+  // Non-GET requests — network only, never cache
+  if (event.request.method !== 'GET') return;
+
   // API — network only, no caching
   if (url.pathname.startsWith('/api/')) {
     return;
