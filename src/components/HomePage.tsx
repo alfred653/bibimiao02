@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api-client'
 
-interface Overview { totalProducts: number; brandCount: number; currencyCount: number; brands: { name: string; count: number; logo: string }[]; lastUpdated: string | null }
+interface Overview { totalProducts: number; brandCount: number; sourceCount: number; brands: { name: string; count: number; logo: string }[]; lastUpdated: string | null }
 
 export default function HomePage() {
   const [keyword, setKeyword] = useState('')
@@ -20,11 +20,12 @@ export default function HomePage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold text-center my-4">比比喵</h1>
+      <h1 className="text-2xl font-bold text-center mt-4 mb-1">比比喵</h1>
+      <p className="text-xs text-[var(--text-secondary)] text-center mb-4">全球商品价格与到手成本查询工具</p>
       <form onSubmit={search} className="mb-6">
         <input
           className="w-full h-12 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] px-4 text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors"
-          placeholder="搜索品牌或商品..."
+          placeholder="搜索品牌、商品或型号"
           value={keyword}
           onChange={e => setKeyword(e.target.value)}
         />
@@ -42,8 +43,8 @@ export default function HomePage() {
               <div className="text-[10px] sm:text-xs text-[var(--text-secondary)] mt-0.5">品牌</div>
             </div>
             <div className="bg-[var(--bg-card)] rounded-xl p-3 sm:p-4">
-              <div className="text-xl sm:text-2xl font-bold text-[var(--brand)]">{overview.currencyCount}</div>
-              <div className="text-[10px] sm:text-xs text-[var(--text-secondary)] mt-0.5">货币</div>
+              <div className="text-xl sm:text-2xl font-bold text-[var(--brand)]">{overview.sourceCount}</div>
+              <div className="text-[10px] sm:text-xs text-[var(--text-secondary)] mt-0.5">来源站点</div>
             </div>
           </div>
 

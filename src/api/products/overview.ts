@@ -20,11 +20,11 @@ export async function GET() {
       logo: `/brands/${name.toLowerCase().replace(/\s+/g, '-')}.png`,
     }));
 
-    const currencyRows = await db
-      .selectDistinct({ currency: products.currency })
+    const sourceRows = await db
+      .selectDistinct({ source: products.source })
       .from(products)
       .where(eq(products.status, 'active'));
-    const currencyCount = currencyRows.filter((r) => r.currency).length;
+    const sourceCount = sourceRows.filter((r) => r.source).length;
 
     const latest = await db
       .select({ updatedAt: products.updatedAt })
@@ -36,7 +36,7 @@ export async function GET() {
     return success({
       totalProducts,
       brandCount: brands.length,
-      currencyCount,
+      sourceCount,
       brands,
       lastUpdated: latest[0]?.updatedAt ?? null,
     });

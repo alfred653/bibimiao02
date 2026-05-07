@@ -234,7 +234,7 @@ export default function SearchPage() {
       <div className="flex gap-2 mb-3">
         <input
           className="flex-1 h-12 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] px-4 text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors"
-          placeholder="搜索品牌或商品..."
+          placeholder="搜索品牌、商品或型号"
           value={keyword}
           onChange={e => setKeyword(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -317,7 +317,7 @@ export default function SearchPage() {
       {/* Summary */}
       {summary && (
         <div className="text-xs text-[var(--text-secondary)] mb-4">
-          找到 {summary.totalResults} 条 · {summary.brands.length} 品牌 · {summary.sources.length} 站点
+          找到 {summary.totalResults} 件商品 · {summary.brands.length} 品牌 · {summary.sources.length} 站点
         </div>
       )}
 
@@ -371,7 +371,7 @@ export default function SearchPage() {
                     className="w-14 h-14 rounded-lg object-cover bg-[var(--bg-card)] shrink-0"
                     onError={e => {
                       const el = e.target as HTMLImageElement
-                      el.src = `https://placehold.co/112x112/1a1a17/666?text=${encodeURIComponent('N/A')}`
+                      el.src = `https://placehold.co/112x112/1a1a17/666?text=${encodeURIComponent('暂无图片')}`
                     }}
                   />
                   <div className="flex-1 min-w-0">
@@ -432,7 +432,7 @@ export default function SearchPage() {
                   className="w-full aspect-[4/3] object-cover bg-[var(--bg-card)]"
                   onError={e => {
                     const el = e.target as HTMLImageElement
-                    el.src = `https://placehold.co/400x300/1a1a17/666?text=${encodeURIComponent('N/A')}`
+                    el.src = `https://placehold.co/400x300/1a1a17/666?text=${encodeURIComponent('暂无图片')}`
                   }}
                 />
                 <div className="p-2.5">

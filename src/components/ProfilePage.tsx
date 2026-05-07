@@ -6,6 +6,13 @@ import { useToast } from './Toast'
 import { useTheme, type ThemeChoice } from '../hooks/useTheme'
 import { api, apiPut } from '../lib/api-client'
 
+function maskEmail(email: string) {
+  const [local, domain] = email.split('@')
+  if (!domain) return email
+  if (local.length <= 3) return `${local[0]}***@${domain}`
+  return `${local.slice(0, 4)}***@${domain}`
+}
+
 function NameEditModal({ currentName, onClose, onSaved }: { currentName: string; onClose: () => void; onSaved: () => void }) {
   const { user } = useUser()
   const { toast } = useToast()
@@ -194,7 +201,7 @@ export default function ProfilePage() {
             </svg>
           </button>
         </div>
-        <p className="text-xs text-[var(--text-secondary)]">{profile?.email}</p>
+        <p className="text-xs text-[var(--text-secondary)]">{profile?.email ? maskEmail(profile.email) : ''}</p>
         {profile && (
           <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs ${profile.membershipTier === 'free' ? 'bg-[var(--text-secondary)]/20 text-[var(--text-secondary)]' : 'bg-[var(--brand-soft)] text-[var(--brand)]'}`}>
             {profile.membershipTier === 'free' ? '免费用户' : profile.membershipTier === 'lifetime' ? '终身会员' : '付费会员'}
