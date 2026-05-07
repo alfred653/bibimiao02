@@ -8,6 +8,7 @@ import FavoritesPage from './components/FavoritesPage'
 import ProfilePage from './components/ProfilePage'
 import LoginPage from './components/LoginPage'
 import AdminPage from './components/admin/AdminPage'
+import RecentViewsPage from './components/RecentViewsPage'
 import NotFound from './components/NotFound'
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/recent-views" element={<RecentViewsPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="/admin" element={<AdminLayout />}>

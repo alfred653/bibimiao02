@@ -19,6 +19,15 @@ interface Carrier {
 
 const TARGET_CURRENCIES = ['CNY', 'USD', 'JPY', 'EUR', 'GBP', 'HKD']
 
+function saveRecentView(p: { id: number; title: string; brand: string; price: string; currency: string; imageUrl: string | null }) {
+  try {
+    const stored = JSON.parse(localStorage.getItem('bbm_recent_views') || '[]')
+    const filtered = stored.filter((item: any) => item.id !== p.id)
+    const entry = { id: p.id, title: p.title, brand: p.brand, price: p.price, currency: p.currency, imageUrl: p.imageUrl, viewedAt: Date.now() }
+    localStorage.setItem('bbm_recent_views', JSON.stringify([entry, ...filtered].slice(0, 20)))
+  } catch {}
+}
+
 interface EstimateResult {
   convertedPriceFormatted: string
   exchangeRate: { rate: number; source: string }
@@ -80,6 +89,7 @@ export default function ProductDetail() {
         if (d.success) {
           setProduct(d.data)
           setFavorited(d.data.favorited)
+          saveRecentView(d.data)
           // Fetch cross-source comparison
           const titleWords = (d.data.title || '').split(/\s+/).slice(0, 3).join(' ')
           if (titleWords) {

@@ -253,7 +253,7 @@ export default function ProfilePage() {
 
       <div className="space-y-3 mb-4">
           <button
-            onClick={() => toast('功能开发中', 'info')}
+            onClick={() => navigate('/recent-views')}
             className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
           >
             <div>
