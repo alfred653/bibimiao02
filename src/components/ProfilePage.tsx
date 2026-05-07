@@ -162,16 +162,18 @@ function ThemeModal({ current, onClose }: { current: ThemeChoice; onClose: () =>
 const TIER_BENEFITS = [
   { tier: 'free', name: '铁牌会员', price: '免费注册', features: ['搜索和浏览商品', '查看实时价格', '收藏 10 件商品', '成本估算（每日 5 次）', '历史浏览记录', '主题外观切换', '默认物流设置', '汇率偏好设置'] },
   { tier: 'monthly', name: '月度会员', price: '按月订阅', features: ['所有铁牌功能', '无限收藏', '无限成本估算', '汇率实时换算', '查看 3 个品牌完整数据'] },
-  { tier: 'lifetime', name: '终身会员', price: '一次性买断', features: ['所有月度功能', '永久有效', '全部品牌完整数据', '优先客服支持', '新品上架通知'] },
-  { tier: 'admin', name: '管理员', price: '—', features: ['所有终身会员功能', '管理后台入口', '商品数据管理', '用户管理', '快递模板管理', '数据导入导出', '系统配置'] },
+  { tier: 'annual', name: '年度会员', price: '按年订阅', features: ['所有月度功能', '全部品牌完整数据', '优先客服支持', '新品上架通知', '年度专属折扣'] },
 ]
 
 function MembershipModal({ currentTier, onClose }: { currentTier: string; onClose: () => void }) {
+  const currentTierInfo = TIER_BENEFITS.find(t => t.tier === currentTier)
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="bg-[var(--bg-card)] rounded-xl p-5 w-full max-w-sm border border-[var(--border-subtle)] max-h-[80vh] overflow-y-auto">
         <h3 className="text-lg font-bold mb-1">会员权益</h3>
-        <p className="text-xs text-[var(--text-secondary)] mb-4">当前：<span className="text-[var(--brand)]">{TIER_BENEFITS.find(t => t.tier === currentTier)?.name || currentTier}</span></p>
+        <p className="text-xs text-[var(--text-secondary)] mb-4">
+          当前：<span className="text-[var(--brand)]">{currentTierInfo?.name || currentTier}</span>
+        </p>
         <div className="space-y-3">
           {TIER_BENEFITS.map(tier => (
             <div key={tier.tier} className={`rounded-lg p-3 border ${currentTier === tier.tier ? 'border-[var(--brand)] bg-[var(--brand-soft)]' : 'border-[var(--border-subtle)] bg-[var(--bg-input)]'}`}>
@@ -243,13 +245,13 @@ export default function ProfilePage() {
           const tier = TIER_BENEFITS.find(t => t.tier === profile.membershipTier)
           const name = tier?.name || profile.membershipTier || '免费用户'
           const isFree = profile.membershipTier === 'free'
-          const isAdmin = profile.membershipTier === 'admin'
+          const isAdmin = profile.role === 'admin'
           return (
             <button
               onClick={() => setShowMembershipModal(true)}
               className={`inline-block mt-1 px-2 py-0.5 rounded text-xs transition-colors ${isFree ? 'bg-[var(--text-secondary)]/20 text-[var(--text-secondary)] hover:bg-[var(--text-secondary)]/30' : isAdmin ? 'bg-[var(--error)]/10 text-[var(--error)] hover:bg-[var(--error)]/20' : 'bg-[var(--brand-soft)] text-[var(--brand)] hover:bg-[var(--brand)]/20'}`}
             >
-              {name}
+              {name}{isAdmin ? ' · 管理员' : ''}
             </button>
           )
         })()}

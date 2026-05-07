@@ -10,7 +10,7 @@ const TIERS = ['free', 'monthly', 'annual', 'lifetime']
 const STATUSES = ['active', 'disabled']
 
 function statusLabel(s: string) { return s === 'active' ? '已启用' : s === 'disabled' ? '已停用' : s === 'inactive' ? '已停用' : s }
-function tierLabel(t: string) { const m: Record<string, string> = { free: '免费', monthly: '月付', annual: '年付', lifetime: '终身' }; return m[t] || t }
+function tierLabel(t: string) { const m: Record<string, string> = { free: '铁牌', monthly: '月度', annual: '年度', lifetime: '终身' }; return m[t] || t }
 
 function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => void; onSaved: () => void }) {
   const [tier, setTier] = useState(user.membershipTier || 'free')
@@ -665,7 +665,12 @@ export default function AdminPage() {
                 {data.map(u => (
                   <tr key={u.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
                     <td className="py-3 text-xs">{u.email}</td>
-                    <td className="py-3"><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-[var(--bg-hover)] text-[var(--text-secondary)]' : 'bg-[var(--brand-soft)] text-[var(--brand)]'}`}>{tierLabel(u.membershipTier)}</span></td>
+                    <td className="py-3">
+                      <div className="flex items-center gap-1">
+                        <span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-[var(--bg-hover)] text-[var(--text-secondary)]' : 'bg-[var(--brand-soft)] text-[var(--brand)]'}`}>{tierLabel(u.membershipTier)}</span>
+                        {u.role === 'admin' && <span className="px-1.5 py-0.5 rounded text-[10px] bg-[var(--danger)]/10 text-[var(--danger)]">管理</span>}
+                      </div>
+                    </td>
                     <td className="py-3 text-xs text-[var(--text-secondary)]">{(u.configuredBrands || []).join(', ') || '—'}</td>
                     <td className="py-3"><span className={`text-xs ${u.status === 'active' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>{statusLabel(u.status)}</span></td>
                     <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{u.updatedAt ? new Date(u.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
