@@ -98,6 +98,12 @@ export default function HomePage() {
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] shrink-0"><path d="M5 3l4 4-4 4"/></svg>
               </button>
             ))}
+            <button onClick={() => nav('/search')}
+              className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-xl p-3 sm:p-4 flex items-center justify-center gap-2 text-left transition-colors min-h-[56px] border border-dashed border-[var(--border-subtle)]"
+            >
+              <span className="text-sm text-[var(--text-secondary)]">更多</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] shrink-0"><path d="M5 3l4 4-4 4"/></svg>
+            </button>
           </div>
         </>
       )}
