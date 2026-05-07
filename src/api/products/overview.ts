@@ -1,7 +1,7 @@
 import { db } from '../../lib/db';
 import { products } from '../../db/schema';
 import { success, error } from '../../lib/response';
-import { count, eq, desc } from 'drizzle-orm';
+import { count, eq, desc, isNull, or } from 'drizzle-orm';
 
 export async function GET() {
   try {
@@ -47,10 +47,19 @@ export async function GET() {
       .orderBy(desc(products.updatedAt))
       .limit(3);
 
+    const [noImageResult] = await db.select({ total: count() }).from(products).where(
+      or(isNull(products.imageUrl), eq(products.imageUrl, ''))
+    );
+    const [noSourceResult] = await db.select({ total: count() }).from(products).where(
+      or(isNull(products.source), eq(products.source, ''))
+    );
+
     return success({
       totalProducts,
       brandCount: brands.length,
       sourceCount,
+      noImageCount: noImageResult?.total ?? 0,
+      noSourceCount: noSourceResult?.total ?? 0,
       brands,
       lastUpdated: latest[0]?.updatedAt ?? null,
       recentProducts,

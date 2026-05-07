@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLoginModal } from './LoginModal'
 import { useToast } from './Toast'
 import { api, apiPost, apiDelete } from '../lib/api-client'
+import { formatPrice } from '../lib/format'
 
 interface Carrier {
   id: number
@@ -138,7 +139,13 @@ export default function ProductDetail() {
   const [rateLoading, setRateLoading] = useState(false)
 
   useEffect(() => {
-    if (product) setDisplayCurrency(product.currency || 'CNY')
+    if (!product) return
+    try {
+      const settings = JSON.parse(localStorage.getItem('bbm_exchange_settings') || '{}')
+      setDisplayCurrency(settings.preferredCurrency || product.currency || 'CNY')
+    } catch {
+      setDisplayCurrency(product.currency || 'CNY')
+    }
   }, [product])
 
   useEffect(() => {
@@ -249,32 +256,21 @@ export default function ProductDetail() {
         }}
       />
 
-      <h1 className="text-lg font-bold mb-2">{product.title}</h1>
-      <div className="flex flex-wrap gap-2 mb-4 text-xs">
-        <span className="bg-[var(--brand-soft)] text-[var(--brand)] px-2 py-0.5 rounded">{product.brand}</span>
-        {product.category && <span className="bg-[var(--bg-card)] text-[var(--text-secondary)] px-2 py-0.5 rounded">{product.category}</span>}
-        {product.spec && <span className="bg-[var(--bg-card)] text-[var(--text-secondary)] px-2 py-0.5 rounded">{product.spec}</span>}
-      </div>
+      <h1 className="text-lg font-bold mb-4">{product.title}</h1>
 
-      {/* Basic info */}
-      <div className="bg-[var(--bg-card)] rounded-xl p-4 mb-4 space-y-2 text-sm">
-        <div className="flex justify-between items-center">
-          <span className="text-[var(--text-secondary)]">价格</span>
-          <span className="text-[var(--brand)] font-bold text-lg" style={{ fontVariantNumeric: 'tabular-nums' }}>{product.currency} {product.price}</span>
-        </div>
-        {product.originalPrice && (
-          <div className="flex justify-between">
-            <span className="text-[var(--text-secondary)]">原价</span>
-            <span className="text-[var(--text-secondary)] line-through">{product.currency} {product.originalPrice}</span>
+      {/* Price & Exchange */}
+      <div className="bg-[var(--bg-card)] rounded-xl p-4 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <div className="text-[var(--brand)] font-bold text-2xl" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(product.currency, product.price)}</div>
+            {product.originalPrice && (
+              <div className="text-[var(--text-secondary)] line-through text-xs mt-0.5">{formatPrice(product.currency, product.originalPrice)}</div>
+            )}
           </div>
-        )}
-
-        <div className="flex justify-between items-center pt-1 border-t border-[var(--border-subtle)]">
-          <span className="text-[var(--text-secondary)] text-xs">切换币种</span>
           <select
             value={displayCurrency}
             onChange={e => setDisplayCurrency(e.target.value)}
-            className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1 text-xs text-[var(--text-primary)]"
+            className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]"
           >
             {TARGET_CURRENCIES.map(c => (
               <option key={c} value={c}>{c}</option>
@@ -282,39 +278,59 @@ export default function ProductDetail() {
           </select>
         </div>
 
-        {rateLoading && (
-          <div className="flex justify-between text-xs">
-            <span className="text-[var(--text-secondary)]">获取汇率中...</span>
-          </div>
-        )}
+        {rateLoading && <div className="text-xs text-[var(--text-secondary)] mb-2">获取汇率中...</div>}
         {dispRate && dispConverted !== null && !rateLoading && (
-          <>
+          <div className="bg-[var(--bg-input)] rounded-lg p-2.5 text-xs space-y-1">
             <div className="flex justify-between">
-              <span className="text-[var(--text-secondary)] text-xs">换算价格</span>
-              <span className="text-[var(--success)] font-bold">{displayCurrency} {dispConverted.toFixed(2)}</span>
+              <span className="text-[var(--text-secondary)]">换算价格</span>
+              <span className="text-[var(--success)] font-bold">{formatPrice(displayCurrency, dispConverted)}</span>
             </div>
             <div className="flex justify-between text-[11px]">
-              <span className="text-[var(--text-secondary)]">汇率</span>
-              <span className="text-[var(--text-secondary)]">
+              <span className="text-[var(--text-muted)]">汇率</span>
+              <span className="text-[var(--text-muted)]">
                 1 {product.currency} = {dispRate.rate} {displayCurrency}
-                <span className="text-[var(--text-muted)] ml-1">
-                  · {dispRate.source === 'frankfurter' ? 'Frankfurter 实时' : dispRate.source === 'cache' ? '缓存' : '预设'}
-                </span>
+                · {dispRate.source === 'frankfurter' ? '实时' : dispRate.source === 'cache' ? '缓存' : '预设'}
               </span>
             </div>
-          </>
-        )}
-
-        <div className="flex justify-between pt-1 border-t border-[var(--border-subtle)]">
-          <span className="text-[var(--text-secondary)]">来源</span>
-          <span>{product.source}</span>
-        </div>
-        {product.country && (
-          <div className="flex justify-between">
-            <span className="text-[var(--text-secondary)]">地区</span>
-            <span>{product.country}</span>
           </div>
         )}
+      </div>
+
+      {/* Product info — Notion-style property panel */}
+      <div className="bg-[var(--bg-card)] rounded-xl mb-4 overflow-hidden">
+        <h3 className="text-xs text-[var(--text-muted)] px-4 pt-3 pb-2 font-medium uppercase tracking-wide">商品信息</h3>
+        <div className="divide-y divide-[var(--border-subtle)] text-sm">
+          <div className="flex justify-between px-4 py-2.5">
+            <span className="text-[var(--text-secondary)]">品牌</span>
+            <span>{product.brand}</span>
+          </div>
+          {product.category && (
+            <div className="flex justify-between px-4 py-2.5">
+              <span className="text-[var(--text-secondary)]">分类</span>
+              <span>{product.category}</span>
+            </div>
+          )}
+          {product.spec && (
+            <div className="flex justify-between px-4 py-2.5">
+              <span className="text-[var(--text-secondary)]">规格</span>
+              <span>{product.spec}</span>
+            </div>
+          )}
+          <div className="flex justify-between px-4 py-2.5">
+            <span className="text-[var(--text-secondary)]">来源</span>
+            <span>{product.source}</span>
+          </div>
+          {product.country && (
+            <div className="flex justify-between px-4 py-2.5">
+              <span className="text-[var(--text-secondary)]">地区</span>
+              <span>{product.country}</span>
+            </div>
+          )}
+          <div className="flex justify-between px-4 py-2.5">
+            <span className="text-[var(--text-secondary)]">币种</span>
+            <span>{product.currency}</span>
+          </div>
+        </div>
       </div>
 
       {/* Cost Estimate Panel */}
@@ -552,7 +568,7 @@ export default function ProductDetail() {
                   <div className="text-xs truncate">{item.title}</div>
                   <div className="text-[10px] text-[var(--text-secondary)]">{item.source}</div>
                 </div>
-                <div className="text-xs font-bold text-[var(--brand)] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{item.currency} {item.price}</div>
+                <div className="text-xs font-bold text-[var(--brand)] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
               </button>
             ))}
           </div>

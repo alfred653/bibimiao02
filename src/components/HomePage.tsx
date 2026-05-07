@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api-client'
+import { formatPrice } from '../lib/format'
 
 interface Overview { totalProducts: number; brandCount: number; sourceCount: number; brands: { name: string; count: number; logo: string }[]; lastUpdated: string | null; recentProducts: { id: number; title: string; brand: string; price: string; currency: string; imageUrl: string | null }[] }
 
@@ -65,7 +66,7 @@ export default function HomePage() {
                       <div className="text-sm truncate">{p.title}</div>
                       <div className="text-xs text-[var(--text-secondary)]">{p.brand}</div>
                     </div>
-                    <div className="text-sm font-bold text-[var(--brand)] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{p.currency} {p.price}</div>
+                    <div className="text-sm font-bold text-[var(--brand)] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(p.currency, p.price)}</div>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] shrink-0"><path d="M5 3l4 4-4 4"/></svg>
                   </button>
                 ))}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { formatPrice } from '../lib/format'
 
 interface RecentItem {
   id: number
@@ -78,7 +79,7 @@ export default function RecentViewsPage() {
                   </div>
                 </div>
                 <div className="text-sm font-bold text-[var(--brand)] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {p.currency} {p.price}
+                  {formatPrice(p.currency, p.price)}
                 </div>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] shrink-0">
                   <path d="M5 3l4 4-4 4" />

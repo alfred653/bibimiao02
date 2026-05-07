@@ -3,7 +3,9 @@ import { useUser } from '@clerk/clerk-react'
 import { useLocation } from 'react-router-dom'
 import { api, apiPut, apiPost, apiDelete } from '../../lib/api-client'
 import { useToast } from '../Toast'
+import ConfirmModal from '../ConfirmModal'
 import { BRANDS } from '../../lib/constants'
+import { formatPrice } from '../../lib/format'
 const TIERS = ['free', 'monthly', 'annual', 'lifetime']
 const STATUSES = ['active', 'disabled']
 
@@ -246,7 +248,7 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
             <p className="text-xs text-[var(--text-secondary)]">前 5 行预览：</p>
             <div className="bg-[var(--bg-hover)] rounded-lg p-2 text-xs max-h-32 overflow-auto">
               {preview.map((row, i) => (
-                <p key={i} className="text-[var(--text-primary)] py-0.5">{row.title} | {row.brand} | {row.currency} {row.price}</p>
+                <p key={i} className="text-[var(--text-primary)] py-0.5">{row.title} | {row.brand} | {formatPrice(row.currency, row.price)}</p>
               ))}
             </div>
 
@@ -442,6 +444,7 @@ export default function AdminPage() {
   // Carrier state
   const [editCarrier, setEditCarrier] = useState<any>(null)
   const [showAddCarrier, setShowAddCarrier] = useState(false)
+  const [confirmModal, setConfirmModal] = useState<{ show: boolean; title: string; message: string; confirmLabel?: string; danger?: boolean; onConfirm: () => void } | null>(null)
 
   const allCurrentIds = data.map((p: any) => p.id)
   const allSelected = allCurrentIds.length > 0 && allCurrentIds.every((id: number) => selectedIds.has(id))
@@ -461,29 +464,41 @@ export default function AdminPage() {
 
   function handleBatchDelete() {
     const ids = [...selectedIds]
-    if (!confirm(`确认删除选中的 ${ids.length} 条商品？`)) return
-    setBatchLoading(true)
-    apiPost('/api/admin/products/batch-delete', { ids })
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) { setSelectedIds(new Set()); fetchData(page); toast(`已删除 ${d.data.deleted} 条`, 'success') }
-        else toast(d.error?.message || '批量删除失败', 'error')
-      })
-      .finally(() => setBatchLoading(false))
+    setConfirmModal({
+      show: true, title: '确认删除', danger: true, confirmLabel: '删除',
+      message: `确认删除选中的 ${ids.length} 条商品？此操作不可撤销。`,
+      onConfirm: () => {
+        setConfirmModal(null)
+        setBatchLoading(true)
+        apiPost('/api/admin/products/batch-delete', { ids })
+          .then(r => r.json())
+          .then(d => {
+            if (d.success) { setSelectedIds(new Set()); fetchData(page); toast(`已删除 ${d.data.deleted} 条`, 'success') }
+            else toast(d.error?.message || '批量删除失败', 'error')
+          })
+          .finally(() => setBatchLoading(false))
+      }
+    })
   }
 
   function handleBatchUpdate(field: string, value: string) {
     const ids = [...selectedIds]
     const label = field === 'status' ? '状态' : '品牌'
-    if (!confirm(`确认将选中的 ${ids.length} 条商品的${label}改为「${value}」？`)) return
-    setBatchLoading(true)
-    apiPost('/api/admin/products/batch-update', { ids, field, value })
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) { setSelectedIds(new Set()); fetchData(page); toast(`已更新 ${d.data.updated} 条`, 'success') }
-        else toast(d.error?.message || '批量修改失败', 'error')
-      })
-      .finally(() => setBatchLoading(false))
+    setConfirmModal({
+      show: true, title: '确认修改', confirmLabel: '确认修改',
+      message: `确认将选中的 ${ids.length} 条商品的${label}改为「${value}」？`,
+      onConfirm: () => {
+        setConfirmModal(null)
+        setBatchLoading(true)
+        apiPost('/api/admin/products/batch-update', { ids, field, value })
+          .then(r => r.json())
+          .then(d => {
+            if (d.success) { setSelectedIds(new Set()); fetchData(page); toast(`已更新 ${d.data.updated} 条`, 'success') }
+            else toast(d.error?.message || '批量修改失败', 'error')
+          })
+          .finally(() => setBatchLoading(false))
+      }
+    })
   }
 
   const fetchData = useCallback((p = 1) => {
@@ -535,7 +550,7 @@ export default function AdminPage() {
       <div>
         <h1 className="text-xl font-bold mb-6">管理仪表板</h1>
         {overview && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
             <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
               <div className="text-2xl font-bold text-[var(--brand)]">{overview.totalProducts}</div>
               <div className="text-xs text-[var(--text-secondary)] mt-1">商品总数</div>
@@ -548,9 +563,24 @@ export default function AdminPage() {
               <div className="text-2xl font-bold text-[var(--brand)]">{overview.sourceCount}</div>
               <div className="text-xs text-[var(--text-secondary)] mt-1">来源站点</div>
             </div>
-            <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
-              <div className="text-lg font-bold text-[var(--text-primary)] truncate">{overview.lastUpdated ? new Date(overview.lastUpdated).toLocaleDateString('zh-CN') : '—'}</div>
-              <div className="text-xs text-[var(--text-secondary)] mt-1">最近更新</div>
+          </div>
+        )}
+        {overview && (overview.noImageCount > 0 || overview.noSourceCount > 0) && (
+          <div className="mb-6">
+            <h2 className="text-sm text-[var(--text-secondary)] mb-3">待完善</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {overview.noImageCount > 0 && (
+                <a href="/admin/products" className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--warning)]/30 hover:bg-[var(--bg-hover)] transition-colors">
+                  <div className="text-xl font-bold text-[var(--warning)]">{overview.noImageCount}</div>
+                  <div className="text-xs text-[var(--text-secondary)] mt-1">缺图商品</div>
+                </a>
+              )}
+              {overview.noSourceCount > 0 && (
+                <a href="/admin/products" className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--warning)]/30 hover:bg-[var(--bg-hover)] transition-colors">
+                  <div className="text-xl font-bold text-[var(--warning)]">{overview.noSourceCount}</div>
+                  <div className="text-xs text-[var(--text-secondary)] mt-1">缺来源商品</div>
+                </a>
+              )}
             </div>
           </div>
         )}
@@ -623,57 +653,77 @@ export default function AdminPage() {
       {/* User Table */}
       {isUsers && (
         <div className="overflow-x-auto -mx-4 px-4">
-          <table className="w-full text-sm min-w-[480px]">
-            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">邮箱</th><th className="py-2.5 font-medium">等级</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
-            <tbody>
-              {data.map(u => (
-                <tr key={u.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
-                  <td className="py-3 text-xs">{u.email}</td>
-                  <td className="py-3"><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-[var(--bg-hover)] text-[var(--text-secondary)]' : 'bg-[var(--brand-soft)] text-[var(--brand)]'}`}>{tierLabel(u.membershipTier)}</span></td>
-                  <td className="py-3 text-xs text-[var(--text-secondary)]">{(u.configuredBrands || []).join(', ') || '—'}</td>
-                  <td className="py-3"><span className={`text-xs ${u.status === 'active' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>{statusLabel(u.status)}</span></td>
-                  <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{u.updatedAt ? new Date(u.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
-                  <td className="py-3"><button onClick={() => setEditUser(u)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {!loading && data.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-sm text-[var(--text-secondary)]">暂无用户数据</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">用户注册后将出现在这里</p>
+            </div>
+          ) : (
+            <table className="w-full text-sm min-w-[480px]">
+              <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">邮箱</th><th className="py-2.5 font-medium">等级</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
+              <tbody>
+                {data.map(u => (
+                  <tr key={u.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
+                    <td className="py-3 text-xs">{u.email}</td>
+                    <td className="py-3"><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-[var(--bg-hover)] text-[var(--text-secondary)]' : 'bg-[var(--brand-soft)] text-[var(--brand)]'}`}>{tierLabel(u.membershipTier)}</span></td>
+                    <td className="py-3 text-xs text-[var(--text-secondary)]">{(u.configuredBrands || []).join(', ') || '—'}</td>
+                    <td className="py-3"><span className={`text-xs ${u.status === 'active' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>{statusLabel(u.status)}</span></td>
+                    <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{u.updatedAt ? new Date(u.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
+                    <td className="py-3"><button onClick={() => setEditUser(u)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
 
       {/* Carrier Table */}
       {isCarriers && (
         <div className="overflow-x-auto -mx-4 px-4">
-          <table className="w-full text-sm min-w-[600px]">
-            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">名称</th><th className="py-2.5 font-medium">首重(kg)</th><th className="py-2.5 font-medium">首重价格</th><th className="py-2.5 font-medium">续重(kg)</th><th className="py-2.5 font-medium">续重价格</th><th className="py-2.5 font-medium">体积除数</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
-            <tbody>
-              {data.map((c: any) => (
-                <tr key={c.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
-                  <td className="py-3 text-xs font-medium">{c.name}</td>
-                  <td className="py-3 text-xs">{c.firstWeight}</td>
-                  <td className="py-3 text-xs">¥{c.firstCost}</td>
-                  <td className="py-3 text-xs">{c.additionalWeight}</td>
-                  <td className="py-3 text-xs">¥{c.additionalCost}</td>
-                  <td className="py-3 text-xs">{c.volumeDivisor}</td>
-                  <td className="py-3"><span className={`text-xs px-2 py-0.5 rounded ${c.isActive === 'active' ? 'bg-[var(--brand-soft)] text-[var(--success)]' : 'bg-[var(--bg-hover)] text-[var(--danger)]'}`}>{c.isActive === 'active' ? '已启用' : '已停用'}</span></td>
-                  <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
-                  <td className="py-3 whitespace-nowrap">
-                    <button onClick={() => setEditCarrier(c)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button>
-                    <button onClick={() => {
-                      if (!confirm('确认删除该快递？')) return
-                      apiDelete('/api/admin/shipping-carriers', { id: c.id })
-                        .then(r => r.json())
-                        .then(d => {
-                          if (d.success) { fetchData(page); toast('已删除', 'success') }
-                          else toast(d.error?.message || '删除失败', 'error')
+          {!loading && data.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-sm text-[var(--text-secondary)]">暂无快递数据</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">点击「新增加快递」添加运费模板</p>
+            </div>
+          ) : (
+            <table className="w-full text-sm min-w-[600px]">
+              <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">名称</th><th className="py-2.5 font-medium">首重(kg)</th><th className="py-2.5 font-medium">首重价格</th><th className="py-2.5 font-medium">续重(kg)</th><th className="py-2.5 font-medium">续重价格</th><th className="py-2.5 font-medium">体积除数</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
+              <tbody>
+                {data.map((c: any) => (
+                  <tr key={c.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
+                    <td className="py-3 text-xs font-medium">{c.name}</td>
+                    <td className="py-3 text-xs">{c.firstWeight}</td>
+                    <td className="py-3 text-xs">¥{c.firstCost}</td>
+                    <td className="py-3 text-xs">{c.additionalWeight}</td>
+                    <td className="py-3 text-xs">¥{c.additionalCost}</td>
+                    <td className="py-3 text-xs">{c.volumeDivisor}</td>
+                    <td className="py-3"><span className={`text-xs px-2 py-0.5 rounded ${c.isActive === 'active' ? 'bg-[var(--brand-soft)] text-[var(--success)]' : 'bg-[var(--bg-hover)] text-[var(--danger)]'}`}>{c.isActive === 'active' ? '已启用' : '已停用'}</span></td>
+                    <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
+                    <td className="py-3 whitespace-nowrap">
+                      <button onClick={() => setEditCarrier(c)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button>
+                      <button onClick={() => {
+                        setConfirmModal({
+                          show: true, title: '确认删除', danger: true, confirmLabel: '删除',
+                          message: `确认删除快递「${c.name}」？`,
+                          onConfirm: () => {
+                            setConfirmModal(null)
+                            apiDelete('/api/admin/shipping-carriers', { id: c.id })
+                              .then(r => r.json())
+                              .then(d => {
+                                if (d.success) { fetchData(page); toast('已删除', 'success') }
+                                else toast(d.error?.message || '删除失败', 'error')
+                              })
+                              .catch(() => toast('网络错误', 'error'))
+                          }
                         })
-                        .catch(() => toast('网络错误', 'error'))
-                    }} className="bg-[var(--danger)]/10 text-[var(--danger)] px-3 py-1 rounded text-xs hover:bg-[var(--danger)]/20 active:bg-[var(--danger)]/20 transition-colors ml-2">删除</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      }} className="bg-[var(--danger)]/10 text-[var(--danger)] px-3 py-1 rounded text-xs hover:bg-[var(--danger)]/20 active:bg-[var(--danger)]/20 transition-colors ml-2">删除</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
 
@@ -682,6 +732,12 @@ export default function AdminPage() {
         const displayData = quickFilter === 'noImage' ? data.filter((p: any) => !p.imageUrl)
           : quickFilter === 'noSource' ? data.filter((p: any) => !p.source)
           : data
+        if (!loading && displayData.length === 0) return (
+          <div className="text-center py-16">
+            <p className="text-sm text-[var(--text-secondary)]">暂无商品数据</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">{data.length === 0 ? '可以手动添加商品，或通过 Excel 批量导入' : '当前筛选条件下无匹配商品'}</p>
+          </div>
+        )
         return (
         <div className="overflow-x-auto -mx-4 px-4">
           <table className="w-full text-sm min-w-[700px]">
@@ -704,21 +760,27 @@ export default function AdminPage() {
                 </td>
                 <td className="py-3 text-xs max-w-48 truncate">{p.title}</td>
                 <td className="py-3 text-[var(--brand)] text-xs">{p.brand}</td>
-                <td className="py-3 text-xs font-mono tabular-nums">{p.currency} {p.price}</td>
+                <td className="py-3 text-xs font-mono tabular-nums">{formatPrice(p.currency, p.price)}</td>
                 <td className="py-3 text-xs text-[var(--text-secondary)]">{p.source}</td>
                 <td className="py-3"><span className={`text-xs px-2 py-0.5 rounded ${p.status === 'active' ? 'bg-[var(--brand-soft)] text-[var(--success)]' : 'bg-[var(--bg-hover)] text-[var(--danger)]'}`}>{statusLabel(p.status)}</span></td>
                 <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
                 <td className="py-3 whitespace-nowrap">
                   <button onClick={() => setEditProduct(p)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button>
                   <button onClick={() => {
-                    if (!confirm('确认删除该商品？')) return
-                    apiDelete('/api/admin/products', { id: p.id })
-                      .then(r => r.json())
-                      .then(d => {
-                        if (d.success) { fetchData(page); toast('商品已删除', 'success') }
-                        else toast(d.error?.message || '删除失败', 'error')
-                      })
-                      .catch(() => toast('网络错误', 'error'))
+                    setConfirmModal({
+                      show: true, title: '确认删除', danger: true, confirmLabel: '删除',
+                      message: `确认删除商品「${p.title}」？`,
+                      onConfirm: () => {
+                        setConfirmModal(null)
+                        apiDelete('/api/admin/products', { id: p.id })
+                          .then(r => r.json())
+                          .then(d => {
+                            if (d.success) { fetchData(page); toast('商品已删除', 'success') }
+                            else toast(d.error?.message || '删除失败', 'error')
+                          })
+                          .catch(() => toast('网络错误', 'error'))
+                      }
+                    })
                   }} className="bg-[var(--danger)]/10 text-[var(--danger)] px-3 py-1 rounded text-xs hover:bg-[var(--danger)]/20 active:bg-[var(--danger)]/20 transition-colors ml-2">删除</button>
                 </td>
               </tr>
@@ -786,6 +848,16 @@ export default function AdminPage() {
           carrier={editCarrier || undefined}
           onClose={() => { setEditCarrier(null); setShowAddCarrier(false) }}
           onSaved={() => { setEditCarrier(null); setShowAddCarrier(false); fetchData(page) }}
+        />
+      )}
+      {confirmModal?.show && (
+        <ConfirmModal
+          title={confirmModal.title}
+          message={confirmModal.message}
+          confirmLabel={confirmModal.confirmLabel}
+          danger={confirmModal.danger}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
         />
       )}
     </div>

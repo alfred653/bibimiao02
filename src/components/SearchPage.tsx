@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUser } from '@clerk/clerk-react'
 import { useLoginModal } from './LoginModal'
+import { formatPrice } from '../lib/format'
 import { api, apiPost, apiDelete } from '../lib/api-client'
 
 const SUGGESTED_BRANDS = ['Osprey', "Arc'teryx", 'Patagonia', 'The North Face', 'Gregory']
@@ -422,7 +423,7 @@ export default function SearchPage() {
                       </div>
                       {item.price && (
                         <div className="text-right shrink-0">
-                          <div className="text-[var(--brand)] font-bold text-lg" style={{ fontVariantNumeric: 'tabular-nums' }}>{item.currency || ''} {item.price}</div>
+                          <div className="text-[var(--brand)] font-bold text-lg" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
                         </div>
                       )}
                       <button
@@ -475,7 +476,7 @@ export default function SearchPage() {
                   </h3>
                   <div className="flex items-center justify-between">
                     {item.price ? (
-                      <span className="text-[var(--brand)] font-bold text-sm" style={{ fontVariantNumeric: 'tabular-nums' }}>{item.currency || ''} {item.price}</span>
+                      <span className="text-[var(--brand)] font-bold text-sm" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</span>
                     ) : (
                       <span className="text-[var(--text-secondary)] text-xs">登录查看价格</span>
                     )}

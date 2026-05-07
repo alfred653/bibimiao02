@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
+import { formatPrice } from '../lib/format'
 import { useLoginModal } from './LoginModal'
 import { useToast } from './Toast'
 import { api, apiDelete } from '../lib/api-client'
@@ -66,7 +67,7 @@ export default function FavoritesPage() {
                 <h3 className="text-sm truncate">{item.title}</h3>
                 <div className="flex gap-2 mt-1 text-xs text-[var(--text-secondary)]">
                   <span className="text-[var(--brand)]">{item.brand}</span>
-                  {item.price && <span>{item.currency} {item.price}</span>}
+                  {item.price && <span>{formatPrice(item.currency, item.price)}</span>}
                 </div>
               </div>
               <button
