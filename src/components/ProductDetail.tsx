@@ -5,10 +5,10 @@ import { useLoginModal } from './LoginModal'
 import { useToast } from './Toast'
 import { api, apiPost, apiDelete } from '../lib/api-client'
 
-const SHIPPING_MODES = [
-  { value: 'standard', label: '普通线', hint: '首重0.5kg ￥32, 续重0.5kg ￥10' },
-  { value: 'sensitive', label: '特货线', hint: '首重0.5kg ￥42, 续重0.5kg ￥12' },
-  { value: 'large', label: '大货线', hint: '首重1.0kg ￥58, 续重0.5kg ￥11' },
+const SHIPPING_PRESETS = [
+  { label: '普通线', firstWeight: '0.5', firstCost: '32', additionalWeight: '0.5', additionalCost: '10', volumeDivisor: '6000' },
+  { label: '特货线', firstWeight: '0.5', firstCost: '42', additionalWeight: '0.5', additionalCost: '12', volumeDivisor: '6000' },
+  { label: '大货线', firstWeight: '1.0', firstCost: '58', additionalWeight: '0.5', additionalCost: '11', volumeDivisor: '5000' },
 ]
 
 const TARGET_CURRENCIES = ['CNY', 'USD', 'JPY', 'EUR', 'GBP', 'HKD']
@@ -38,7 +38,11 @@ export default function ProductDetail() {
   const [favorited, setFavorited] = useState(false)
   const [favToggling, setFavToggling] = useState(false)
 
-  const [shipMode, setShipMode] = useState('standard')
+  const [firstWeight, setFirstWeight] = useState('0.5')
+  const [firstCost, setFirstCost] = useState('32')
+  const [additionalWeight, setAdditionalWeight] = useState('0.5')
+  const [additionalCost, setAdditionalCost] = useState('10')
+  const [volumeDivisor, setVolumeDivisor] = useState('6000')
   const [weight, setWeight] = useState('1.5')
   const [length, setLength] = useState('')
   const [width, setWidth] = useState('')
@@ -100,7 +104,12 @@ export default function ProductDetail() {
         currency: product.currency || 'CNY',
         targetCurrency: 'CNY',
         shipping: {
-          mode: shipMode,
+          mode: 'custom',
+          firstWeight: parseFloat(firstWeight) || 0,
+          firstCost: parseFloat(firstCost) || 0,
+          additionalWeight: parseFloat(additionalWeight) || 0,
+          additionalCost: parseFloat(additionalCost) || 0,
+          volumeDivisor: parseFloat(volumeDivisor) || 6000,
           weight: parseFloat(weight) || 0,
           length: parseFloat(length) || 0,
           width: parseFloat(width) || 0,
@@ -245,23 +254,52 @@ export default function ProductDetail() {
         </h2>
 
         <div className="space-y-3">
-          {/* Shipping mode */}
+          {/* Shipping params */}
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[#b0aea5] w-12 sm:w-16 shrink-0">运费模板</span>
-              <select
-                value={shipMode}
-                onChange={e => setShipMode(e.target.value)}
-                className="flex-1 min-w-0 bg-white border border-gray-300 rounded-lg px-2 sm:px-3 py-2 text-sm text-gray-700"
-              >
-                {SHIPPING_MODES.map(m => (
-                  <option key={m.value} value={m.value}>{m.label}</option>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs text-[#b0aea5] w-12 sm:w-16 shrink-0">运费参数</span>
+              <div className="flex gap-1">
+                {SHIPPING_PRESETS.map(p => (
+                  <button
+                    key={p.label}
+                    onClick={() => {
+                      setFirstWeight(p.firstWeight); setFirstCost(p.firstCost)
+                      setAdditionalWeight(p.additionalWeight); setAdditionalCost(p.additionalCost)
+                      setVolumeDivisor(p.volumeDivisor)
+                    }}
+                    className="text-[10px] sm:text-xs bg-white/[0.04] hover:bg-white/[0.06] active:bg-white/[0.08] rounded-lg px-2 py-1 text-[#b0aea5] transition-colors"
+                  >
+                    {p.label}
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
-            <p className="text-[10px] text-[#b0aea5] mt-0.5 pl-12 sm:pl-16">
-              {SHIPPING_MODES.find(m => m.value === shipMode)?.hint}
-            </p>
+            <div className="pl-12 sm:pl-16 space-y-2">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-[10px] text-[#b0aea5] w-6 shrink-0">首重</span>
+                <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)}
+                  className="w-14 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-1.5 py-1.5 text-xs text-[#faf9f5]" />
+                <span className="text-[10px] text-[#b0aea5] shrink-0">kg</span>
+                <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)}
+                  className="w-14 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-1.5 py-1.5 text-xs text-[#faf9f5]" />
+                <span className="text-[10px] text-[#b0aea5] shrink-0">元</span>
+              </div>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-[10px] text-[#b0aea5] w-6 shrink-0">续重</span>
+                <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)}
+                  className="w-14 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-1.5 py-1.5 text-xs text-[#faf9f5]" />
+                <span className="text-[10px] text-[#b0aea5] shrink-0">kg</span>
+                <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)}
+                  className="w-14 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-1.5 py-1.5 text-xs text-[#faf9f5]" />
+                <span className="text-[10px] text-[#b0aea5] shrink-0">元</span>
+              </div>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-[10px] text-[#b0aea5] w-6 shrink-0">体积除数</span>
+                <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVolumeDivisor(e.target.value)}
+                  className="w-16 min-w-0 bg-[#1C1C1A] border border-white/[0.08] rounded-lg px-1.5 py-1.5 text-xs text-[#faf9f5]" />
+                <span className="text-[10px] text-[#b0aea5]/70">（长×宽×高÷除数 = 体积重）</span>
+              </div>
+            </div>
           </div>
 
           {/* Weight */}

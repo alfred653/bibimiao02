@@ -45,23 +45,34 @@ export async function POST(req: Request) {
     const shipping = body.shipping;
     if (shipping?.mode && shipping.mode !== 'manual') {
       const profile = SHIPPING_PROFILES[shipping.mode as keyof typeof SHIPPING_PROFILES];
-      if (profile) {
+      const custom = shipping.mode === 'custom'
+        ? {
+            firstWeight: parseFloat(shipping.firstWeight) || 0.5,
+            firstCost: parseFloat(shipping.firstCost) || 32,
+            additionalWeight: parseFloat(shipping.additionalWeight) || 0.5,
+            additionalCost: parseFloat(shipping.additionalCost) || 10,
+            volumeDivisor: parseFloat(shipping.volumeDivisor) || 6000,
+          }
+        : null;
+
+      const p = custom || profile;
+      if (p) {
         const weight = parseFloat(shipping.weight) || 0;
         const l = parseFloat(shipping.length) || 0;
         const w = parseFloat(shipping.width) || 0;
         const h = parseFloat(shipping.height) || 0;
-        const volumetricWeight = (l * w * h) / profile.volumeDivisor;
+        const volumetricWeight = (l * w * h) / p.volumeDivisor;
         const billableWeight = Math.max(weight, volumetricWeight);
         const labelParts = [
-          `${shipping.mode === 'standard' ? '普通线' : shipping.mode === 'sensitive' ? '特货线' : '大货线'}`,
-          `首重${profile.firstWeight}kg ¥${profile.firstCost}`,
+          custom ? '自定义' : shipping.mode === 'standard' ? '普通线' : shipping.mode === 'sensitive' ? '特货线' : '大货线',
+          `首重${p.firstWeight}kg ¥${p.firstCost}`,
         ];
-        if (billableWeight <= profile.firstWeight) {
-          shippingCost = profile.firstCost;
+        if (billableWeight <= p.firstWeight) {
+          shippingCost = p.firstCost;
         } else {
-          const extra = Math.ceil((billableWeight - profile.firstWeight) / profile.additionalWeight);
-          shippingCost = profile.firstCost + extra * profile.additionalCost;
-          labelParts.push(`续重${extra}×${profile.additionalWeight}kg ¥${extra * profile.additionalCost}`);
+          const extra = Math.ceil((billableWeight - p.firstWeight) / p.additionalWeight);
+          shippingCost = p.firstCost + extra * p.additionalCost;
+          labelParts.push(`续重${extra}×${p.additionalWeight}kg ¥${extra * p.additionalCost}`);
         }
         shippingLabel = labelParts.join(' + ');
       }
