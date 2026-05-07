@@ -14,6 +14,8 @@ export async function POST(req: Request) {
     const category = body.category?.trim();
     const currency = body.currency?.trim();
     const source = body.source?.trim();
+    const priceMin = body.priceMin ? parseFloat(body.priceMin) : null;
+    const priceMax = body.priceMax ? parseFloat(body.priceMax) : null;
     const sortBy = body.sortBy || 'relevance';
     const sortOrder = body.sortOrder || 'desc';
     const page = Math.max(1, parseInt(body.page) || 1);
@@ -36,6 +38,8 @@ export async function POST(req: Request) {
       if (category) chunks.push(sql`p.category = ${category}`);
       if (currency) chunks.push(sql`p.currency = ${currency}`);
       if (source) chunks.push(sql`p.source = ${source}`);
+      if (priceMin != null) chunks.push(sql`p.price::numeric >= ${priceMin}`);
+      if (priceMax != null) chunks.push(sql`p.price::numeric <= ${priceMax}`);
 
       const result = await db.execute(
         sql`SELECT p.*, ts_rank(p.search_vector, to_tsquery('simple', ${tsquery})) AS _rank
@@ -65,6 +69,8 @@ export async function POST(req: Request) {
       if (category) whereConditions.push(eq(products.category, category));
       if (currency) whereConditions.push(eq(products.currency, currency));
       if (source) whereConditions.push(eq(products.source, source));
+      if (priceMin != null) whereConditions.push(sql`${products.price}::numeric >= ${priceMin}`);
+      if (priceMax != null) whereConditions.push(sql`${products.price}::numeric <= ${priceMax}`);
 
       const query = db.select().from(products).where(and(...whereConditions));
 

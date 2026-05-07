@@ -74,6 +74,7 @@ export default function ProductDetail() {
   // Carrier dropdown
   const [carriers, setCarriers] = useState<Carrier[]>([])
   const [selectedCarrierId, setSelectedCarrierId] = useState<number | null>(null)
+  const [showShippingHelp, setShowShippingHelp] = useState(false)
 
   useEffect(() => {
     api('/api/shipping-carriers')
@@ -372,7 +373,21 @@ export default function ProductDetail() {
 
           {/* Group 2: 物流方案 */}
           <div>
-            <h3 className="text-[11px] text-[var(--text-muted)] mb-2 font-medium uppercase tracking-wide">物流方案</h3>
+            <div className="flex items-center gap-1.5 mb-2">
+              <h3 className="text-[11px] text-[var(--text-muted)] font-medium uppercase tracking-wide">物流方案</h3>
+              <button
+                onClick={() => setShowShippingHelp(v => !v)}
+                className="text-[10px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] w-4 h-4 rounded-full border border-[var(--text-muted)] flex items-center justify-center leading-none"
+                aria-label="物流术语说明"
+              >?</button>
+            </div>
+            {showShippingHelp && (
+              <div className="mb-3 bg-[var(--bg-input)] rounded-lg p-2.5 text-[10px] text-[var(--text-secondary)] space-y-1">
+                <p><span className="text-[var(--text-primary)]">首重</span>：第一档重量及其运费。如「首重 0.5kg / 32元」表示前 0.5kg 收费 32 元。</p>
+                <p><span className="text-[var(--text-primary)]">续重</span>：超出首重后，每增加一个重量单位的运费。如「续重 0.5kg / 10元」表示每超出 0.5kg 加收 10 元。</p>
+                <p><span className="text-[var(--text-primary)]">体积除数</span>：长×宽×高(cm) ÷ 除数 = 体积重量(kg)。快递按「实际重量 与 体积重量 取较大值」计费。</p>
+              </div>
+            )}
             <div className="space-y-2.5">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[var(--text-secondary)] w-12 sm:w-16 shrink-0">快递</span>

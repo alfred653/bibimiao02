@@ -100,6 +100,8 @@ export default function SearchPage() {
   const [currency, setCurrency] = useState('')
   const [sortBy, setSortBy] = useState('relevance')
   const [sortOrder, setSortOrder] = useState('desc')
+  const [priceMin, setPriceMin] = useState('')
+  const [priceMax, setPriceMax] = useState('')
 
   const [results, setResults] = useState<any[]>([])
   const [summary, setSummary] = useState<any>(null)
@@ -155,8 +157,8 @@ export default function SearchPage() {
     })
   }
 
-  const filtersRef = useRef({ keyword, brand, source, currency, sortBy, sortOrder })
-  filtersRef.current = { keyword, brand, source, currency, sortBy, sortOrder }
+  const filtersRef = useRef({ keyword, brand, source, currency, sortBy, sortOrder, priceMin, priceMax })
+  filtersRef.current = { keyword, brand, source, currency, sortBy, sortOrder, priceMin, priceMax }
 
   function doSearch(p = 1, overrides?: Partial<typeof filtersRef.current>) {
     const f = { ...filtersRef.current, ...overrides }
@@ -173,6 +175,8 @@ export default function SearchPage() {
         currency: f.currency || undefined,
         sortBy: sortByParam,
         sortOrder: sortOrderParam,
+        priceMin: f.priceMin || undefined,
+        priceMax: f.priceMax || undefined,
         page: p,
         pageSize: 10,
       })
@@ -261,6 +265,24 @@ export default function SearchPage() {
         </div>
       )}
 
+      {/* Initial recommendations */}
+      {!keyword.trim() && !searched && searchHistory.length === 0 && (
+        <div className="mb-3">
+          <div className="text-[10px] text-[var(--text-secondary)] mb-2">热门品牌</div>
+          <div className="flex flex-wrap gap-1.5">
+            {SUGGESTED_BRANDS.map(b => (
+              <button
+                key={b}
+                onClick={() => { setKeyword(b); doSearch(1, { keyword: b }) }}
+                className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors"
+              >
+                {b}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Autocomplete */}
       {showSuggestions && suggestions.length > 0 && (
         <div className="relative -mt-2 mb-3 mx-1">
@@ -280,7 +302,7 @@ export default function SearchPage() {
       )}
 
       {/* Active filter pills */}
-      {(brand || source || currency) && (
+      {(brand || source || currency || priceMin || priceMax) && (
         <div className="flex flex-wrap items-center gap-1.5 mb-2">
           {brand && (
             <button
@@ -306,8 +328,24 @@ export default function SearchPage() {
               {currency} <span className="text-[10px]">×</span>
             </button>
           )}
+          {priceMin && (
+            <button
+              onClick={() => { setPriceMin(''); doSearch(1, { priceMin: '' }) }}
+              className="inline-flex items-center gap-1 bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-1 rounded-full hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors"
+            >
+              ≥{priceMin} <span className="text-[10px]">×</span>
+            </button>
+          )}
+          {priceMax && (
+            <button
+              onClick={() => { setPriceMax(''); doSearch(1, { priceMax: '' }) }}
+              className="inline-flex items-center gap-1 bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-1 rounded-full hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors"
+            >
+              ≤{priceMax} <span className="text-[10px]">×</span>
+            </button>
+          )}
           <button
-            onClick={() => { setBrand(''); setSource(''); setCurrency(''); doSearch(page, { brand: '', source: '', currency: '' }) }}
+            onClick={() => { setBrand(''); setSource(''); setCurrency(''); setPriceMin(''); setPriceMax(''); doSearch(page, { brand: '', source: '', currency: '', priceMin: '', priceMax: '' }) }}
             className="text-[10px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors ml-1"
           >
             清除全部
@@ -336,6 +374,24 @@ export default function SearchPage() {
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
+          <input
+            type="number"
+            placeholder="最低价"
+            value={priceMin}
+            onChange={e => setPriceMin(e.target.value)}
+            onBlur={() => doSearch(1)}
+            onKeyDown={e => { if (e.key === 'Enter') doSearch(1) }}
+            className="w-16 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)]"
+          />
+          <input
+            type="number"
+            placeholder="最高价"
+            value={priceMax}
+            onChange={e => setPriceMax(e.target.value)}
+            onBlur={() => doSearch(1)}
+            onKeyDown={e => { if (e.key === 'Enter') doSearch(1) }}
+            className="w-16 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)]"
+          />
           <select value={`${sortBy}:${sortOrder}`} onChange={e => { const [sb, so] = e.target.value.split(':'); setSortBy(sb); setSortOrder(so); doSearch(1, { sortBy: sb, sortOrder: so }) }} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-primary)]">
             {SORT_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -429,7 +485,7 @@ export default function SearchPage() {
                       <button
                         onClick={e => toggleFavorite(item.id, e)}
                         disabled={favToggling.has(item.id)}
-                        className={`shrink-0 text-lg p-1.5 min-w-[36px] min-h-[36px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)]' : 'text-[var(--text-secondary)] hover:text-[var(--danger)]'}`}
+                        className={`shrink-0 text-xl p-1.5 min-w-[40px] min-h-[40px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
                         title={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                       >
                         {favoriteIds.has(item.id) ? '♥' : '♡'}
@@ -485,7 +541,7 @@ export default function SearchPage() {
                       <button
                         onClick={e => toggleFavorite(item.id, e)}
                         disabled={favToggling.has(item.id)}
-                        className={`text-base p-1 min-w-[32px] min-h-[32px] transition-colors active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)]' : 'text-[var(--text-secondary)] hover:text-[var(--danger)]'}`}
+                        className={`text-lg p-1.5 min-w-[36px] min-h-[36px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
                         title={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                       >
                         {favoriteIds.has(item.id) ? '♥' : '♡'}
