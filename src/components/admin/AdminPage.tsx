@@ -576,10 +576,10 @@ export default function AdminPage() {
               {data.map(u => (
                 <tr key={u.id} className="border-b border-white/[0.04]">
                   <td className="py-2 text-xs">{u.email}</td>
-                  <td><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-white/[0.04] text-[#b0aea5]' : 'bg-[#d97757]/10 text-[#d97757]'}`}>{u.membershipTier}</span></td>
-                  <td className="text-xs text-[#b0aea5]">{(u.configuredBrands || []).join(', ') || '—'}</td>
-                  <td><span className={`text-xs ${u.status === 'active' ? 'text-[#788c5d]' : 'text-[#b53333]'}`}>{u.status}</span></td>
-                  <td><button onClick={() => setEditUser(u)} className="text-[#d97757] text-xs hover:underline active:text-[#d97757]">编辑</button></td>
+                  <td className="py-2"><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-white/[0.04] text-[#b0aea5]' : 'bg-[#d97757]/10 text-[#d97757]'}`}>{u.membershipTier}</span></td>
+                  <td className="py-2 text-xs text-[#b0aea5]">{(u.configuredBrands || []).join(', ') || '—'}</td>
+                  <td className="py-2"><span className={`text-xs ${u.status === 'active' ? 'text-[#788c5d]' : 'text-[#b53333]'}`}>{u.status}</span></td>
+                  <td className="py-2"><button onClick={() => setEditUser(u)} className="text-[#d97757] text-xs hover:underline active:text-[#d97757]">编辑</button></td>
                 </tr>
               ))}
             </tbody>
@@ -596,13 +596,13 @@ export default function AdminPage() {
               {data.map((c: any) => (
                 <tr key={c.id} className="border-b border-white/[0.04]">
                   <td className="py-2 text-xs font-medium">{c.name}</td>
-                  <td className="text-xs">{c.firstWeight}</td>
-                  <td className="text-xs">¥{c.firstCost}</td>
-                  <td className="text-xs">{c.additionalWeight}</td>
-                  <td className="text-xs">¥{c.additionalCost}</td>
-                  <td className="text-xs">{c.volumeDivisor}</td>
-                  <td><span className={`text-xs ${c.isActive === 'active' ? 'text-[#788c5d]' : 'text-[#b53333]'}`}>{c.isActive === 'active' ? '启用' : '禁用'}</span></td>
-                  <td className="flex gap-2">
+                  <td className="py-2 text-xs">{c.firstWeight}</td>
+                  <td className="py-2 text-xs">¥{c.firstCost}</td>
+                  <td className="py-2 text-xs">{c.additionalWeight}</td>
+                  <td className="py-2 text-xs">¥{c.additionalCost}</td>
+                  <td className="py-2 text-xs">{c.volumeDivisor}</td>
+                  <td className="py-2"><span className={`text-xs ${c.isActive === 'active' ? 'text-[#788c5d]' : 'text-[#b53333]'}`}>{c.isActive === 'active' ? '启用' : '禁用'}</span></td>
+                  <td className="py-2 whitespace-nowrap">
                     <button onClick={() => setEditCarrier(c)} className="text-[#d97757] text-xs hover:underline">编辑</button>
                     <button onClick={() => {
                       if (!confirm('确认删除该快递？')) return
@@ -613,7 +613,7 @@ export default function AdminPage() {
                           else toast(d.error?.message || '删除失败', 'error')
                         })
                         .catch(() => toast('网络错误', 'error'))
-                    }} className="text-[#b53333] text-xs hover:underline">删除</button>
+                    }} className="text-[#b53333] text-xs hover:underline ml-2">删除</button>
                   </td>
                 </tr>
               ))}
@@ -644,11 +644,11 @@ export default function AdminPage() {
                   />
                 </td>
                 <td className="py-2 text-xs max-w-48 truncate">{p.title}</td>
-                <td className="text-[#d97757] text-xs">{p.brand}</td>
-                <td className="text-xs">{p.currency} {p.price}</td>
-                <td className="text-xs text-[#b0aea5]">{p.source}</td>
-                <td><span className={`text-xs ${p.status === 'active' ? 'text-[#788c5d]' : 'text-[#b53333]'}`}>{p.status}</span></td>
-                <td className="flex gap-2">
+                <td className="py-2 text-[#d97757] text-xs">{p.brand}</td>
+                <td className="py-2 text-xs">{p.currency} {p.price}</td>
+                <td className="py-2 text-xs text-[#b0aea5]">{p.source}</td>
+                <td className="py-2"><span className={`text-xs ${p.status === 'active' ? 'text-[#788c5d]' : 'text-[#b53333]'}`}>{p.status}</span></td>
+                <td className="py-2 whitespace-nowrap">
                   <button onClick={() => setEditProduct(p)} className="text-[#d97757] text-xs hover:underline">编辑</button>
                   <button onClick={() => {
                     if (!confirm('确认删除该商品？')) return
@@ -659,7 +659,7 @@ export default function AdminPage() {
                         else toast(d.error?.message || '删除失败', 'error')
                       })
                       .catch(() => toast('网络错误', 'error'))
-                  }} className="text-[#b53333] text-xs hover:underline">删除</button>
+                  }} className="text-[#b53333] text-xs hover:underline ml-2">删除</button>
                 </td>
               </tr>
             ))}
