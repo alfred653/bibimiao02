@@ -1,7 +1,7 @@
 import { db } from '../../lib/db';
 import { products } from '../../db/schema';
 import { success, error } from '../../lib/response';
-import { count, eq } from 'drizzle-orm';
+import { count, eq, desc } from 'drizzle-orm';
 
 export async function GET() {
   try {
@@ -30,8 +30,22 @@ export async function GET() {
       .select({ updatedAt: products.updatedAt })
       .from(products)
       .where(eq(products.status, 'active'))
-      .orderBy(products.updatedAt)
+      .orderBy(desc(products.updatedAt))
       .limit(1);
+
+    const recentProducts = await db
+      .select({
+        id: products.id,
+        title: products.title,
+        brand: products.brand,
+        price: products.price,
+        currency: products.currency,
+        imageUrl: products.imageUrl,
+      })
+      .from(products)
+      .where(eq(products.status, 'active'))
+      .orderBy(desc(products.updatedAt))
+      .limit(3);
 
     return success({
       totalProducts,
@@ -39,6 +53,7 @@ export async function GET() {
       sourceCount,
       brands,
       lastUpdated: latest[0]?.updatedAt ?? null,
+      recentProducts,
     });
   } catch (e) {
     console.error('GET /api/products/overview:', e);

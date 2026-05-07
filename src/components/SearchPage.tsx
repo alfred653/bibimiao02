@@ -389,7 +389,7 @@ export default function SearchPage() {
                       </div>
                       {item.price && (
                         <div className="text-right shrink-0">
-                          <div className="text-[var(--brand)] font-bold">{item.currency || ''} {item.price}</div>
+                          <div className="text-[var(--brand)] font-bold text-lg" style={{ fontVariantNumeric: 'tabular-nums' }}>{item.currency || ''} {item.price}</div>
                         </div>
                       )}
                       <button
@@ -442,7 +442,7 @@ export default function SearchPage() {
                   </h3>
                   <div className="flex items-center justify-between">
                     {item.price ? (
-                      <span className="text-[var(--brand)] font-bold text-sm">{item.currency || ''} {item.price}</span>
+                      <span className="text-[var(--brand)] font-bold text-sm" style={{ fontVariantNumeric: 'tabular-nums' }}>{item.currency || ''} {item.price}</span>
                     ) : (
                       <span className="text-[var(--text-secondary)] text-xs">登录查看价格</span>
                     )}

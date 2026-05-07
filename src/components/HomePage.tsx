@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api-client'
 
-interface Overview { totalProducts: number; brandCount: number; sourceCount: number; brands: { name: string; count: number; logo: string }[]; lastUpdated: string | null }
+interface Overview { totalProducts: number; brandCount: number; sourceCount: number; brands: { name: string; count: number; logo: string }[]; lastUpdated: string | null; recentProducts: { id: number; title: string; brand: string; price: string; currency: string; imageUrl: string | null }[] }
 
 export default function HomePage() {
   const [keyword, setKeyword] = useState('')
@@ -47,6 +47,31 @@ export default function HomePage() {
               <div className="text-[10px] sm:text-xs text-[var(--text-secondary)] mt-0.5">来源站点</div>
             </div>
           </div>
+
+          {overview.recentProducts?.length > 0 && (
+            <div className="mb-6">
+              <h2 className="text-sm text-[var(--text-secondary)] mb-3">最近更新</h2>
+              <div className="space-y-2">
+                {overview.recentProducts.map(p => (
+                  <button key={p.id} onClick={() => nav(`/product/${p.id}`)}
+                    className="w-full bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-xl p-3 flex items-center gap-3 text-left transition-colors min-h-[48px]"
+                  >
+                    <img
+                      src={p.imageUrl || `https://placehold.co/56x56/1a1a17/666?text=${encodeURIComponent(p.brand.slice(0, 4))}`}
+                      alt="" className="w-9 h-9 rounded-lg object-cover bg-[var(--bg-card)] shrink-0" loading="lazy"
+                      onError={e => { (e.target as HTMLImageElement).src = `https://placehold.co/56x56/1a1a17/666?text=${encodeURIComponent(p.brand.slice(0, 2))}` }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm truncate">{p.title}</div>
+                      <div className="text-xs text-[var(--text-secondary)]">{p.brand}</div>
+                    </div>
+                    <div className="text-sm font-bold text-[var(--brand)] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{p.currency} {p.price}</div>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] shrink-0"><path d="M5 3l4 4-4 4"/></svg>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <h2 className="text-sm text-[var(--text-secondary)] mb-3">支持品牌</h2>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">

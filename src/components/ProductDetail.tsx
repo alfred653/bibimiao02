@@ -211,7 +211,7 @@ export default function ProductDetail() {
       <div className="bg-[var(--bg-card)] rounded-xl p-4 mb-4 space-y-2 text-sm">
         <div className="flex justify-between items-center">
           <span className="text-[var(--text-secondary)]">价格</span>
-          <span className="text-[var(--brand)] font-bold text-lg">{product.currency} {product.price}</span>
+          <span className="text-[var(--brand)] font-bold text-lg" style={{ fontVariantNumeric: 'tabular-nums' }}>{product.currency} {product.price}</span>
         </div>
         {product.originalPrice && (
           <div className="flex justify-between">
@@ -270,131 +270,107 @@ export default function ProductDetail() {
 
       {/* Cost Estimate Panel */}
       <div className="bg-[var(--bg-card)] rounded-xl p-4 mb-4">
-        <h2 className="text-sm font-bold mb-3 text-[var(--text-primary)]">
+        <h2 className="text-sm font-bold mb-4 text-[var(--text-primary)]">
           成本估算 <span className="text-xs text-[var(--text-secondary)] font-normal">(CNY)</span>
         </h2>
 
-        <div className="space-y-3">
-          {/* Shipping params */}
+        <div className="space-y-4">
+          {/* Group 1: 商品参数 */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs text-[var(--text-secondary)] w-12 sm:w-16 shrink-0">快递</span>
-              <select
-                value={selectedCarrierId ?? ''}
-                onChange={e => {
-                  const id = parseInt(e.target.value, 10)
-                  setSelectedCarrierId(id)
-                  const c = carriers.find(x => x.id === id)
-                  if (c) {
-                    setFirstWeight(String(c.firstWeight))
-                    setFirstCost(String(c.firstCost))
-                    setAdditionalWeight(String(c.additionalWeight))
-                    setAdditionalCost(String(c.additionalCost))
-                    setVolumeDivisor(String(c.volumeDivisor))
-                  }
-                }}
-                className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]"
-              >
-                <option value="">自定义参数</option>
-                {carriers.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="pl-12 sm:pl-16 space-y-2">
+            <h3 className="text-[11px] text-[var(--text-muted)] mb-2 font-medium uppercase tracking-wide">商品参数</h3>
+            <div className="space-y-2.5">
               <div className="flex items-center gap-1 sm:gap-2">
-                <span className="text-[10px] text-[var(--text-secondary)] w-6 shrink-0">首重</span>
-                <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)}
-                  className="w-14 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)]" />
-                <span className="text-[10px] text-[var(--text-secondary)] shrink-0">kg</span>
-                <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)}
-                  className="w-14 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)]" />
-                <span className="text-[10px] text-[var(--text-secondary)] shrink-0">元</span>
+                <span className="text-xs text-[var(--text-secondary)] w-12 sm:w-16 shrink-0">重量</span>
+                <input
+                  type="number" step="0.1" min="0"
+                  value={weight}
+                  onChange={e => setWeight(e.target.value)}
+                  placeholder="kg"
+                  className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 sm:px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]"
+                />
+                <span className="text-xs text-[var(--text-secondary)] w-5 shrink-0">kg</span>
               </div>
               <div className="flex items-center gap-1 sm:gap-2">
-                <span className="text-[10px] text-[var(--text-secondary)] w-6 shrink-0">续重</span>
-                <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)}
-                  className="w-14 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)]" />
-                <span className="text-[10px] text-[var(--text-secondary)] shrink-0">kg</span>
-                <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)}
-                  className="w-14 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)]" />
-                <span className="text-[10px] text-[var(--text-secondary)] shrink-0">元</span>
-              </div>
-              <div className="flex items-center gap-1 sm:gap-2">
-                <span className="text-[10px] text-[var(--text-secondary)] w-6 shrink-0">体积除数</span>
-                <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVolumeDivisor(e.target.value)}
-                  className="w-16 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)]" />
-                <span className="text-[10px] text-[var(--text-muted)]">（长×宽×高÷除数 = 体积重）</span>
+                <span className="text-xs text-[var(--text-secondary)] w-12 sm:w-16 shrink-0">尺寸</span>
+                <span className="text-[10px] text-[var(--text-secondary)] w-3 sm:w-4 shrink-0">长</span>
+                <input type="number" step="0.1" min="0" value={length} onChange={e => setLength(e.target.value)} placeholder="0" className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1 sm:px-2 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
+                <span className="text-[var(--text-secondary)] text-xs shrink-0">×</span>
+                <span className="text-[10px] text-[var(--text-secondary)] w-3 sm:w-4 shrink-0">宽</span>
+                <input type="number" step="0.1" min="0" value={width} onChange={e => setWidth(e.target.value)} placeholder="0" className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1 sm:px-2 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
+                <span className="text-[var(--text-secondary)] text-xs shrink-0">×</span>
+                <span className="text-[10px] text-[var(--text-secondary)] w-3 sm:w-4 shrink-0">高</span>
+                <input type="number" step="0.1" min="0" value={height} onChange={e => setHeight(e.target.value)} placeholder="0" className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1 sm:px-2 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
+                <span className="text-[10px] text-[var(--text-secondary)] w-5 sm:w-7 shrink-0">cm</span>
               </div>
             </div>
           </div>
 
-          {/* Weight */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            <span className="text-xs text-[var(--text-secondary)] w-12 sm:w-16 shrink-0">重量</span>
-            <input
-              type="number" step="0.1" min="0"
-              value={weight}
-              onChange={e => setWeight(e.target.value)}
-              placeholder="kg"
-              className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 sm:px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]"
-            />
-            <span className="text-xs text-[var(--text-secondary)] w-5 shrink-0">kg</span>
-          </div>
-
-          {/* Dimensions */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            <span className="text-xs text-[var(--text-secondary)] w-12 sm:w-16 shrink-0">尺寸</span>
-            <span className="text-[10px] text-[var(--text-secondary)] w-3 sm:w-4 shrink-0">长</span>
-            <input
-              type="number" step="0.1" min="0"
-              value={length}
-              onChange={e => setLength(e.target.value)}
-              placeholder="0"
-              className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1 sm:px-2 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]"
-            />
-            <span className="text-[var(--text-secondary)] text-xs shrink-0">×</span>
-            <span className="text-[10px] text-[var(--text-secondary)] w-3 sm:w-4 shrink-0">宽</span>
-            <input
-              type="number" step="0.1" min="0"
-              value={width}
-              onChange={e => setWidth(e.target.value)}
-              placeholder="0"
-              className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1 sm:px-2 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]"
-            />
-            <span className="text-[var(--text-secondary)] text-xs shrink-0">×</span>
-            <span className="text-[10px] text-[var(--text-secondary)] w-3 sm:w-4 shrink-0">高</span>
-            <input
-              type="number" step="0.1" min="0"
-              value={height}
-              onChange={e => setHeight(e.target.value)}
-              placeholder="0"
-              className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1 sm:px-2 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]"
-            />
-            <span className="text-[10px] text-[var(--text-secondary)] w-5 sm:w-7 shrink-0">cm</span>
-          </div>
-
-          {/* Extra cost + margin */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div className="flex items-center gap-1 sm:gap-2">
-              <span className="text-xs text-[var(--text-secondary)] w-12 sm:w-16 shrink-0">其他费用</span>
-              <input
-                type="number" step="0.01" min="0"
-                value={extraCost}
-                onChange={e => setExtraCost(e.target.value)}
-                className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 sm:px-3 py-2 text-sm text-[var(--text-primary)]"
-              />
-              <span className="text-xs text-[var(--text-secondary)] w-4 shrink-0">¥</span>
+          {/* Group 2: 物流方案 */}
+          <div>
+            <h3 className="text-[11px] text-[var(--text-muted)] mb-2 font-medium uppercase tracking-wide">物流方案</h3>
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-[var(--text-secondary)] w-12 sm:w-16 shrink-0">快递</span>
+                <select
+                  value={selectedCarrierId ?? ''}
+                  onChange={e => {
+                    const id = parseInt(e.target.value, 10)
+                    setSelectedCarrierId(id)
+                    const c = carriers.find(x => x.id === id)
+                    if (c) {
+                      setFirstWeight(String(c.firstWeight))
+                      setFirstCost(String(c.firstCost))
+                      setAdditionalWeight(String(c.additionalWeight))
+                      setAdditionalCost(String(c.additionalCost))
+                      setVolumeDivisor(String(c.volumeDivisor))
+                    }
+                  }}
+                  className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]"
+                >
+                  <option value="">自定义参数</option>
+                  {carriers.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="pl-12 sm:pl-16 space-y-2">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="text-[10px] text-[var(--text-secondary)] w-6 shrink-0">首重</span>
+                  <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)} className="w-14 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)]" />
+                  <span className="text-[10px] text-[var(--text-secondary)] shrink-0">kg</span>
+                  <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)} className="w-14 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)]" />
+                  <span className="text-[10px] text-[var(--text-secondary)] shrink-0">元</span>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="text-[10px] text-[var(--text-secondary)] w-6 shrink-0">续重</span>
+                  <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)} className="w-14 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)]" />
+                  <span className="text-[10px] text-[var(--text-secondary)] shrink-0">kg</span>
+                  <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)} className="w-14 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)]" />
+                  <span className="text-[10px] text-[var(--text-secondary)] shrink-0">元</span>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="text-[10px] text-[var(--text-secondary)] w-6 shrink-0">体积除数</span>
+                  <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVolumeDivisor(e.target.value)} className="w-16 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)]" />
+                  <span className="text-[10px] text-[var(--text-muted)]">（长×宽×高÷除数 = 体积重）</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <span className="text-xs text-[var(--text-secondary)] shrink-0">毛利率</span>
-              <input
-                type="number" step="1" min="0" max="99"
-                value={marginRate}
-                onChange={e => setMarginRate(e.target.value)}
-                className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 sm:px-3 py-2 text-sm text-[var(--text-primary)]"
-              />
-              <span className="text-xs text-[var(--text-secondary)] w-4 shrink-0">%</span>
+          </div>
+
+          {/* Group 3: 利润设置 */}
+          <div>
+            <h3 className="text-[11px] text-[var(--text-muted)] mb-2 font-medium uppercase tracking-wide">利润设置</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs text-[var(--text-secondary)] w-12 sm:w-16 shrink-0">其他费用</span>
+                <input type="number" step="0.01" min="0" value={extraCost} onChange={e => setExtraCost(e.target.value)} className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 sm:px-3 py-2 text-sm text-[var(--text-primary)]" />
+                <span className="text-xs text-[var(--text-secondary)] w-4 shrink-0">¥</span>
+              </div>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs text-[var(--text-secondary)] shrink-0">目标毛利率</span>
+                <input type="number" step="1" min="0" max="99" value={marginRate} onChange={e => setMarginRate(e.target.value)} className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 sm:px-3 py-2 text-sm text-[var(--text-primary)]" />
+                <span className="text-xs text-[var(--text-secondary)] w-4 shrink-0">%</span>
+              </div>
             </div>
           </div>
 
@@ -404,65 +380,71 @@ export default function ProductDetail() {
             disabled={estimating}
             className="w-full bg-[var(--brand)] py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 active:bg-[var(--brand-hover)] transition-colors"
           >
-            {estimating ? '计算中...' : '计算'}
+            {estimating ? '计算中...' : '计算到手成本'}
           </button>
 
           {estimateError && (
             <p className="text-[var(--danger)] text-xs text-center">{estimateError}</p>
           )}
 
-          {/* Results */}
+          {/* Results - Enhanced */}
           {estimate && (
-            <div className="bg-[var(--bg-card)] rounded-lg p-3 space-y-1.5 text-sm">
-              <div className="flex justify-between">
-                <span className="text-[var(--text-secondary)]">换算价格</span>
-                <span className="text-[var(--brand)] font-bold">{estimate.convertedPriceFormatted}</span>
+            <div className="bg-[var(--bg-input)] rounded-xl p-4 space-y-2">
+              {/* Total cost - prominent */}
+              <div className="text-center">
+                <p className="text-[10px] text-[var(--text-muted)] mb-1">预计到手成本</p>
+                <p className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]" style={{ fontVariantNumeric: 'tabular-nums' }}>{estimate.estimatedCostFormatted}</p>
               </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-[var(--text-secondary)]">汇率来源</span>
-                <span className="text-[var(--text-secondary)]">{estimate.exchangeRate.source} · {estimate.exchangeRate.rate}</span>
-              </div>
-              {estimate.shippingEstimate && (
-                <>
+
+              <hr className="border-[var(--border-subtle)]" />
+
+              {/* Fee breakdown */}
+              <div className="space-y-1.5 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-[var(--text-secondary)]">商品价格折合</span>
+                  <span className="text-[var(--brand)] font-medium">{estimate.convertedPriceFormatted}</span>
+                </div>
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-[var(--text-muted)]">汇率</span>
+                  <span className="text-[var(--text-muted)]">{estimate.exchangeRate.source} · {estimate.exchangeRate.rate}</span>
+                </div>
+                {estimate.shippingEstimate && (
                   <div className="flex justify-between">
-                    <span className="text-[var(--text-secondary)]">运费</span>
-                    <span>¥{estimate.shippingEstimate.cost}</span>
+                    <span className="text-[var(--text-secondary)]">国际运费</span>
+                    <span>¥{estimate.shippingEstimate.cost} <span className="text-[10px] text-[var(--text-muted)]">({estimate.shippingEstimate.label})</span></span>
                   </div>
-                  <p className="text-[10px] text-[var(--text-secondary)] break-all">{estimate.shippingEstimate.label}</p>
-                </>
-              )}
-              <div className="flex justify-between">
-                <span className="text-[var(--text-secondary)]">其他费用</span>
-                <span>¥{estimate.extraCost}</span>
-              </div>
-              <hr className="border-[var(--border-subtle)] my-1" />
-              <div className="flex justify-between font-bold">
-                <span>总成本</span>
-                <span className="text-[var(--brand)]">{estimate.estimatedCostFormatted}</span>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-[var(--text-secondary)]">其他费用</span>
+                  <span>¥{estimate.extraCost}</span>
+                </div>
               </div>
 
               {estimate.profitTrial && (
-                <div className="mt-2 pt-2 border-t border-[var(--border-subtle)] space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-[var(--text-secondary)]">目标毛利率</span>
-                    <span>{estimate.profitTrial.estimatedMarginRate}</span>
+                <>
+                  <hr className="border-[var(--border-subtle)]" />
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-[var(--text-secondary)]">目标毛利率</span>
+                      <span className="text-[var(--text-muted)]">{estimate.profitTrial.estimatedMarginRate}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[var(--text-secondary)]">建议售价</span>
+                      <span className="font-bold">{estimate.profitTrial.suggestedQuotePrice}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[var(--text-secondary)]">预计毛利</span>
+                      <span className={`font-bold text-base ${estimate.profitTrial.status === 'positive' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
+                        {estimate.profitTrial.estimatedProfit}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-[var(--text-secondary)]">建议售价</span>
-                    <span className="text-[var(--success)] font-bold">{estimate.profitTrial.suggestedQuotePrice}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[var(--text-secondary)]">预估利润</span>
-                    <span className={estimate.profitTrial.status === 'positive' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}>
-                      {estimate.profitTrial.estimatedProfit}
-                    </span>
-                  </div>
-                </div>
+                </>
               )}
 
               <button
                 onClick={copyResult}
-                className="w-full mt-2 bg-[var(--bg-hover)] py-1.5 rounded text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
+                className="w-full mt-2 bg-[var(--bg-card)] py-1.5 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
               >
                 复制结果
               </button>
