@@ -169,6 +169,7 @@ export default function ProfilePage() {
   const [showPwdModal, setShowPwdModal] = useState(false)
   const [showThemeModal, setShowThemeModal] = useState(false)
   const { choice, resolved } = useTheme()
+  const { toast } = useToast()
 
   const fetchProfile = () => {
     api('/api/profile')
@@ -251,28 +252,37 @@ export default function ProfilePage() {
       </div>
 
       <div className="space-y-3 mb-4">
-	        <button className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors">
-	          <div>
-	            <div className="text-sm">最近浏览</div>
-	            <div className="text-xs text-[var(--text-secondary)] mt-0.5">查看最近浏览过的商品</div>
-	          </div>
-	          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]"><path d="M6 4l4 4-4 4"/></svg>
-	        </button>
-	        <button className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors">
-	          <div>
-	            <div className="text-sm">默认物流设置</div>
-	            <div className="text-xs text-[var(--text-secondary)] mt-0.5">设置默认快递模板和运费参数</div>
-	          </div>
-	          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]"><path d="M6 4l4 4-4 4"/></svg>
-	        </button>
-	        <button className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors">
-	          <div>
-	            <div className="text-sm">汇率设置</div>
-	            <div className="text-xs text-[var(--text-secondary)] mt-0.5">设置默认汇率来源和偏好币种</div>
-	          </div>
-	          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]"><path d="M6 4l4 4-4 4"/></svg>
-	        </button>
-	      </div>
+          <button
+            onClick={() => toast('功能开发中', 'info')}
+            className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
+          >
+            <div>
+              <div className="text-sm">最近浏览</div>
+              <div className="text-xs text-[var(--text-secondary)] mt-0.5">查看最近浏览过的商品</div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]"><path d="M6 4l4 4-4 4"/></svg>
+          </button>
+          <button
+            onClick={() => toast('功能开发中', 'info')}
+            className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
+          >
+            <div>
+              <div className="text-sm">默认物流设置</div>
+              <div className="text-xs text-[var(--text-secondary)] mt-0.5">设置默认快递模板和运费参数</div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]"><path d="M6 4l4 4-4 4"/></svg>
+          </button>
+          <button
+            onClick={() => toast('功能开发中', 'info')}
+            className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
+          >
+            <div>
+              <div className="text-sm">汇率设置</div>
+              <div className="text-xs text-[var(--text-secondary)] mt-0.5">设置默认汇率来源和偏好币种</div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]"><path d="M6 4l4 4-4 4"/></svg>
+          </button>
+        </div>
 
 	      {profile?.configuredBrands?.length > 0 && (
         <div className="bg-[var(--bg-card)] rounded-xl p-4 mb-4">
