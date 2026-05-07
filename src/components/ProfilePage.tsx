@@ -120,7 +120,6 @@ export default function ProfilePage() {
   const { signOut } = useClerk()
   const { openLogin } = useLoginModal()
   const navigate = useNavigate()
-  const { toast } = useToast()
   const [profile, setProfile] = useState<any>(null)
   const [showNameModal, setShowNameModal] = useState(false)
   const [showPwdModal, setShowPwdModal] = useState(false)
