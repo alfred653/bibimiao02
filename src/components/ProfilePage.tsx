@@ -16,7 +16,7 @@ function NameEditModal({ currentName, onClose, onSaved }: { currentName: string;
     if (!v) { toast('用户名不能为空', 'error'); return }
     setSaving(true)
     try {
-      await user!.update({ username: v })
+      await user!.update({ firstName: v, lastName: '' })
       await apiPut('/api/profile', { name: v })
       toast('用户名已更新', 'success')
       onSaved()
