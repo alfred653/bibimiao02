@@ -263,7 +263,7 @@ export default function ProfilePage() {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]"><path d="M6 4l4 4-4 4"/></svg>
           </button>
           <button
-            onClick={() => toast('功能开发中', 'info')}
+            onClick={() => navigate('/default-shipping')}
             className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
           >
             <div>

@@ -77,7 +77,32 @@ export default function ProductDetail() {
   useEffect(() => {
     api('/api/shipping-carriers')
       .then(r => r.json())
-      .then(d => { if (d.success) setCarriers(d.data) })
+      .then(d => {
+        if (d.success) {
+          setCarriers(d.data)
+          // Apply default shipping settings
+          try {
+            const defs = JSON.parse(localStorage.getItem('bbm_default_shipping') || '{}')
+            if (defs.weight !== undefined) setWeight(defs.weight)
+            if (defs.length !== undefined) setLength(defs.length)
+            if (defs.width !== undefined) setWidth(defs.width)
+            if (defs.height !== undefined) setHeight(defs.height)
+            if (defs.extraCost !== undefined) setExtraCost(defs.extraCost)
+            if (defs.marginRate !== undefined) setMarginRate(defs.marginRate)
+            if (defs.carrierId) {
+              setSelectedCarrierId(defs.carrierId)
+              const c = d.data.find((x: Carrier) => x.id === defs.carrierId)
+              if (c) {
+                setFirstWeight(String(c.firstWeight))
+                setFirstCost(String(c.firstCost))
+                setAdditionalWeight(String(c.additionalWeight))
+                setAdditionalCost(String(c.additionalCost))
+                setVolumeDivisor(String(c.volumeDivisor))
+              }
+            }
+          } catch {}
+        }
+      })
       .catch((e) => console.warn('Failed to load carriers:', e))
   }, [])
 
