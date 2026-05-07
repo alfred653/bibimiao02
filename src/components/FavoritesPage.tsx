@@ -41,7 +41,14 @@ export default function FavoritesPage() {
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">我的收藏</h1>
       {loading ? <div className="text-[var(--text-secondary)] text-center">加载中...</div> :
-       !items.length ? <div className="text-[var(--text-secondary)] text-center py-8">暂无收藏</div> :
+       !items.length ? (
+        <div className="text-center py-12">
+          <div className="text-4xl mb-4 opacity-30">♡</div>
+          <p className="text-[var(--text-secondary)] mb-2">还没有收藏商品</p>
+          <p className="text-xs text-[var(--text-muted)] mb-5">浏览商品时点击心形即可收藏，方便随时查看价格</p>
+          <button onClick={() => nav('/search')} className="bg-[var(--brand)] text-[var(--button-on-brand)] px-5 py-2 rounded-lg text-sm active:bg-[var(--brand-hover)] transition-colors">去搜索商品</button>
+        </div>
+      ) :
         <div className="space-y-3">
           {items.map(item => (
             <div key={item.id} className="bg-[var(--bg-card)] rounded-xl p-3 cursor-pointer hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] flex gap-3 transition-colors" onClick={() => nav(`/product/${item.id}`)}>

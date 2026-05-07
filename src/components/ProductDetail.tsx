@@ -178,7 +178,12 @@ export default function ProductDetail() {
 
   if (!isSignedIn) return <div className="p-8 text-center text-[var(--text-secondary)]">请先登录</div>
   if (loading) return <div className="p-8 text-center text-[var(--text-secondary)]">加载中...</div>
-  if (!product) return <div className="p-8 text-center text-[var(--text-secondary)]">商品不存在</div>
+  if (!product) return (
+    <div className="p-8 text-center">
+      <p className="text-[var(--text-secondary)] mb-4">商品不存在或已下架</p>
+      <button onClick={() => nav('/search')} className="bg-[var(--brand)] text-[var(--button-on-brand)] px-5 py-2 rounded-lg text-sm active:bg-[var(--brand-hover)] transition-colors">去搜索</button>
+    </div>
+  )
 
   return (
     <div className="p-4">

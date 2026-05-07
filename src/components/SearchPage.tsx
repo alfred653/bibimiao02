@@ -330,9 +330,9 @@ export default function SearchPage() {
 
       {/* Empty state */}
       {!results.length && !loading && searched && (
-        <div className="text-center py-8">
-          <p className="text-[var(--text-secondary)] mb-3">无搜索结果</p>
-          <p className="text-xs text-[var(--text-secondary)]/70 mb-4">试试搜索这些品牌：</p>
+        <div className="text-center py-10">
+          <p className="text-[var(--text-secondary)] mb-2">没有找到匹配的商品</p>
+          <p className="text-xs text-[var(--text-muted)] mb-5">试试搜索品牌名、英文型号或容量，例如：</p>
           <div className="flex flex-wrap justify-center gap-2">
             {SUGGESTED_BRANDS.map(b => (
               <button

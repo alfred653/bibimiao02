@@ -7,6 +7,9 @@ import { BRANDS } from '../../lib/constants'
 const TIERS = ['free', 'monthly', 'annual', 'lifetime']
 const STATUSES = ['active', 'disabled']
 
+function statusLabel(s: string) { return s === 'active' ? '已启用' : s === 'disabled' ? '已停用' : s === 'inactive' ? '已停用' : s }
+function tierLabel(t: string) { const m: Record<string, string> = { free: '免费', monthly: '月付', annual: '年付', lifetime: '终身' }; return m[t] || t }
+
 function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => void; onSaved: () => void }) {
   const [tier, setTier] = useState(user.membershipTier || 'free')
   const [status, setStatus] = useState(user.status || 'active')
@@ -426,6 +429,15 @@ export default function AdminPage() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [batchLoading, setBatchLoading] = useState(false)
 
+  // Dashboard stats
+  const [overview, setOverview] = useState<any>(null)
+
+  useEffect(() => {
+    if (!isUsers && !isProducts && !isCarriers) {
+      api('/api/products/overview').then(r => r.json()).then(d => { if (d.success) setOverview(d.data) }).catch(() => {})
+    }
+  }, [loc.pathname])
+
   // Carrier state
   const [editCarrier, setEditCarrier] = useState<any>(null)
   const [showAddCarrier, setShowAddCarrier] = useState(false)
@@ -520,8 +532,41 @@ export default function AdminPage() {
   if (!isUsers && !isProducts && !isCarriers) {
     return (
       <div>
-        <h1 className="text-xl font-bold mb-4">管理仪表板</h1>
-        <p className="text-[var(--text-secondary)]">欢迎使用管理后台。选择左侧菜单管理用户或商品。</p>
+        <h1 className="text-xl font-bold mb-6">管理仪表板</h1>
+        {overview && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
+              <div className="text-2xl font-bold text-[var(--brand)]">{overview.totalProducts}</div>
+              <div className="text-xs text-[var(--text-secondary)] mt-1">商品总数</div>
+            </div>
+            <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
+              <div className="text-2xl font-bold text-[var(--brand)]">{overview.brandCount}</div>
+              <div className="text-xs text-[var(--text-secondary)] mt-1">品牌数量</div>
+            </div>
+            <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
+              <div className="text-2xl font-bold text-[var(--brand)]">{overview.currencyCount}</div>
+              <div className="text-xs text-[var(--text-secondary)] mt-1">来源站点</div>
+            </div>
+            <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
+              <div className="text-lg font-bold text-[var(--text-primary)] truncate">{overview.lastUpdated ? new Date(overview.lastUpdated).toLocaleDateString('zh-CN') : '—'}</div>
+              <div className="text-xs text-[var(--text-secondary)] mt-1">最近更新</div>
+            </div>
+          </div>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <a href="/admin/products" className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)] hover:bg-[var(--bg-hover)] transition-colors">
+            <div className="text-sm font-medium text-[var(--text-primary)]">商品管理</div>
+            <div className="text-xs text-[var(--text-secondary)] mt-1">浏览、搜索、编辑和导入商品</div>
+          </a>
+          <a href="/admin/users" className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)] hover:bg-[var(--bg-hover)] transition-colors">
+            <div className="text-sm font-medium text-[var(--text-primary)]">用户管理</div>
+            <div className="text-xs text-[var(--text-secondary)] mt-1">管理用户等级、品牌权限和状态</div>
+          </a>
+          <a href="/admin/carriers" className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)] hover:bg-[var(--bg-hover)] transition-colors">
+            <div className="text-sm font-medium text-[var(--text-primary)]">快递管理</div>
+            <div className="text-xs text-[var(--text-secondary)] mt-1">配置国际运费模板和参数</div>
+          </a>
+        </div>
       </div>
     )
   }
@@ -571,15 +616,15 @@ export default function AdminPage() {
       {isUsers && (
         <div className="overflow-x-auto -mx-4 px-4">
           <table className="w-full text-sm min-w-[480px]">
-            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2">邮箱</th><th>等级</th><th>品牌</th><th>状态</th><th>操作</th></tr></thead>
+            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">邮箱</th><th className="py-2.5 font-medium">等级</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">操作</th></tr></thead>
             <tbody>
               {data.map(u => (
-                <tr key={u.id} className="border-b border-[var(--admin-border)]">
-                  <td className="py-2 text-xs">{u.email}</td>
-                  <td className="py-2"><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-[var(--bg-hover)] text-[var(--text-secondary)]' : 'bg-[var(--brand-soft)] text-[var(--brand)]'}`}>{u.membershipTier}</span></td>
-                  <td className="py-2 text-xs text-[var(--text-secondary)]">{(u.configuredBrands || []).join(', ') || '—'}</td>
-                  <td className="py-2"><span className={`text-xs ${u.status === 'active' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>{u.status}</span></td>
-                  <td className="py-2"><button onClick={() => setEditUser(u)} className="text-[var(--brand)] text-xs hover:underline active:text-[var(--brand)]">编辑</button></td>
+                <tr key={u.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
+                  <td className="py-3 text-xs">{u.email}</td>
+                  <td className="py-3"><span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-[var(--bg-hover)] text-[var(--text-secondary)]' : 'bg-[var(--brand-soft)] text-[var(--brand)]'}`}>{tierLabel(u.membershipTier)}</span></td>
+                  <td className="py-3 text-xs text-[var(--text-secondary)]">{(u.configuredBrands || []).join(', ') || '—'}</td>
+                  <td className="py-3"><span className={`text-xs ${u.status === 'active' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>{statusLabel(u.status)}</span></td>
+                  <td className="py-3"><button onClick={() => setEditUser(u)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button></td>
                 </tr>
               ))}
             </tbody>
@@ -591,19 +636,19 @@ export default function AdminPage() {
       {isCarriers && (
         <div className="overflow-x-auto -mx-4 px-4">
           <table className="w-full text-sm min-w-[600px]">
-            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2">名称</th><th>首重(kg)</th><th>首重价格</th><th>续重(kg)</th><th>续重价格</th><th>体积除数</th><th>状态</th><th>操作</th></tr></thead>
+            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">名称</th><th className="py-2.5 font-medium">首重(kg)</th><th className="py-2.5 font-medium">首重价格</th><th className="py-2.5 font-medium">续重(kg)</th><th className="py-2.5 font-medium">续重价格</th><th className="py-2.5 font-medium">体积除数</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">操作</th></tr></thead>
             <tbody>
               {data.map((c: any) => (
-                <tr key={c.id} className="border-b border-[var(--admin-border)]">
-                  <td className="py-2 text-xs font-medium">{c.name}</td>
-                  <td className="py-2 text-xs">{c.firstWeight}</td>
-                  <td className="py-2 text-xs">¥{c.firstCost}</td>
-                  <td className="py-2 text-xs">{c.additionalWeight}</td>
-                  <td className="py-2 text-xs">¥{c.additionalCost}</td>
-                  <td className="py-2 text-xs">{c.volumeDivisor}</td>
-                  <td className="py-2"><span className={`text-xs ${c.isActive === 'active' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>{c.isActive === 'active' ? '启用' : '禁用'}</span></td>
-                  <td className="py-2 whitespace-nowrap">
-                    <button onClick={() => setEditCarrier(c)} className="text-[var(--brand)] text-xs hover:underline">编辑</button>
+                <tr key={c.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
+                  <td className="py-3 text-xs font-medium">{c.name}</td>
+                  <td className="py-3 text-xs">{c.firstWeight}</td>
+                  <td className="py-3 text-xs">¥{c.firstCost}</td>
+                  <td className="py-3 text-xs">{c.additionalWeight}</td>
+                  <td className="py-3 text-xs">¥{c.additionalCost}</td>
+                  <td className="py-3 text-xs">{c.volumeDivisor}</td>
+                  <td className="py-3"><span className={`text-xs px-2 py-0.5 rounded ${c.isActive === 'active' ? 'bg-[var(--brand-soft)] text-[var(--success)]' : 'bg-[var(--bg-hover)] text-[var(--danger)]'}`}>{c.isActive === 'active' ? '已启用' : '已停用'}</span></td>
+                  <td className="py-3 whitespace-nowrap">
+                    <button onClick={() => setEditCarrier(c)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button>
                     <button onClick={() => {
                       if (!confirm('确认删除该快递？')) return
                       apiDelete('/api/admin/shipping-carriers', { id: c.id })
@@ -613,7 +658,7 @@ export default function AdminPage() {
                           else toast(d.error?.message || '删除失败', 'error')
                         })
                         .catch(() => toast('网络错误', 'error'))
-                    }} className="text-[var(--danger)] text-xs hover:underline ml-2">删除</button>
+                    }} className="bg-[var(--danger)]/10 text-[var(--danger)] px-3 py-1 rounded text-xs hover:bg-[var(--danger)]/20 active:bg-[var(--danger)]/20 transition-colors ml-2">删除</button>
                   </td>
                 </tr>
               ))}
@@ -626,12 +671,12 @@ export default function AdminPage() {
       {isProducts && (
         <div className="overflow-x-auto -mx-4 px-4">
           <table className="w-full text-sm min-w-[640px]">
-            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2 w-8"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></th><th className="py-2 w-10"></th><th className="py-2">标题</th><th>品牌</th><th>价格</th><th>来源</th><th>状态</th><th>操作</th></tr></thead>
+            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 w-8 font-medium"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></th><th className="py-2.5 w-10 font-medium"></th><th className="py-2.5 font-medium">标题</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">价格</th><th className="py-2.5 font-medium">来源</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">操作</th></tr></thead>
           <tbody>
             {data.map(p => (
-              <tr key={p.id} className="border-b border-[var(--admin-border)]">
-                <td className="py-2"><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></td>
-                <td className="py-2">
+              <tr key={p.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
+                <td className="py-3"><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></td>
+                <td className="py-3">
                   <img
                     src={p.imageUrl || `https://placehold.co/64x64/1a1a17/d97757?text=${encodeURIComponent((p.brand || '').slice(0, 6))}`}
                     alt=""
@@ -643,13 +688,13 @@ export default function AdminPage() {
                     }}
                   />
                 </td>
-                <td className="py-2 text-xs max-w-48 truncate">{p.title}</td>
-                <td className="py-2 text-[var(--brand)] text-xs">{p.brand}</td>
-                <td className="py-2 text-xs">{p.currency} {p.price}</td>
-                <td className="py-2 text-xs text-[var(--text-secondary)]">{p.source}</td>
-                <td className="py-2"><span className={`text-xs ${p.status === 'active' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>{p.status}</span></td>
-                <td className="py-2 whitespace-nowrap">
-                  <button onClick={() => setEditProduct(p)} className="text-[var(--brand)] text-xs hover:underline">编辑</button>
+                <td className="py-3 text-xs max-w-48 truncate">{p.title}</td>
+                <td className="py-3 text-[var(--brand)] text-xs">{p.brand}</td>
+                <td className="py-3 text-xs font-mono tabular-nums">{p.currency} {p.price}</td>
+                <td className="py-3 text-xs text-[var(--text-secondary)]">{p.source}</td>
+                <td className="py-3"><span className={`text-xs px-2 py-0.5 rounded ${p.status === 'active' ? 'bg-[var(--brand-soft)] text-[var(--success)]' : 'bg-[var(--bg-hover)] text-[var(--danger)]'}`}>{statusLabel(p.status)}</span></td>
+                <td className="py-3 whitespace-nowrap">
+                  <button onClick={() => setEditProduct(p)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button>
                   <button onClick={() => {
                     if (!confirm('确认删除该商品？')) return
                     apiDelete('/api/admin/products', { id: p.id })
@@ -659,7 +704,7 @@ export default function AdminPage() {
                         else toast(d.error?.message || '删除失败', 'error')
                       })
                       .catch(() => toast('网络错误', 'error'))
-                  }} className="text-[var(--danger)] text-xs hover:underline ml-2">删除</button>
+                  }} className="bg-[var(--danger)]/10 text-[var(--danger)] px-3 py-1 rounded text-xs hover:bg-[var(--danger)]/20 active:bg-[var(--danger)]/20 transition-colors ml-2">删除</button>
                 </td>
               </tr>
             ))}
@@ -691,8 +736,8 @@ export default function AdminPage() {
             className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded px-2 py-1 text-xs text-[var(--text-primary)] disabled:opacity-50"
           >
             <option value="" disabled>修改状态</option>
-            <option value="active">active</option>
-            <option value="inactive">inactive</option>
+            <option value="active">已启用</option>
+            <option value="inactive">已停用</option>
           </select>
           <select
             defaultValue=""
