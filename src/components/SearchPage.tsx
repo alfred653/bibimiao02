@@ -157,6 +157,19 @@ export default function SearchPage() {
     })
   }
 
+  function removeHistoryItem(index: number) {
+    setSearchHistory(prev => {
+      const next = prev.filter((_, i) => i !== index)
+      saveHistory(next)
+      return next
+    })
+  }
+
+  function clearHistory() {
+    setSearchHistory([])
+    saveHistory([])
+  }
+
   const filtersRef = useRef({ keyword, brand, source, currency, sortBy, sortOrder, priceMin, priceMax })
   filtersRef.current = { keyword, brand, source, currency, sortBy, sortOrder, priceMin, priceMax }
 
@@ -250,16 +263,25 @@ export default function SearchPage() {
       {/* Search history */}
       {showHistory && (
         <div className="mb-3">
-          <div className="text-[10px] text-[var(--text-secondary)] mb-2">最近搜索</div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] text-[var(--text-secondary)]">最近搜索</span>
+            <button onClick={clearHistory} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">清除全部</button>
+          </div>
           <div className="flex flex-wrap gap-1.5">
             {searchHistory.map((q, i) => (
-              <button
-                key={i}
-                onClick={() => { setKeyword(q); doSearch(1, { keyword: q }) }}
-                className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors"
-              >
-                {q}
-              </button>
+              <span key={i} className="inline-flex items-center bg-[var(--bg-card)] rounded-lg overflow-hidden">
+                <button
+                  onClick={() => { setKeyword(q); doSearch(1, { keyword: q }) }}
+                  className="px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
+                >
+                  {q}
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); removeHistoryItem(i) }}
+                  className="px-1.5 py-1.5 text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
+                  aria-label={`删除 ${q}`}
+                >×</button>
+              </span>
             ))}
           </div>
         </div>
@@ -470,11 +492,11 @@ export default function SearchPage() {
                         <h3 className="text-sm font-medium leading-snug">
                           {highlightText(item.title, keyword)}
                         </h3>
-                        <div className="flex flex-wrap gap-1.5 mt-1.5 text-xs text-[var(--text-secondary)]">
-                          <span className="bg-[var(--brand)]/10 text-[var(--brand)] px-1.5 rounded">{item.brand}</span>
-                          {item.source && <span>{item.source}</span>}
-                          {item.currency && <span>{item.currency}</span>}
-                          {item.spec && <span className="text-[var(--text-secondary)]">{item.spec}</span>}
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5 text-xs">
+                          <span className="bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded">{item.brand}</span>
+                          {item.source && <span className="text-[var(--text-secondary)]">{item.source}</span>}
+                          {item.spec && <span className="text-[var(--text-muted)] text-[11px]">{item.spec}</span>}
+                          {item.currency && <span className="text-[var(--text-muted)] text-[11px]">{item.currency}</span>}
                         </div>
                       </div>
                       {item.price && (

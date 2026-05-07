@@ -135,7 +135,7 @@ export default function ProductDetail() {
   }, [id, isSignedIn])
 
   const [displayCurrency, setDisplayCurrency] = useState('')
-  const [dispRate, setDispRate] = useState<{ rate: number; source: string } | null>(null)
+  const [dispRate, setDispRate] = useState<{ rate: number; source: string; updatedAt: string } | null>(null)
   const [dispConverted, setDispConverted] = useState<number | null>(null)
   const [rateLoading, setRateLoading] = useState(false)
 
@@ -160,7 +160,7 @@ export default function ProductDetail() {
       .then(r => r.json())
       .then(d => {
         if (d.success) {
-          setDispRate({ rate: d.data.rate, source: d.data.source })
+          setDispRate({ rate: d.data.rate, source: d.data.source, updatedAt: d.data.updatedAt })
           setDispConverted(Math.round((parseFloat(product.price) || 0) * d.data.rate * 100) / 100)
         }
       })
@@ -286,12 +286,18 @@ export default function ProductDetail() {
               <span className="text-[var(--text-secondary)]">换算价格</span>
               <span className="text-[var(--success)] font-bold">{formatPrice(displayCurrency, dispConverted)}</span>
             </div>
-            <div className="flex justify-between text-[11px]">
-              <span className="text-[var(--text-muted)]">汇率</span>
-              <span className="text-[var(--text-muted)]">
-                1 {product.currency} = {dispRate.rate} {displayCurrency}
-                · {dispRate.source === 'frankfurter' ? '实时' : dispRate.source === 'cache' ? '缓存' : '预设'}
-              </span>
+            <div className="text-[11px] space-y-0.5">
+              <div className="flex justify-between">
+                <span className="text-[var(--text-muted)]">汇率</span>
+                <span className="text-[var(--text-muted)]">
+                  1 {product.currency} = {dispRate.rate} {displayCurrency}
+                  · {dispRate.source === 'frankfurter' ? 'Frankfurter 实时' : dispRate.source === 'cache' ? '缓存' : '预设'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--text-muted)]">更新时间</span>
+                <span className="text-[var(--text-muted)]">{new Date(dispRate.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
             </div>
           </div>
         )}
@@ -367,6 +373,22 @@ export default function ProductDetail() {
                 <span className="text-[10px] text-[var(--text-secondary)] w-3 sm:w-4 shrink-0">高</span>
                 <input type="number" step="0.1" min="0" value={height} onChange={e => setHeight(e.target.value)} placeholder="0" className="flex-1 min-w-0 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1 sm:px-2 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
                 <span className="text-[10px] text-[var(--text-secondary)] w-5 sm:w-7 shrink-0">cm</span>
+              </div>
+              <div className="flex flex-wrap gap-1 pl-12 sm:pl-16">
+                {[
+                  { label: '20L登机', l: '45', w: '30', h: '18' },
+                  { label: '30L日用', l: '50', w: '30', h: '22' },
+                  { label: '40L登山', l: '55', w: '32', h: '25' },
+                  { label: '50L徒步', l: '60', w: '35', h: '28' },
+                  { label: '65L大容量', l: '65', w: '38', h: '30' },
+                  { label: '80L远征', l: '75', w: '40', h: '35' },
+                ].map(p => (
+                  <button
+                    key={p.label}
+                    onClick={() => { setLength(p.l); setWidth(p.w); setHeight(p.h) }}
+                    className="bg-[var(--bg-input)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] border border-[var(--border-subtle)] rounded-md px-1.5 py-0.5 text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                  >{p.label}</button>
+                ))}
               </div>
             </div>
           </div>
@@ -540,6 +562,46 @@ export default function ProductDetail() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Price history */}
+      {(product.originalPrice || product.updatedAt) && (
+        <div className="bg-[var(--bg-card)] rounded-xl p-4 mb-4">
+          <h3 className="text-xs text-[var(--text-muted)] mb-3 font-medium uppercase tracking-wide">价格变动</h3>
+          <div className="space-y-2 text-xs">
+            {product.originalPrice && (
+              <div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-[var(--text-secondary)]">原价</span>
+                  <span className="text-[var(--text-muted)] line-through">{formatPrice(product.currency, product.originalPrice)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[var(--text-secondary)]">现价</span>
+                  <span className="text-[var(--brand)] font-bold">{formatPrice(product.currency, product.price)}</span>
+                </div>
+                <div className="mt-2 bg-[var(--bg-input)] rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="h-full bg-[var(--success)] rounded-full transition-all"
+                    style={{ width: `${Math.min(100, Math.round((parseFloat(product.price) / parseFloat(product.originalPrice)) * 100))}%` }}
+                  />
+                </div>
+                <div className="text-[10px] text-[var(--text-muted)] mt-1 text-right">
+                  {(() => {
+                    const pct = Math.round((1 - parseFloat(product.price) / parseFloat(product.originalPrice)) * 100)
+                    return pct > 0 ? `↓${pct}%` : pct < 0 ? `↑${Math.abs(pct)}%` : '持平'
+                  })()}
+                </div>
+              </div>
+            )}
+            {product.updatedAt && (
+              <div className="flex justify-between text-[10px]">
+                <span className="text-[var(--text-muted)]">数据更新</span>
+                <span className="text-[var(--text-muted)]">{new Date(product.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+            )}
+            <p className="text-[10px] text-[var(--text-muted)] leading-relaxed">价格历史数据正在积累中。定期访问可获取更完整的价格走势。</p>
+          </div>
+        </div>
+      )}
 
       {/* Action buttons */}
       <button
