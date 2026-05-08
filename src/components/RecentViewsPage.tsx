@@ -61,7 +61,7 @@ export default function RecentViewsPage() {
       ) : (
         <div className="space-y-2">
           {items.map(p => (
-            <div key={p.id} className="bg-[var(--bg-card)] rounded-xl p-3 flex items-center gap-3 group">
+            <div key={p.id} className="bg-[var(--bg-card)] rounded-xl p-3 flex items-center gap-3">
               <button
                 onClick={() => nav(`/product/${p.id}`)}
                 className="flex items-center gap-3 flex-1 min-w-0 text-left"
@@ -71,27 +71,24 @@ export default function RecentViewsPage() {
                   alt="" className="w-10 h-10 rounded-lg object-cover bg-[var(--bg-input)] shrink-0" loading="lazy"
                   onError={e => { (e.target as HTMLImageElement).src = `https://placehold.co/56x56/1a1a17/666?text=${encodeURIComponent(p.brand.slice(0, 2))}` }}
                 />
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 space-y-0.5">
                   <div className="text-sm truncate">{stripBrandPrefix(p.title, p.brand)}</div>
-                  <div className="flex items-center gap-2 mt-0.5 min-w-0">
-                    <span className="text-xs text-[var(--text-secondary)] whitespace-nowrap">{p.brand}</span>
-                    <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap shrink-0">{timeAgo(p.viewedAt)}</span>
+                  <div className="text-xs text-[var(--text-secondary)] whitespace-nowrap">{p.brand}</div>
+                </div>
+                <div className="shrink-0 flex flex-col items-end gap-0.5">
+                  <div className="text-sm font-bold text-[var(--brand)]" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    {formatPrice(p.currency, p.price)}
                   </div>
+                  <div className="text-[10px] text-[var(--text-muted)] whitespace-nowrap">{timeAgo(p.viewedAt)}</div>
                 </div>
-                <div className="text-sm font-bold text-[var(--brand)] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {formatPrice(p.currency, p.price)}
-                </div>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] shrink-0">
-                  <path d="M5 3l4 4-4 4" />
-                </svg>
               </button>
               <button
                 onClick={() => removeOne(p.id)}
-                className="p-1 min-w-[28px] min-h-[28px] rounded text-[var(--text-muted)] hover:text-[var(--text-secondary)] active:text-[var(--text-secondary)] shrink-0"
+                className="p-1 min-w-[28px] min-h-[28px] rounded text-[var(--text-muted)] hover:text-[var(--danger)] active:text-[var(--danger)] shrink-0 transition-colors"
                 aria-label="移除"
               >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M2 2l8 8M10 2l-8 8" />
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M2 2l10 10M12 2l-10 10" />
                 </svg>
               </button>
             </div>
