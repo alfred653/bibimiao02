@@ -212,8 +212,8 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (!isSignedIn) return
-    api('/api/favorites').then(r => r.json())
-      .then(d => { if (d.success) setFavoriteIds(new Set(d.data.items.map((it: any) => it.id))) })
+    api('/api/favorites?idsOnly=1').then(r => r.json())
+      .then(d => { if (d.success) setFavoriteIds(new Set(d.data.ids)) })
       .catch(() => {})
   }, [isSignedIn])
 

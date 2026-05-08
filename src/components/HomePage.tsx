@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api-client'
 import { formatPrice } from '../lib/format'
 
-interface Overview { totalProducts: number; brandCount: number; sourceCount: number; brands: { name: string; count: number; logo: string }[]; lastUpdated: string | null; recentProducts: { id: number; title: string; brand: string; price: string; currency: string; imageUrl: string | null }[] }
+interface Overview { totalProducts: number; brandCount: number; sourceCount: number; brands: { name: string; count: number }[]; lastUpdated: string | null; recentProducts: { id: number; title: string; brand: string; price: string; currency: string; imageUrl: string | null }[] }
 
 export default function HomePage() {
   const [keyword, setKeyword] = useState('')
@@ -32,6 +32,36 @@ export default function HomePage() {
         />
       </form>
 
+      {!overview && (
+        <div className="animate-pulse">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 text-center">
+            {[0, 1, 2].map(i => (
+              <div key={i} className="bg-[var(--bg-card)] rounded-xl p-3 sm:p-4">
+                <div className="h-6 sm:h-7 w-10 mx-auto bg-[var(--bg-hover)] rounded mb-1" />
+                <div className="h-3 w-14 mx-auto bg-[var(--bg-hover)] rounded" />
+              </div>
+            ))}
+          </div>
+          <div className="mb-6 bg-[var(--bg-card)] rounded-xl p-4">
+            <div className="h-3 w-16 bg-[var(--bg-hover)] rounded mb-3" />
+            <div className="space-y-1.5">
+              {[0, 1, 2].map(i => <div key={i} className="h-3 bg-[var(--bg-hover)] rounded w-full" />)}
+            </div>
+          </div>
+          <div className="h-4 w-16 bg-[var(--bg-hover)] rounded mb-3" />
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            {[0, 1, 2, 3].map(i => (
+              <div key={i} className="bg-[var(--bg-card)] rounded-xl p-3 sm:p-4 min-h-[56px] flex items-center gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[var(--bg-hover)] shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-3 bg-[var(--bg-hover)] rounded w-16" />
+                  <div className="h-2.5 bg-[var(--bg-hover)] rounded w-8" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {overview && (
         <>
           <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 text-center">
@@ -90,7 +120,7 @@ export default function HomePage() {
               <button key={b.name} onClick={() => nav(`/search?q=${encodeURIComponent(b.name)}&brand=${encodeURIComponent(b.name)}`)}
                 className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-xl p-3 sm:p-4 flex items-center gap-3 text-left transition-colors min-h-[56px]"
               >
-                <img src={b.logo} alt={b.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0" loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0 bg-[var(--brand-soft)] text-[var(--brand)] flex items-center justify-center text-sm sm:text-base font-bold">{b.name.charAt(0)}</span>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-medium truncate">{b.name}</div>
                   <div className="text-xs text-[var(--text-secondary)]">{b.count} 件</div>

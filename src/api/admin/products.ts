@@ -2,7 +2,7 @@ import { db } from '../../lib/db';
 import { products } from '../../db/schema';
 import { success, error } from '../../lib/response';
 import { requireAdmin } from '../../lib/auth';
-import { and, eq, ilike, or, inArray } from 'drizzle-orm';
+import { and, eq, ilike, or, inArray, isNull } from 'drizzle-orm';
 
 const VALID_STATUSES = ['active', 'inactive'];
 const MAX_IMPORT_ROWS = 1000;
@@ -102,6 +102,8 @@ export async function GET(req: Request) {
     const brand = url.searchParams.get('brand')?.trim();
     const status = url.searchParams.get('status');
     const search = url.searchParams.get('search')?.trim();
+    const missingImage = url.searchParams.get('missingImage') === '1';
+    const missingSource = url.searchParams.get('missingSource') === '1';
     const page = Math.max(1, parseInt(url.searchParams.get('page') || '') || 1);
     const pageSize = 30;
 
@@ -113,6 +115,8 @@ export async function GET(req: Request) {
         or(ilike(products.title, `%${search}%`), ilike(products.brand, `%${search}%`))!
       );
     }
+    if (missingImage) conditions.push(or(isNull(products.imageUrl), eq(products.imageUrl, ''))!);
+    if (missingSource) conditions.push(or(isNull(products.source), eq(products.source, ''))!);
 
     const allRows = conditions.length > 0
       ? await db.select().from(products).where(and(...conditions))

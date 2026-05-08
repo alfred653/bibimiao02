@@ -516,6 +516,8 @@ export default function AdminPage() {
       if (search) params.set('search', search)
       if (brandFilter) params.set('brand', brandFilter)
       if (statusFilter) params.set('status', statusFilter)
+      if (quickFilter === 'noImage') params.set('missingImage', '1')
+      if (quickFilter === 'noSource') params.set('missingSource', '1')
       params.set('page', String(p))
       url = `/api/admin/products?${params}`
     } else if (isCarriers) {
@@ -537,9 +539,9 @@ export default function AdminPage() {
         }
       })
       .finally(() => setLoading(false))
-  }, [isUsers, isProducts, isCarriers, search, tierFilter, statusFilter, brandFilter])
+  }, [isUsers, isProducts, isCarriers, search, tierFilter, statusFilter, brandFilter, quickFilter])
 
-  useEffect(() => { setPage(1); fetchData(1) }, [loc.pathname, search, tierFilter, statusFilter, brandFilter])
+  useEffect(() => { setPage(1); fetchData(1) }, [loc.pathname, search, tierFilter, statusFilter, brandFilter, quickFilter])
   useEffect(() => { fetchData(page) }, [page])
 
   if (!isSignedIn) return <div className="text-[var(--text-secondary)] p-4">请用管理员账号登录</div>
@@ -734,13 +736,10 @@ export default function AdminPage() {
 
       {/* Product Table */}
       {isProducts && (() => {
-        const displayData = quickFilter === 'noImage' ? data.filter((p: any) => !p.imageUrl)
-          : quickFilter === 'noSource' ? data.filter((p: any) => !p.source)
-          : data
-        if (!loading && displayData.length === 0) return (
+        if (!loading && data.length === 0) return (
           <div className="text-center py-16">
             <p className="text-sm text-[var(--text-secondary)]">暂无商品数据</p>
-            <p className="text-xs text-[var(--text-muted)] mt-1">{data.length === 0 ? '可以手动添加商品，或通过 Excel 批量导入' : '当前筛选条件下无匹配商品'}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">{!search && !brandFilter && !statusFilter && !quickFilter ? '可以手动添加商品，或通过 Excel 批量导入' : '当前筛选条件下无匹配商品'}</p>
           </div>
         )
         return (
@@ -748,7 +747,7 @@ export default function AdminPage() {
           <table className="w-full text-sm min-w-[700px]">
             <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 w-8 font-medium"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></th><th className="py-2.5 w-10 font-medium"></th><th className="py-2.5 font-medium">标题</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">价格</th><th className="py-2.5 font-medium">来源</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
           <tbody>
-            {displayData.map(p => (
+            {data.map(p => (
               <tr key={p.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
                 <td className="py-3"><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></td>
                 <td className="py-3">

@@ -248,7 +248,7 @@ export default function ProductDetail() {
 
   return (
     <div className="p-4">
-      <button onClick={() => nav(-1)} className="text-[var(--text-secondary)] text-sm mb-4 hover:text-[var(--text-primary)] transition-colors">← 返回</button>
+      <button onClick={() => (window.history.length > 1 ? nav(-1) : nav('/search'))} className="text-[var(--text-secondary)] text-sm mb-4 hover:text-[var(--text-primary)] transition-colors">← 返回</button>
 
       <img
         src={product.imageUrl || `https://placehold.co/800x400/1a1a17/d97757?text=${encodeURIComponent(product.brand || '')}`}

@@ -17,7 +17,6 @@ export async function GET() {
     const brands = [...brandMap.entries()].map(([name, count]) => ({
       name,
       count,
-      logo: `/brands/${name.toLowerCase().replace(/\s+/g, '-')}.png`,
     }));
 
     const sourceRows = await db

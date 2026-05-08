@@ -11,6 +11,7 @@ export async function GET(req: Request) {
     const userIdInner = authResult;
 
     const url = new URL(req.url);
+    const idsOnly = url.searchParams.get('idsOnly') === '1';
     const page = Math.max(1, parseInt(url.searchParams.get('page') || '') || 1);
     const pageSize = Math.min(50, parseInt(url.searchParams.get('pageSize') || '') || 30);
 
@@ -24,10 +25,15 @@ export async function GET(req: Request) {
       .where(eq(favorites.userId, userIdInner));
 
     if (favRows.length === 0) {
-      return success({ items: [], pagination: { page, pageSize, total: 0, totalPages: 0 } });
+      return success(idsOnly ? { ids: [] } : { items: [], pagination: { page, pageSize, total: 0, totalPages: 0 } });
     }
 
     const productIds = favRows.map((r) => r.productId);
+
+    if (idsOnly) {
+      return success({ ids: productIds });
+    }
+
     const productRows = await db
       .select()
       .from(products)
