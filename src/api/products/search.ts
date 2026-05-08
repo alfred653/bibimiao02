@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       );
       rows = result.rows as any[];
     } else {
-      // ILIKE for filtering, sort in-memory for price or by DB for newest
+      // ILIKE for filtering with DB-level sort and generous limit for quota filtering
       const whereConditions = [eq(products.status, 'active')];
 
       const words = keyword.split(/\s+/);
@@ -76,7 +76,13 @@ export async function POST(req: Request) {
 
       if (sortBy === 'newest') {
         query.orderBy(desc(products.createdAt));
+      } else if (sortBy === 'price') {
+        query.orderBy(sortOrder === 'asc'
+          ? sql`${products.price}::numeric ASC`
+          : sql`${products.price}::numeric DESC`);
       }
+
+      query.limit(300);
 
       rows = await query;
     }
@@ -101,15 +107,6 @@ export async function POST(req: Request) {
     // For anonymous users: max 10 total
     if (!limit) {
       filtered = filtered.slice(0, 10);
-    }
-
-    // Sort for price (in-memory)
-    if (sortBy === 'price') {
-      filtered.sort((a, b) => {
-        const pa = parseFloat(a.price as string) || 0;
-        const pb = parseFloat(b.price as string) || 0;
-        return sortOrder === 'asc' ? pa - pb : pb - pa;
-      });
     }
 
     const total = filtered.length;

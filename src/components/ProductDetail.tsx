@@ -109,15 +109,13 @@ export default function ProductDetail() {
   }, [])
 
   useEffect(() => {
-    if (!isSignedIn) { openLogin(); return }
-    api(`/api/products/${id}`)
+    fetch(`/api/products/${id}`)
       .then(r => r.json())
       .then(d => {
         if (d.success) {
           setProduct(d.data)
           setFavorited(d.data.favorited)
           saveRecentView(d.data)
-          // Fetch cross-source comparison
           const titleWords = (d.data.title || '').split(/\s+/).slice(0, 3).join(' ')
           if (titleWords) {
             apiPost('/api/products/search', { keyword: titleWords, pageSize: 10 })
@@ -132,7 +130,7 @@ export default function ProductDetail() {
         }
       })
       .finally(() => setLoading(false))
-  }, [id, isSignedIn])
+  }, [id])
 
   const [displayCurrency, setDisplayCurrency] = useState('')
   const [dispRate, setDispRate] = useState<{ rate: number; source: string; updatedAt: string } | null>(null)
@@ -240,7 +238,6 @@ export default function ProductDetail() {
     }
   }
 
-  if (!isSignedIn) return <div className="p-8 text-center text-[var(--text-secondary)]">请先登录</div>
   if (loading) return <div className="p-8 text-center text-[var(--text-secondary)]">加载中...</div>
   if (!product) return (
     <div className="p-8 text-center">
@@ -348,6 +345,7 @@ export default function ProductDetail() {
       </div>
 
       {/* Cost Estimate Panel */}
+      {isSignedIn ? (
       <div className="bg-[var(--bg-card)] rounded-xl p-4 mb-4">
         <h2 className="text-sm font-bold mb-4 text-[var(--text-primary)]">
           成本估算 <span className="text-xs text-[var(--text-secondary)] font-normal">(CNY)</span>
@@ -569,6 +567,12 @@ export default function ProductDetail() {
           </AnimatePresence>
         </div>
       </div>
+      ) : (
+      <div className="bg-[var(--bg-card)] rounded-xl p-6 mb-4 text-center">
+        <p className="text-sm text-[var(--text-secondary)] mb-3">登录后可使用成本估算</p>
+        <button onClick={() => openLogin()} className="bg-[var(--brand)] text-[var(--button-on-brand)] px-5 py-2 rounded-lg text-sm active:bg-[var(--brand-hover)] transition-colors">立即登录</button>
+      </div>
+      )}
 
       {/* Price history */}
       {(product.originalPrice || product.updatedAt) && (
@@ -611,13 +615,22 @@ export default function ProductDetail() {
       )}
 
       {/* Action buttons */}
-      <button
-        onClick={toggleFavorite}
-        disabled={favToggling}
-        className={`w-full py-3 rounded-xl text-sm font-medium mb-2 transition-colors ${favorited ? 'bg-[var(--brand-soft)] text-[var(--danger)] border border-[var(--danger)]' : 'bg-[var(--brand)] text-[var(--button-on-brand)] active:bg-[var(--brand-hover)]'}`}
-      >
-        {favorited ? '已收藏' : '收藏'}
-      </button>
+      {isSignedIn ? (
+        <button
+          onClick={toggleFavorite}
+          disabled={favToggling}
+          className={`w-full py-3 rounded-xl text-sm font-medium mb-2 transition-colors ${favorited ? 'bg-[var(--brand-soft)] text-[var(--danger)] border border-[var(--danger)]' : 'bg-[var(--brand)] text-[var(--button-on-brand)] active:bg-[var(--brand-hover)]'}`}
+        >
+          {favorited ? '已收藏' : '收藏'}
+        </button>
+      ) : (
+        <button
+          onClick={() => openLogin()}
+          className="w-full py-3 rounded-xl text-sm font-medium mb-2 transition-colors bg-[var(--brand)] text-[var(--button-on-brand)] active:bg-[var(--brand-hover)]"
+        >
+          登录后收藏
+        </button>
+      )}
       <div className="flex gap-2 mb-2">
         <button
           onClick={() => {

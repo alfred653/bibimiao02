@@ -1,15 +1,13 @@
 import { db } from '../../lib/db';
 import { products, browseHistory } from '../../db/schema';
 import { success, error } from '../../lib/response';
-import { requireAuth } from '../../lib/auth';
+import { getUserId } from '../../lib/auth';
 import { getRate } from '../../lib/exchange-rate';
 import { eq } from 'drizzle-orm';
 
 export async function GET(req: Request) {
   try {
-    const authResult = await requireAuth(req);
-    if (typeof authResult !== 'string') return authResult;
-    const userIdInner = authResult;
+    const userId = await getUserId(req).catch(() => null);
 
     const url = new URL(req.url);
     const segments = url.pathname.split('/');
@@ -30,10 +28,12 @@ export async function GET(req: Request) {
       }
     }
 
-    // Record browse history (fire-and-forget)
-    db.insert(browseHistory)
-      .values({ userId: userIdInner, productId: id })
-      .then(() => {}, () => {});
+    // Record browse history (fire-and-forget, auth only)
+    if (userId) {
+      db.insert(browseHistory)
+        .values({ userId, productId: id })
+        .then(() => {}, () => {});
+    }
 
     return success({
       ...product,
