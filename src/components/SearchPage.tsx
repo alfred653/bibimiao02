@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useSearchParams, useNavigate, useNavigationType } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUser } from '@clerk/clerk-react'
 import { useLoginModal } from './LoginModal'
@@ -91,6 +91,7 @@ function PaginationJumper({ current, max, onJump }: { current: number; max: numb
 export default function SearchPage() {
   const [params] = useSearchParams()
   const nav = useNavigate()
+  const navigationType = useNavigationType()
   const { isSignedIn } = useUser()
   const { openLogin } = useLoginModal()
 
@@ -217,27 +218,28 @@ export default function SearchPage() {
   }
 
   useEffect(() => {
-    // Restore last search from sessionStorage so back-nav preserves results
-    const saved = sessionStorage.getItem('bbm_last_search')
-    let restoredKeyword = ''
-    if (saved) {
-      try {
-        const s = JSON.parse(saved)
-        if (s.keyword) {
-          restoredKeyword = s.keyword
-          setKeyword(s.keyword)
-          if (s.brand) setBrand(s.brand)
-          if (s.source) setSource(s.source)
-          if (s.currency) setCurrency(s.currency)
-          if (s.sortBy) setSortBy(s.sortBy)
-          if (s.sortOrder) setSortOrder(s.sortOrder)
-          if (s.priceMin) setPriceMin(s.priceMin)
-          if (s.priceMax) setPriceMax(s.priceMax)
-        }
-      } catch {}
+    // POP = back/forward navigation → restore saved search; PUSH/REPLACE = tab click → fresh start
+    if (navigationType === 'POP') {
+      const saved = sessionStorage.getItem('bbm_last_search')
+      if (saved) {
+        try {
+          const s = JSON.parse(saved)
+          if (s.keyword) {
+            setKeyword(s.keyword)
+            if (s.brand) setBrand(s.brand)
+            if (s.source) setSource(s.source)
+            if (s.currency) setCurrency(s.currency)
+            if (s.sortBy) setSortBy(s.sortBy)
+            if (s.sortOrder) setSortOrder(s.sortOrder)
+            if (s.priceMin) setPriceMin(s.priceMin)
+            if (s.priceMax) setPriceMax(s.priceMax)
+            doSearch(1, { keyword: s.keyword, brand: s.brand, source: s.source, currency: s.currency, sortBy: s.sortBy, sortOrder: s.sortOrder, priceMin: s.priceMin, priceMax: s.priceMax })
+          }
+        } catch {}
+      }
+    } else {
+      sessionStorage.removeItem('bbm_last_search')
     }
-    const kw = restoredKeyword || keyword
-    if (kw) doSearch(1, { keyword: kw })
   }, [])
 
   useEffect(() => {
@@ -522,10 +524,9 @@ export default function SearchPage() {
                         <h3 className="text-sm font-medium leading-snug">
                           {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
                         </h3>
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5 text-xs">
-                          <span className="bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">{item.brand}</span>
-                          {item.source && <span className="text-[var(--text-secondary)]">{item.source}</span>}
-                          {item.spec && <span className="text-[var(--text-muted)] text-[11px]">{item.spec}</span>}
+                        <div className="flex items-center gap-x-2 mt-1 text-xs">
+                          <span className="bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded whitespace-nowrap text-[11px]">{item.brand}</span>
+                          {item.source && <span className="text-[var(--text-muted)] text-[11px] truncate">{item.source}</span>}
                         </div>
                       </div>
                       {item.price && (
@@ -578,26 +579,26 @@ export default function SearchPage() {
                 />
                 <div className="p-2.5">
                   <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] text-[10px] px-1.5 py-0.5 rounded mb-1.5 whitespace-nowrap">{item.brand}</span>
-                  <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1.5 text-[var(--text-primary)]">
+                  <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1 text-[var(--text-primary)]">
                     {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
                   </h3>
-                  <div className="flex items-center justify-between">
-                    {item.price ? (
-                      <span className="text-[var(--brand)] font-bold text-sm" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</span>
-                    ) : (
-                      <span className="text-[var(--text-secondary)] text-xs">登录查看价格</span>
-                    )}
-                    <div className="flex items-center gap-1">
-                      {item.source && <span className="text-[10px] text-[var(--text-secondary)]">{item.source}</span>}
-                      <button
-                        onClick={e => toggleFavorite(item.id, e)}
-                        disabled={favToggling.has(item.id)}
-                        aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
-                        className={`text-lg p-1.5 min-w-[36px] min-h-[36px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
-                      >
-                        {favoriteIds.has(item.id) ? '♥' : '♡'}
-                      </button>
-                    </div>
+                  {item.price ? (
+                    <div className="text-[var(--brand)] font-bold text-sm mb-1" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
+                  ) : (
+                    <div className="text-[var(--text-secondary)] text-xs mb-1">登录查看价格</div>
+                  )}
+                  <div className="flex items-center justify-between gap-1">
+                    {item.source ? (
+                      <span className="text-[10px] text-[var(--text-muted)] truncate">{item.source}</span>
+                    ) : <span />}
+                    <button
+                      onClick={e => toggleFavorite(item.id, e)}
+                      disabled={favToggling.has(item.id)}
+                      aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
+                      className={`shrink-0 text-base p-1 min-w-[32px] min-h-[32px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
+                    >
+                      {favoriteIds.has(item.id) ? '♥' : '♡'}
+                    </button>
                   </div>
                 </div>
               </motion.div>

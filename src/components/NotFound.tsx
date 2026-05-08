@@ -8,7 +8,7 @@ export default function NotFound() {
       <p className="text-[var(--text-secondary)] text-sm mb-6">你访问的页面可能已被移除或地址有误</p>
       <Link
         to="/"
-        className="bg-[var(--brand)] text-white px-6 py-2 rounded-lg text-sm hover:bg-[var(--brand-hover)] active:bg-[var(--brand-soft)] transition-colors"
+        className="bg-[var(--brand)] text-[var(--button-on-brand)] px-6 py-2 rounded-lg text-sm hover:bg-[var(--brand-hover)] active:bg-[var(--brand-soft)] transition-colors"
       >
         返回首页
       </Link>
