@@ -523,10 +523,9 @@ export default function SearchPage() {
                           {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
                         </h3>
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5 text-xs">
-                          <span className="bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded">{item.brand}</span>
+                          <span className="bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">{item.brand}</span>
                           {item.source && <span className="text-[var(--text-secondary)]">{item.source}</span>}
                           {item.spec && <span className="text-[var(--text-muted)] text-[11px]">{item.spec}</span>}
-                          {item.currency && <span className="text-[var(--text-muted)] text-[11px]">{item.currency}</span>}
                         </div>
                       </div>
                       {item.price && (
@@ -578,7 +577,7 @@ export default function SearchPage() {
                   }}
                 />
                 <div className="p-2.5">
-                  <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] text-[10px] px-1.5 py-0.5 rounded mb-1.5">{item.brand}</span>
+                  <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] text-[10px] px-1.5 py-0.5 rounded mb-1.5 whitespace-nowrap">{item.brand}</span>
                   <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1.5 text-[var(--text-primary)]">
                     {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
                   </h3>
