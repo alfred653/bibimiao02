@@ -1,3 +1,14 @@
+export function stripBrandPrefix(title: string, brand: string): string {
+  if (!brand || !title) return title
+  const lower = title.toLowerCase()
+  const prefix = brand.toLowerCase()
+  if (lower.startsWith(prefix)) {
+    const rest = title.slice(brand.length)
+    return rest.replace(/^[-_\s]+/, '') || title
+  }
+  return title
+}
+
 const SYMBOLS: Record<string, string> = {
   CNY: '¥',
   USD: '$',

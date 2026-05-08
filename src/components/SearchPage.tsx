@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUser } from '@clerk/clerk-react'
 import { useLoginModal } from './LoginModal'
-import { formatPrice } from '../lib/format'
+import { formatPrice, stripBrandPrefix } from '../lib/format'
 import { api, apiPost, apiDelete } from '../lib/api-client'
 
 const SUGGESTED_BRANDS = ['Osprey', "Arc'teryx", 'Patagonia', 'The North Face', 'Gregory']
@@ -201,13 +201,43 @@ export default function SearchPage() {
           setPagination(d.data.pagination)
           setIsAnon(!isSignedIn)
           setPage(p)
+          sessionStorage.setItem('bbm_last_search', JSON.stringify({
+            keyword: f.keyword.trim(),
+            brand: f.brand,
+            source: f.source,
+            currency: f.currency,
+            sortBy: sortByParam,
+            sortOrder: sortOrderParam,
+            priceMin: f.priceMin,
+            priceMax: f.priceMax,
+          }))
         }
       })
       .finally(() => setLoading(false))
   }
 
   useEffect(() => {
-    if (keyword) doSearch(1)
+    // Restore last search from sessionStorage so back-nav preserves results
+    const saved = sessionStorage.getItem('bbm_last_search')
+    let restoredKeyword = ''
+    if (saved) {
+      try {
+        const s = JSON.parse(saved)
+        if (s.keyword) {
+          restoredKeyword = s.keyword
+          setKeyword(s.keyword)
+          if (s.brand) setBrand(s.brand)
+          if (s.source) setSource(s.source)
+          if (s.currency) setCurrency(s.currency)
+          if (s.sortBy) setSortBy(s.sortBy)
+          if (s.sortOrder) setSortOrder(s.sortOrder)
+          if (s.priceMin) setPriceMin(s.priceMin)
+          if (s.priceMax) setPriceMax(s.priceMax)
+        }
+      } catch {}
+    }
+    const kw = restoredKeyword || keyword
+    if (kw) doSearch(1, { keyword: kw })
   }, [])
 
   useEffect(() => {
@@ -490,7 +520,7 @@ export default function SearchPage() {
                     <div className="flex justify-between items-start gap-3">
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-medium leading-snug">
-                          {highlightText(item.title, keyword)}
+                          {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
                         </h3>
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5 text-xs">
                           <span className="bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded">{item.brand}</span>
@@ -550,7 +580,7 @@ export default function SearchPage() {
                 <div className="p-2.5">
                   <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] text-[10px] px-1.5 py-0.5 rounded mb-1.5">{item.brand}</span>
                   <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1.5 text-[var(--text-primary)]">
-                    {highlightText(item.title, keyword)}
+                    {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
                   </h3>
                   <div className="flex items-center justify-between">
                     {item.price ? (

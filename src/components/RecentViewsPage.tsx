@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { formatPrice } from '../lib/format'
+import { formatPrice, stripBrandPrefix } from '../lib/format'
 
 interface RecentItem {
   id: number
@@ -72,10 +72,10 @@ export default function RecentViewsPage() {
                   onError={e => { (e.target as HTMLImageElement).src = `https://placehold.co/56x56/1a1a17/666?text=${encodeURIComponent(p.brand.slice(0, 2))}` }}
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm truncate">{p.title}</div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs text-[var(--text-secondary)]">{p.brand}</span>
-                    <span className="text-[10px] text-[var(--text-muted)]">{timeAgo(p.viewedAt)}</span>
+                  <div className="text-sm truncate">{stripBrandPrefix(p.title, p.brand)}</div>
+                  <div className="flex items-center gap-2 mt-0.5 min-w-0">
+                    <span className="text-xs text-[var(--text-secondary)] whitespace-nowrap">{p.brand}</span>
+                    <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap shrink-0">{timeAgo(p.viewedAt)}</span>
                   </div>
                 </div>
                 <div className="text-sm font-bold text-[var(--brand)] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>
