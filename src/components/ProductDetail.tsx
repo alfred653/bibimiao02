@@ -253,7 +253,7 @@ export default function ProductDetail() {
       <img
         src={product.imageUrl || `https://placehold.co/800x400/1a1a17/d97757?text=${encodeURIComponent(product.brand || '')}`}
         alt=""
-        className="w-full h-48 object-cover rounded-xl bg-[var(--bg-card)] mb-4"
+        className="w-full max-h-64 object-contain rounded-xl bg-[var(--bg-card)] mb-4"
         loading="eager"
         onError={e => {
           const el = e.target as HTMLImageElement

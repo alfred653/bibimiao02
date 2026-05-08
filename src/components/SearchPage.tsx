@@ -512,7 +512,7 @@ export default function SearchPage() {
                     src={item.imageUrl || `https://placehold.co/112x112/1a1a17/d97757?text=${encodeURIComponent((item.brand || '').slice(0, 8))}`}
                     alt=""
                     loading="lazy"
-                    className="w-14 h-14 rounded-lg object-cover bg-[var(--bg-card)] shrink-0"
+                    className="w-14 h-14 rounded-lg object-contain bg-[var(--bg-card)] shrink-0 p-0.5"
                     onError={e => {
                       const el = e.target as HTMLImageElement
                       el.src = `https://placehold.co/112x112/1a1a17/666?text=${encodeURIComponent('暂无图片')}`
@@ -567,7 +567,7 @@ export default function SearchPage() {
                   src={item.imageUrl || `https://placehold.co/400x300/1a1a17/d97757?text=${encodeURIComponent((item.brand || '').slice(0, 12))}`}
                   alt=""
                   loading="lazy"
-                  className="w-full aspect-[4/3] object-cover bg-[var(--bg-card)]"
+                  className="w-full aspect-[4/3] object-contain bg-[var(--bg-card)] p-0.5"
                   onError={e => {
                     const el = e.target as HTMLImageElement
                     el.src = `https://placehold.co/400x300/1a1a17/666?text=${encodeURIComponent('暂无图片')}`
