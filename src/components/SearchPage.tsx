@@ -518,27 +518,27 @@ export default function SearchPage() {
                       el.src = `https://placehold.co/112x112/1a1a17/666?text=${encodeURIComponent('暂无图片')}`
                     }}
                   />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2">
-                      <h3 className="text-sm font-medium leading-snug min-w-0 flex-1">
-                        {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
-                      </h3>
-                      <button
-                        onClick={e => toggleFavorite(item.id, e)}
-                        disabled={favToggling.has(item.id)}
-                        aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
-                        className={`shrink-0 text-lg p-1 min-w-[36px] min-h-[36px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
-                      >
-                        {favoriteIds.has(item.id) ? '♥' : '♡'}
-                      </button>
-                    </div>
-                    <div className="mt-1 space-y-0.5">
-                      <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded text-[11px] whitespace-nowrap">{item.brand}</span>
-                      {item.source && <div className="text-[11px] text-[var(--text-muted)] truncate">{item.source}</div>}
-                      {item.price && (
-                        <div className="text-[var(--brand)] font-bold text-base" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
-                      )}
-                    </div>
+                  <div className="flex-1 min-w-0 space-y-0.5">
+                    <h3 className="text-sm font-medium leading-snug">
+                      {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
+                    </h3>
+                    <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded text-[11px] whitespace-nowrap">{item.brand}</span>
+                    {item.source && <div className="text-[11px] text-[var(--text-muted)] truncate">{item.source}</div>}
+                  </div>
+                  <div className="shrink-0 flex flex-col items-end gap-1">
+                    {item.price ? (
+                      <div className="text-[var(--brand)] font-bold text-base whitespace-nowrap" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
+                    ) : (
+                      <div className="text-[var(--text-secondary)] text-xs whitespace-nowrap">登录查看</div>
+                    )}
+                    <button
+                      onClick={e => toggleFavorite(item.id, e)}
+                      disabled={favToggling.has(item.id)}
+                      aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
+                      className={`shrink-0 text-lg p-1 min-w-[36px] min-h-[36px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
+                    >
+                      {favoriteIds.has(item.id) ? '♥' : '♡'}
+                    </button>
                   </div>
                 </div>
               </motion.div>
