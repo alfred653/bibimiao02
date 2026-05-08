@@ -199,7 +199,7 @@ export default function SearchPage() {
           setResults(d.data.items)
           setSummary(d.data.summary)
           setPagination(d.data.pagination)
-          setIsAnon(!d.data.items?.[0]?.price)
+          setIsAnon(!isSignedIn)
           setPage(p)
         }
       })
@@ -507,8 +507,8 @@ export default function SearchPage() {
                       <button
                         onClick={e => toggleFavorite(item.id, e)}
                         disabled={favToggling.has(item.id)}
+                        aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                         className={`shrink-0 text-xl p-1.5 min-w-[40px] min-h-[40px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
-                        title={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                       >
                         {favoriteIds.has(item.id) ? '♥' : '♡'}
                       </button>
@@ -563,8 +563,8 @@ export default function SearchPage() {
                       <button
                         onClick={e => toggleFavorite(item.id, e)}
                         disabled={favToggling.has(item.id)}
+                        aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                         className={`text-lg p-1.5 min-w-[36px] min-h-[36px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
-                        title={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
                       >
                         {favoriteIds.has(item.id) ? '♥' : '♡'}
                       </button>

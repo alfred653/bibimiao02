@@ -31,7 +31,6 @@ export default function FavoritesPage() {
       .then(r => r.json())
       .then(d => {
         if (d.success) { setItems(prev => prev.filter(it => it.id !== productId)); toast('已取消收藏', 'success') }
-        else toast(d.error?.message || '操作失败', 'error')
       })
       .catch(() => toast('网络错误', 'error'))
   }

@@ -8,6 +8,8 @@ const VALID_STATUSES = ['active', 'inactive'];
 const MAX_IMPORT_ROWS = 1000;
 const MAX_TAG_LENGTH = 50;
 const MAX_TAGS = 20;
+const MAX_TEXT_LENGTH = 500;
+const MAX_URL_LENGTH = 2000;
 
 function sanitizeTags(raw: unknown): string[] {
   if (Array.isArray(raw)) {
@@ -76,18 +78,20 @@ export function normalizeRow(row: Record<string, unknown>): NormalizedRow {
   const price = sanitizePrice(row.price);
   const originalPrice = sanitizePrice(row.originalPrice) ?? price;
 
+  const truncate = (v: string | null, max: number) => v && v.length > max ? v.slice(0, max) : v;
+
   return {
-    title: String(row.title ?? ''),
-    brand: String(row.brand ?? ''),
-    category: typeof row.category === 'string' && row.category ? row.category : null,
-    spec: typeof row.spec === 'string' && row.spec ? row.spec : null,
+    title: String(row.title ?? '').slice(0, MAX_TEXT_LENGTH),
+    brand: String(row.brand ?? '').slice(0, MAX_TEXT_LENGTH),
+    category: truncate(typeof row.category === 'string' ? row.category : null, MAX_TEXT_LENGTH),
+    spec: truncate(typeof row.spec === 'string' ? row.spec : null, MAX_TEXT_LENGTH),
     price,
     originalPrice,
     currency: typeof row.currency === 'string' && row.currency ? row.currency : 'CNY',
-    source: typeof row.source === 'string' && row.source ? row.source : null,
+    source: truncate(typeof row.source === 'string' ? row.source : null, MAX_TEXT_LENGTH),
     sourceUrl: sanitizeUrl(row.sourceUrl),
     imageUrl: sanitizeUrl(row.imageUrl),
-    country: typeof row.country === 'string' && row.country ? row.country : null,
+    country: truncate(typeof row.country === 'string' ? row.country : null, MAX_TEXT_LENGTH),
     tags: sanitizeTags(row.tags),
     status: sanitizeStatus(row.status),
   };
@@ -228,6 +232,20 @@ export async function PUT(req: Request) {
     const body = await req.json();
     const { id, ...fields } = body;
     if (!id) return error('id 不能为空', 400);
+
+    // Validate text field lengths
+    const textFields = ['title', 'brand', 'category', 'spec', 'source', 'country'];
+    const urlFields = ['sourceUrl', 'imageUrl'];
+    for (const key of textFields) {
+      if (typeof fields[key] === 'string' && fields[key].length > MAX_TEXT_LENGTH) {
+        return error(`${key} 不能超过 ${MAX_TEXT_LENGTH} 个字符`, 400);
+      }
+    }
+    for (const key of urlFields) {
+      if (typeof fields[key] === 'string' && fields[key].length > MAX_URL_LENGTH) {
+        return error(`${key} 不能超过 ${MAX_URL_LENGTH} 个字符`, 400);
+      }
+    }
 
     const updates: Record<string, unknown> = { updatedAt: new Date() };
     const allowed = ['title', 'brand', 'category', 'spec', 'price', 'originalPrice', 'currency', 'source', 'sourceUrl', 'imageUrl', 'country', 'tags', 'status'];
