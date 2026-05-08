@@ -519,29 +519,25 @@ export default function SearchPage() {
                     }}
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-medium leading-snug">
-                          {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
-                        </h3>
-                        <div className="flex items-center gap-x-2 mt-1 text-xs">
-                          <span className="bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded whitespace-nowrap text-[11px]">{item.brand}</span>
-                          {item.source && <span className="text-[var(--text-muted)] text-[11px] truncate">{item.source}</span>}
-                        </div>
-                      </div>
-                      {item.price && (
-                        <div className="text-right shrink-0">
-                          <div className="text-[var(--brand)] font-bold text-lg" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
-                        </div>
-                      )}
+                    <div className="flex items-start gap-2">
+                      <h3 className="text-sm font-medium leading-snug min-w-0 flex-1">
+                        {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
+                      </h3>
                       <button
                         onClick={e => toggleFavorite(item.id, e)}
                         disabled={favToggling.has(item.id)}
                         aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
-                        className={`shrink-0 text-xl p-1.5 min-w-[40px] min-h-[40px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
+                        className={`shrink-0 text-lg p-1 min-w-[36px] min-h-[36px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
                       >
                         {favoriteIds.has(item.id) ? '♥' : '♡'}
                       </button>
+                    </div>
+                    <div className="mt-1 space-y-0.5">
+                      <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded text-[11px] whitespace-nowrap">{item.brand}</span>
+                      {item.source && <div className="text-[11px] text-[var(--text-muted)] truncate">{item.source}</div>}
+                      {item.price && (
+                        <div className="text-[var(--brand)] font-bold text-base" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -561,7 +557,7 @@ export default function SearchPage() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: i * 0.04 }}
-                className="bg-[var(--bg-card)] rounded-xl overflow-hidden cursor-pointer hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
+                className="bg-[var(--bg-card)] rounded-xl overflow-hidden cursor-pointer hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors flex flex-col"
                 onClick={() => {
                   if (!isSignedIn) { openLogin(); return }
                   nav(`/product/${item.id}`)
@@ -577,20 +573,22 @@ export default function SearchPage() {
                     el.src = `https://placehold.co/400x300/1a1a17/666?text=${encodeURIComponent('暂无图片')}`
                   }}
                 />
-                <div className="p-2.5">
-                  <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] text-[10px] px-1.5 py-0.5 rounded mb-1.5 whitespace-nowrap">{item.brand}</span>
-                  <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1 text-[var(--text-primary)]">
+                <div className="p-2.5 flex flex-col flex-1">
+                  <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] text-[10px] px-1.5 py-0.5 rounded mb-1.5 whitespace-nowrap self-start">{item.brand}</span>
+                  <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1.5 text-[var(--text-primary)]">
                     {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
                   </h3>
-                  {item.price ? (
-                    <div className="text-[var(--brand)] font-bold text-sm mb-1" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
-                  ) : (
-                    <div className="text-[var(--text-secondary)] text-xs mb-1">登录查看价格</div>
+                  {item.source && (
+                    <div className="text-[10px] text-[var(--text-muted)] truncate mb-1.5">{item.source}</div>
                   )}
-                  <div className="flex items-center justify-between gap-1">
-                    {item.source ? (
-                      <span className="text-[10px] text-[var(--text-muted)] truncate">{item.source}</span>
-                    ) : <span />}
+                  <div className="mt-auto flex items-end justify-between gap-1">
+                    <div>
+                      {item.price ? (
+                        <div className="text-[var(--brand)] font-bold text-sm" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
+                      ) : (
+                        <div className="text-[var(--text-secondary)] text-[11px]">登录查看价格</div>
+                      )}
+                    </div>
                     <button
                       onClick={e => toggleFavorite(item.id, e)}
                       disabled={favToggling.has(item.id)}
