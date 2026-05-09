@@ -293,14 +293,14 @@ export default function ProductDetail() {
               <input type="number" step="0.1" min="0" value={weight} onChange={e => setWeight(e.target.value)} placeholder="kg" style={{ ...inputStyle, flex: 1 }} />
               <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px' }}>KG</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
               <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Dims</span>
               <input type="number" step="0.1" min="0" value={length} onChange={e => setLength(e.target.value)} placeholder="L" style={{ ...inputStyle, flex: 1 }} />
-              <span style={{ fontSize: '7px' }}>×</span>
-              <input type="number" step="0.1" min="0" value={width} onChange={e => setWidth(e.target.value)} placeholder="W" style={{ ...inputStyle, flex: 1 }} />
-              <span style={{ fontSize: '7px' }}>×</span>
-              <input type="number" step="0.1" min="0" value={height} onChange={e => setHeight(e.target.value)} placeholder="H" style={{ ...inputStyle, flex: 1 }} />
-              <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '28px' }}>CM</span>
+              <span style={{ fontSize: '7px', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
+              <input type="number" step="0.1" min="0" value={width} onChange={e => setWidth(e.target.value)} placeholder="W" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
+              <span style={{ fontSize: '7px', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
+              <input type="number" step="0.1" min="0" value={height} onChange={e => setHeight(e.target.value)} placeholder="H" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
+              <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px', flexShrink: 0 }}>CM</span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '62px' }}>
               {[{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }].map(p => (
@@ -355,14 +355,16 @@ export default function ProductDetail() {
           {/* Profit */}
           <div style={{ marginBottom: '12px' }}>
             <h3 style={{ ...labelStyle, marginBottom: '6px' }}>Profit Settings</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', flexShrink: 0 }}>Extra ¥</span>
-                <input type="number" step="0.01" min="0" value={extraCost} onChange={e => setExtraCost(e.target.value)} style={{ ...inputStyle, flex: 1 }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Extra</span>
+                <input type="number" step="0.01" min="0" value={extraCost} onChange={e => setExtraCost(e.target.value)} style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
+                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>¥</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', flexShrink: 0 }}>Margin %</span>
-                <input type="number" step="1" min="0" max="99" value={marginRate} onChange={e => setMarginRate(e.target.value)} style={{ ...inputStyle, flex: 1 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Margin</span>
+                <input type="number" step="1" min="0" max="99" value={marginRate} onChange={e => setMarginRate(e.target.value)} style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
+                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>%</span>
               </div>
             </div>
           </div>

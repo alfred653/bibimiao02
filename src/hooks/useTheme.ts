@@ -15,7 +15,7 @@ function resolveTheme(choice: ThemeChoice): ResolvedTheme {
 function applyTheme(resolved: ResolvedTheme) {
   document.documentElement.setAttribute('data-theme', resolved)
   const mc = document.querySelector('meta[name="theme-color"]')
-  if (mc) mc.setAttribute('content', resolved === 'light' ? '#F7F1EA' : '#171512')
+  if (mc) mc.setAttribute('content', resolved === 'light' ? '#FAF7F2' : '#252622')
 }
 
 export function useThemeSource() {

@@ -17,7 +17,7 @@
     sans-serif;
 }
 
-/* ===== Theme: Industrial (always light gray-green base, dark override) ===== */
+/* ===== Theme: Industrial Dark (default) ===== */
 :root,
 [data-theme="dark"] {
   --bg-primary: #D8D8CC;
@@ -51,7 +51,7 @@
 
   --border-width: 1px;
 
-  /* Mobile layout vars (from spec) */
+  /* Mobile layout vars */
   --page-padding: 8px;
   --header-height: 36px;
   --row-height: 92px;
@@ -65,6 +65,57 @@
   --admin-bg-row: #D8D8CC;
   --admin-bg-row-hover: #C0C0B4;
   --admin-border: #9D9E92;
+
+  --radius: 0;
+}
+
+/* ===== Theme: Claude Warm Light ===== */
+[data-theme="light"] {
+  --bg-primary: #FAF7F2;
+  --bg-secondary: #F0EBE3;
+  --bg-input: #FFFFFF;
+  --bg-nav: #2C2416;
+  --bg-hover: #EBE4D8;
+  --bg-active: #2C2416;
+
+  --border-default: #D4C9B8;
+  --border-light: #E8DDD0;
+
+  --text-primary: #2C2416;
+  --text-secondary: #6B5D4F;
+  --text-inverse: #FAF7F2;
+  --text-muted: #9B8C7A;
+
+  --brand: #D97757;
+  --brand-hover: #C56A4C;
+  --brand-soft: rgba(217, 119, 87, 0.12);
+
+  --success: #5A8A4E;
+  --warning: #B8953E;
+  --danger: #C45545;
+
+  --shadow-card: 0 1px 3px rgba(44, 36, 22, 0.08);
+  --button-on-brand: #FAF7F2;
+
+  --font-display: "Archivo Black", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  --border-width: 1px;
+
+  --page-padding: 8px;
+  --header-height: 36px;
+  --row-height: 92px;
+  --thumb-width: 72px;
+  --bottom-nav-height: 64px;
+
+  --admin-bg-page: #FAF7F2;
+  --admin-bg-sidebar: #2C2416;
+  --admin-bg-card: #FFFFFF;
+  --admin-bg-row: #FAF7F2;
+  --admin-bg-row-hover: #F0EBE3;
+  --admin-border: #D4C9B8;
+
+  --radius: 6px;
 }
 
 /* ===== Theme transition ===== */
@@ -75,8 +126,17 @@
     color 120ms linear;
 }
 
-/* ===== Global reset ===== */
-* {
+/* ===== Border radius: zero for industrial dark, rounded for Claude light ===== */
+[data-theme="dark"] * {
+  border-radius: 0 !important;
+}
+
+[data-theme="light"] * {
+  border-radius: var(--radius) !important;
+}
+
+/* No data-theme yet (initial load) — default to dark */
+:root:not([data-theme]) * {
   border-radius: 0 !important;
 }
 
@@ -164,7 +224,7 @@ h1, h2, h3, h4 {
 }
 
 /* ===== Global image treatment ===== */
-img:not([src*="favicon"]):not([src*="clerk"]) {
+[data-theme="dark"] img:not([src*="favicon"]):not([src*="clerk"]) {
   filter: grayscale(100%) contrast(0.9) brightness(0.92);
 }
 
@@ -198,7 +258,7 @@ input:focus, select:focus, button:focus-visible {
   outline-offset: -1px;
 }
 
-/* ===== Responsive breakpoints (from spec) ===== */
+/* ===== Responsive breakpoints ===== */
 @media (max-width: 374px) {
   :root {
     --page-padding: 6px;

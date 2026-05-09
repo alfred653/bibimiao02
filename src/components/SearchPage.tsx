@@ -401,7 +401,7 @@ export default function SearchPage() {
                 }}
                 aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
               >
-                {favoriteIds.has(item.id) ? '♥' : String.fromCharCode(65 + i)}
+                {favoriteIds.has(item.id) ? '♥' : '♡'}
               </button>
             </motion.div>
           ))}

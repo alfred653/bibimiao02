@@ -92,16 +92,25 @@ export default function HomePage() {
         <>
           <div
             style={{
-              height: '36px', padding: '0 var(--page-padding)',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '12px var(--page-padding)',
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px',
               borderBottom: 'var(--border-width) solid var(--border-default)',
               marginLeft: 'calc(-1 * var(--page-padding))',
               marginRight: 'calc(-1 * var(--page-padding))',
             }}
           >
-            <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-              Data ({overview.totalProducts} items · {overview.brandCount} brands · {overview.sourceCount} sources)
-            </span>
+            <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.totalProducts}</div>
+              <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Items</div>
+            </div>
+            <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.brandCount}</div>
+              <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Brands</div>
+            </div>
+            <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.sourceCount}</div>
+              <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Sources</div>
+            </div>
           </div>
 
           {/* Recent products */}
@@ -127,7 +136,7 @@ export default function HomePage() {
                   <img
                     src={p.imageUrl || `https://placehold.co/72x92/B8B8AD/5C5D55?text=${encodeURIComponent(p.brand.slice(0, 4))}`}
                     alt=""
-                    style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover' }}
+                    style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover', border: 'var(--border-width) solid var(--border-default)' }}
                     loading={i < 3 ? 'eager' : 'lazy'}
                     onError={e => { (e.target as HTMLImageElement).src = `https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A` }}
                   />

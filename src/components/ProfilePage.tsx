@@ -102,9 +102,9 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
 }
 
 const THEME_OPTIONS: { value: ThemeChoice; label: string; desc: string }[] = [
-  { value: 'system', label: 'SYSTEM', desc: 'Match system appearance' },
+  { value: 'system', label: 'SYSTEM', desc: 'Follow OS preference' },
+  { value: 'light', label: 'CLAUDE', desc: 'Warm amber mode' },
   { value: 'dark', label: 'INDUSTRIAL', desc: 'Gray-green archival mode' },
-  { value: 'light', label: 'LIGHT', desc: 'Bright archival mode' },
 ]
 
 function ThemeModal({ current, onClose }: { current: ThemeChoice; onClose: () => void }) {
