@@ -15,6 +15,11 @@
     "Microsoft YaHei",
     "Noto Sans SC",
     sans-serif;
+
+  /* Font scale */
+  --fs-label: 10px;
+  --fs-body: 12px;
+  --fs-input: 13px;
 }
 
 /* ===== Theme: Industrial Dark (default) ===== */

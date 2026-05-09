@@ -44,7 +44,7 @@ export default function Layout() {
             to={to}
             className="flex items-center justify-center no-underline"
             style={({ isActive }: { isActive: boolean }) => ({
-              fontSize: '7px',
+              fontSize: 'var(--fs-label)',
               fontWeight: 800,
               letterSpacing: '0.14em',
               textTransform: 'uppercase' as const,

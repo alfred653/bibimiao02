@@ -30,12 +30,12 @@ const inputClass: React.CSSProperties = {
 
 const btnPrimary: React.CSSProperties = {
   background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none',
-  padding: '8px 12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer',
+  padding: '8px 12px', fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer',
 }
 
 const btnSecondary: React.CSSProperties = {
   background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)',
-  padding: '8px 12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer',
+  padding: '8px 12px', fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer',
   color: 'var(--text-primary)',
 }
 
@@ -67,27 +67,27 @@ function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => v
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Edit User</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div>
-            <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Email</span>
+            <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Email</span>
             <p style={{ fontSize: '13px', margin: '2px 0 0' }}>{user.email || '—'}</p>
           </div>
           <div>
-            <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Membership Tier</label>
+            <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Membership Tier</label>
             <select value={tier} onChange={e => setTier(e.target.value)} style={inputClass}>
               {TIERS.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
           <div>
-            <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Status</label>
+            <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Status</label>
             <select value={status} onChange={e => setStatus(e.target.value)} style={inputClass}>
               {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           <div>
-            <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Configured Brands</label>
+            <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Configured Brands</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
               {BRANDS.map(b => (
                 <label key={b} style={{
-                  padding: '4px 8px', fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer',
+                  padding: '4px 8px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer',
                   background: brands.includes(b) ? 'var(--bg-active)' : 'var(--bg-hover)',
                   color: brands.includes(b) ? 'var(--text-inverse)' : 'var(--text-secondary)',
                 }}>
@@ -166,7 +166,7 @@ function ProductEditModal({ product, onClose, onSaved }: { product?: any; onClos
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {PRODUCT_FIELDS.map(f => (
             <div key={f.key}>
-              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>{f.label}{'required' in f && f.required ? ' *' : ''}</label>
+              <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>{f.label}{'required' in f && f.required ? ' *' : ''}</label>
               <input
                 value={form[f.key]}
                 onChange={e => set(f.key, e.target.value)}
@@ -251,13 +251,13 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
         {!rows ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ background: 'var(--brand-soft)', border: 'var(--border-width) solid var(--border-default)', padding: '12px' }}>
-              <p style={{ fontSize: '9px', color: 'var(--text-secondary)', margin: '0 0 8px' }}>Prepare data in template format. Required columns: <b style={{ color: 'var(--brand)' }}>title</b> and <b style={{ color: 'var(--brand)' }}>brand</b></p>
-              <button onClick={downloadTemplate} style={{ ...btnPrimary, fontSize: '10px', padding: '8px 16px' }}>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 8px' }}>Prepare data in template format. Required columns: <b style={{ color: 'var(--brand)' }}>title</b> and <b style={{ color: 'var(--brand)' }}>brand</b></p>
+              <button onClick={downloadTemplate} style={{ ...btnPrimary, fontSize: '14px', padding: '8px 16px' }}>
                 Download Template
               </button>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ fontSize: '9px', color: 'var(--text-secondary)' }}>Select file:</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Select file:</span>
               <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFile} style={{ fontSize: '13px', color: 'var(--text-secondary)' }} />
             </div>
             {uploading && <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Parsing...</p>}
@@ -271,13 +271,13 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
             </div>
 
             {errors.length > 0 && (
-              <div style={{ background: 'var(--danger)', padding: '8px', fontSize: '10px', color: 'var(--text-inverse)', maxHeight: '128px', overflow: 'auto' }}>
+              <div style={{ background: 'var(--danger)', padding: '8px', fontSize: '14px', color: 'var(--text-inverse)', maxHeight: '128px', overflow: 'auto' }}>
                 {errors.map((e, i) => <p key={i} style={{ margin: '2px 0' }}>⚠ {e}</p>)}
               </div>
             )}
 
-            <p style={{ fontSize: '9px', color: 'var(--text-secondary)', margin: 0 }}>First 5 rows preview:</p>
-            <div style={{ background: 'var(--bg-hover)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', fontSize: '10px', maxHeight: '128px', overflow: 'auto' }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>First 5 rows preview:</p>
+            <div style={{ background: 'var(--bg-hover)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', fontSize: '14px', maxHeight: '128px', overflow: 'auto' }}>
               {preview.map((row, i) => (
                 <p key={i} style={{ color: 'var(--text-primary)', margin: '2px 0' }}>{row.title} | {row.brand} | {formatPrice(row.currency, row.price)}</p>
               ))}
@@ -333,36 +333,36 @@ function CarrierEditModal({ carrier, onClose, onSaved }: { carrier?: any; onClos
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>{isEdit ? 'Edit Carrier' : 'Add Carrier'}</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div>
-            <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Name *</label>
+            <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Name *</label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="SF Express" style={inputClass} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div>
-              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>First Weight (kg)</label>
+              <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>First Weight (kg)</label>
               <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFW(e.target.value)} style={inputClass} />
             </div>
             <div>
-              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>First Cost (yuan)</label>
+              <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>First Cost (yuan)</label>
               <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFC(e.target.value)} style={inputClass} />
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div>
-              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Add. Weight (kg)</label>
+              <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Add. Weight (kg)</label>
               <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAW(e.target.value)} style={inputClass} />
             </div>
             <div>
-              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Add. Cost (yuan)</label>
+              <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Add. Cost (yuan)</label>
               <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAC(e.target.value)} style={inputClass} />
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div>
-              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Vol Divisor</label>
+              <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Vol Divisor</label>
               <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVD(e.target.value)} style={inputClass} />
             </div>
             <div>
-              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Status</label>
+              <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Status</label>
               <select value={isActive} onChange={e => setIsActive(e.target.value)} style={inputClass}>
                 <option value="active">Active</option>
                 <option value="inactive">Disabled</option>
@@ -400,25 +400,25 @@ function PaginationBar({ page, totalPages, onChange }: { page: number; totalPage
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginTop: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
         <button disabled={page <= 1} onClick={() => onChange(page - 1)}
-          style={{ ...btnSecondary, opacity: page <= 1 ? 0.3 : 1, fontSize: '10px' }}>
+          style={{ ...btnSecondary, opacity: page <= 1 ? 0.3 : 1, fontSize: '14px' }}>
           Prev
         </button>
-        <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{page} / {totalPages}</span>
+        <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{page} / {totalPages}</span>
         <button disabled={page >= totalPages} onClick={() => onChange(page + 1)}
-          style={{ ...btnSecondary, opacity: page >= totalPages ? 0.3 : 1, fontSize: '10px' }}>
+          style={{ ...btnSecondary, opacity: page >= totalPages ? 0.3 : 1, fontSize: '14px' }}>
           Next
         </button>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', color: 'var(--text-secondary)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: 'var(--text-secondary)' }}>
         <span>Go to</span>
         <input
-          style={{ width: '48px', background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', textAlign: 'center', color: 'var(--text-primary)', fontSize: '10px', outline: 'none' }}
+          style={{ width: '48px', background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', textAlign: 'center', color: 'var(--text-primary)', fontSize: '14px', outline: 'none' }}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           inputMode="numeric"
         />
-        <button onClick={jump} style={{ ...btnSecondary, fontSize: '10px', padding: '4px 8px' }}>Go</button>
+        <button onClick={jump} style={{ ...btnSecondary, fontSize: '14px', padding: '4px 8px' }}>Go</button>
         <span style={{ opacity: 0.7 }}>/ {totalPages} pages</span>
       </div>
     </div>
@@ -572,32 +572,32 @@ export default function AdminPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
             <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px' }}>
               <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>{overview.totalProducts}</div>
-              <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Total Products</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Total Products</div>
             </div>
             <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px' }}>
               <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>{overview.brandCount}</div>
-              <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Brands</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Brands</div>
             </div>
             <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px' }}>
               <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>{overview.sourceCount}</div>
-              <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Sources</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Sources</div>
             </div>
           </div>
         )}
         {overview && (overview.noImageCount > 0 || overview.noSourceCount > 0) && (
           <div style={{ marginBottom: '24px' }}>
-            <h2 style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-secondary)', margin: '0 0 12px' }}>Needs Attention</h2>
+            <h2 style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-secondary)', margin: '0 0 12px' }}>Needs Attention</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               {overview.noImageCount > 0 && (
                 <a href="/admin/products" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--warning)', padding: '16px', textDecoration: 'none', display: 'block' }}>
                   <div style={{ fontSize: '24px', fontWeight: 900, color: 'var(--warning)', fontFamily: 'var(--font-display)' }}>{overview.noImageCount}</div>
-                  <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Missing Images</div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Missing Images</div>
                 </a>
               )}
               {overview.noSourceCount > 0 && (
                 <a href="/admin/products" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--warning)', padding: '16px', textDecoration: 'none', display: 'block' }}>
                   <div style={{ fontSize: '24px', fontWeight: 900, color: 'var(--warning)', fontFamily: 'var(--font-display)' }}>{overview.noSourceCount}</div>
-                  <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Missing Sources</div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Missing Sources</div>
                 </a>
               )}
             </div>
@@ -605,26 +605,26 @@ export default function AdminPage() {
         )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
           <a href="/admin/products" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px', textDecoration: 'none' }}>
-            <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}>Products</div>
-            <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px' }}>Browse, search, edit and import products</div>
+            <div style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}>Products</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>Browse, search, edit and import products</div>
           </a>
           <a href="/admin/users" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px', textDecoration: 'none' }}>
-            <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}>Users</div>
-            <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px' }}>Manage tiers, brand access and status</div>
+            <div style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}>Users</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>Manage tiers, brand access and status</div>
           </a>
           <a href="/admin/carriers" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px', textDecoration: 'none' }}>
-            <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}>Carriers</div>
-            <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px' }}>Configure shipping rate templates</div>
+            <div style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}>Carriers</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>Configure shipping rate templates</div>
           </a>
         </div>
       </div>
     )
   }
 
-  const thStyle: React.CSSProperties = { padding: '10px 8px', fontWeight: 700, fontSize: '7px', textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'left' }
-  const tdStyle: React.CSSProperties = { padding: '12px 8px', fontSize: '11px', borderBottom: 'var(--border-width) solid var(--admin-border)' }
-  const filterInput: React.CSSProperties = { background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: '11px', color: 'var(--text-primary)', outline: 'none' }
-  const tagBase: React.CSSProperties = { padding: '2px 8px', fontSize: '9px', fontWeight: 700, textTransform: 'uppercase' }
+  const thStyle: React.CSSProperties = { padding: '10px 8px', fontWeight: 700, fontSize: 'var(--fs-label)', textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'left' }
+  const tdStyle: React.CSSProperties = { padding: '12px 8px', fontSize: '13px', borderBottom: 'var(--border-width) solid var(--admin-border)' }
+  const filterInput: React.CSSProperties = { background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: '13px', color: 'var(--text-primary)', outline: 'none' }
+  const tagBase: React.CSSProperties = { padding: '2px 8px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase' }
 
   return (
     <div>
@@ -682,7 +682,7 @@ export default function AdminPage() {
           {!loading && data.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '64px 0' }}>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No user data</p>
-              <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>Users will appear here after registration</p>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>Users will appear here after registration</p>
             </div>
           ) : (
             <table style={{ width: '100%', fontSize: '13px', minWidth: '480px', borderCollapse: 'collapse' }}>
@@ -700,8 +700,8 @@ export default function AdminPage() {
                       </div>
                     </td>
                     <td style={{ ...tdStyle, color: 'var(--text-secondary)' }}>{(u.configuredBrands || []).join(', ') || '—'}</td>
-                    <td style={tdStyle}><span style={{ fontSize: '11px', color: u.status === 'active' ? 'var(--success)' : 'var(--danger)' }}>{statusLabel(u.status)}</span></td>
-                    <td style={{ ...tdStyle, fontSize: '9px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{u.updatedAt ? new Date(u.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
+                    <td style={tdStyle}><span style={{ fontSize: '13px', color: u.status === 'active' ? 'var(--success)' : 'var(--danger)' }}>{statusLabel(u.status)}</span></td>
+                    <td style={{ ...tdStyle, fontSize: '13px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{u.updatedAt ? new Date(u.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
                     <td style={tdStyle}><button onClick={() => setEditUser(u)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button></td>
                   </tr>
                 ))}
@@ -717,7 +717,7 @@ export default function AdminPage() {
           {!loading && data.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '64px 0' }}>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No carrier data</p>
-              <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>Click "+ Add Carrier" to add a shipping template</p>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>Click "+ Add Carrier" to add a shipping template</p>
             </div>
           ) : (
             <table style={{ width: '100%', fontSize: '13px', minWidth: '600px', borderCollapse: 'collapse' }}>
@@ -734,7 +734,7 @@ export default function AdminPage() {
                     <td style={tdStyle}>¥{c.additionalCost}</td>
                     <td style={tdStyle}>{c.volumeDivisor}</td>
                     <td style={tdStyle}><span style={{ ...tagBase, background: c.isActive === 'active' ? 'var(--brand-soft)' : 'var(--bg-hover)', color: c.isActive === 'active' ? 'var(--success)' : 'var(--danger)' }}>{c.isActive === 'active' ? 'Active' : 'Disabled'}</span></td>
-                    <td style={{ ...tdStyle, fontSize: '9px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
+                    <td style={{ ...tdStyle, fontSize: '13px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
                     <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
                       <button onClick={() => setEditCarrier(c)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button>
                       <button onClick={() => {
@@ -767,7 +767,7 @@ export default function AdminPage() {
         if (!loading && data.length === 0) return (
           <div style={{ textAlign: 'center', padding: '64px 0' }}>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No product data</p>
-            <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>{!search && !brandFilter && !statusFilter && !quickFilter ? 'Add products manually or import via Excel' : 'No matching products for current filters'}</p>
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>{!search && !brandFilter && !statusFilter && !quickFilter ? 'Add products manually or import via Excel' : 'No matching products for current filters'}</p>
           </div>
         )
         return (
@@ -799,7 +799,7 @@ export default function AdminPage() {
                 <td style={{ ...tdStyle, fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums' }}>{formatPrice(p.currency, p.price)}</td>
                 <td style={{ ...tdStyle, color: 'var(--text-secondary)' }}>{p.source}</td>
                 <td style={tdStyle}><span style={{ ...tagBase, background: p.status === 'active' ? 'var(--brand-soft)' : 'var(--bg-hover)', color: p.status === 'active' ? 'var(--success)' : 'var(--danger)' }}>{statusLabel(p.status)}</span></td>
-                <td style={{ ...tdStyle, fontSize: '9px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
+                <td style={{ ...tdStyle, fontSize: '13px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
                 <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
                   <button onClick={() => setEditProduct(p)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button>
                   <button onClick={() => {
@@ -842,7 +842,7 @@ export default function AdminPage() {
           background: 'var(--admin-bg-sidebar)', border: 'var(--border-width) solid var(--admin-border)',
           padding: '10px 16px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px',
         }}>
-          <span style={{ fontSize: '10px', color: 'var(--text-inverse)' }}>Selected <b>{selectedIds.size}</b> items</span>
+          <span style={{ fontSize: '14px', color: 'var(--text-inverse)' }}>Selected <b>{selectedIds.size}</b> items</span>
           <button onClick={handleBatchDelete} disabled={batchLoading} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', opacity: batchLoading ? 0.5 : 1 }}>
             Batch Delete
           </button>
@@ -850,7 +850,7 @@ export default function AdminPage() {
             defaultValue=""
             onChange={e => { const v = e.target.value; if (v) { handleBatchUpdate('status', v); e.target.value = '' } }}
             disabled={batchLoading}
-            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '10px', color: 'var(--text-primary)', opacity: batchLoading ? 0.5 : 1 }}
+            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '14px', color: 'var(--text-primary)', opacity: batchLoading ? 0.5 : 1 }}
           >
             <option value="" disabled>Change Status</option>
             <option value="active">Active</option>
@@ -860,14 +860,14 @@ export default function AdminPage() {
             defaultValue=""
             onChange={e => { const v = e.target.value; if (v) { handleBatchUpdate('brand', v); e.target.value = '' } }}
             disabled={batchLoading}
-            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '10px', color: 'var(--text-primary)', opacity: batchLoading ? 0.5 : 1 }}
+            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '14px', color: 'var(--text-primary)', opacity: batchLoading ? 0.5 : 1 }}
           >
             <option value="" disabled>Change Brand</option>
             {BRANDS.filter(b => typeof b === 'string').map(b => (
               <option key={b} value={b}>{b}</option>
             ))}
           </select>
-          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '10px', color: 'var(--text-inverse)', opacity: batchLoading ? 0.5 : 0.7 }}>
+          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', color: 'var(--text-inverse)', opacity: batchLoading ? 0.5 : 0.7 }}>
             Deselect All
           </button>
         </div>

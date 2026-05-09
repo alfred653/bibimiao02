@@ -50,7 +50,7 @@ const inputStyle: React.CSSProperties = {
   background: 'var(--bg-input)',
   border: 'var(--border-width) solid var(--border-default)',
   padding: '6px 8px',
-  fontSize: '12px',
+  fontSize: '14px',
   color: 'var(--text-primary)',
   outline: 'none',
 }
@@ -90,8 +90,8 @@ export default function DefaultShippingPage() {
         borderBottom: 'var(--border-width) solid var(--border-default)',
         marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
       }}>
-        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>BIBIMIAO比比喵</span>
-        <span style={{ width: '18px', height: '18px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '9px', fontWeight: 800 }}>SH</span>
+        <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>BIBIMIAO比比喵</span>
+        <span style={{ width: '18px', height: '18px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '13px', fontWeight: 800 }}>SH</span>
       </header>
 
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', padding: '14px 0 10px', borderBottom: 'var(--border-width) solid var(--border-default)', margin: '0 calc(-1 * var(--page-padding))', marginBottom: '12px' }}>
@@ -100,7 +100,7 @@ export default function DefaultShippingPage() {
 
       {/* Carrier */}
       <div style={sectionStyle}>
-        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Default Carrier</label>
+        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Default Carrier</label>
         <select
           value={form.carrierId ?? ''}
           onChange={e => {
@@ -117,7 +117,7 @@ export default function DefaultShippingPage() {
         {form.carrierId && carriers.find(c => c.id === form.carrierId) && (() => {
           const c = carriers.find(x => x.id === form.carrierId)!
           return (
-            <div style={{ marginTop: '8px', fontSize: '9px', color: 'var(--text-secondary)' }}>
+            <div style={{ marginTop: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
               First {c.firstWeight}kg / {c.firstCost}yuan, Additional {c.additionalWeight}kg / {c.additionalCost}yuan, Vol divisor {c.volumeDivisor}
             </div>
           )
@@ -126,55 +126,55 @@ export default function DefaultShippingPage() {
 
       {/* Weight & Dimensions */}
       <div style={sectionStyle}>
-        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>Default Product Params</label>
+        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>Default Product Params</label>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '9px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Weight</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Weight</span>
             <input type="number" step="0.1" min="0" value={form.weight} onChange={e => set('weight', e.target.value)}
               style={{ flex: 1, ...inputStyle }} />
-            <span style={{ fontSize: '8px', color: 'var(--text-muted)', flexShrink: 0 }}>kg</span>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>kg</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ fontSize: '9px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Dimensions</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Dimensions</span>
             <input type="number" step="1" min="0" value={form.length} onChange={e => set('length', e.target.value)} placeholder="L"
               style={{ width: '56px', textAlign: 'center', ...inputStyle }} />
-            <span style={{ fontSize: '8px', color: 'var(--text-muted)' }}>x</span>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>x</span>
             <input type="number" step="1" min="0" value={form.width} onChange={e => set('width', e.target.value)} placeholder="W"
               style={{ width: '56px', textAlign: 'center', ...inputStyle }} />
-            <span style={{ fontSize: '8px', color: 'var(--text-muted)' }}>x</span>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>x</span>
             <input type="number" step="1" min="0" value={form.height} onChange={e => set('height', e.target.value)} placeholder="H"
               style={{ width: '56px', textAlign: 'center', ...inputStyle }} />
-            <span style={{ fontSize: '8px', color: 'var(--text-muted)', flexShrink: 0 }}>cm</span>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>cm</span>
           </div>
         </div>
       </div>
 
       {/* Profit settings */}
       <div style={sectionStyle}>
-        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>Default Profit Settings</label>
+        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>Default Profit Settings</label>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '9px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Extra Cost</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Extra Cost</span>
             <input type="number" step="0.01" min="0" value={form.extraCost} onChange={e => set('extraCost', e.target.value)}
               style={{ flex: 1, ...inputStyle }} />
-            <span style={{ fontSize: '8px', color: 'var(--text-muted)', flexShrink: 0 }}>yuan</span>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>yuan</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '9px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Margin Rate</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Margin Rate</span>
             <input type="number" step="1" min="0" max="100" value={form.marginRate} onChange={e => set('marginRate', e.target.value)}
               style={{ flex: 1, ...inputStyle }} />
-            <span style={{ fontSize: '8px', color: 'var(--text-muted)', flexShrink: 0 }}>%</span>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>%</span>
           </div>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
         <button onClick={reset}
-          style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+          style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-secondary)' }}>
           Reset
         </button>
         <button onClick={save}
-          style={{ background: 'var(--bg-active)', border: 'none', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-inverse)' }}>
+          style={{ background: 'var(--bg-active)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-inverse)' }}>
           Save
         </button>
       </div>

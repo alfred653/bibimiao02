@@ -34,13 +34,13 @@ export default function HomePage() {
           marginRight: 'calc(-1 * var(--page-padding))',
         }}
       >
-        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>BIBIMIAO比比喵</span>
+        <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>BIBIMIAO比比喵</span>
         <span
           style={{
             width: '18px', height: '18px', borderRadius: '999px',
             display: 'grid', placeItems: 'center',
             background: 'var(--brand)', color: 'var(--text-inverse)',
-            fontSize: '9px', fontWeight: 800, letterSpacing: '0',
+            fontSize: '11px', fontWeight: 800, letterSpacing: '0',
           }}
         >01</span>
       </header>
@@ -68,7 +68,7 @@ export default function HomePage() {
         </h1>
         <form onSubmit={search}>
           <label style={{ display: 'block' }}>
-            <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '8px', display: 'block' }}>
+            <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '8px', display: 'block' }}>
               Enter Brand Keyword
             </span>
             <input
@@ -101,15 +101,15 @@ export default function HomePage() {
           >
             <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.totalProducts}</div>
-              <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Items</div>
+              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Items</div>
             </div>
             <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.brandCount}</div>
-              <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Brands</div>
+              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Brands</div>
             </div>
             <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.sourceCount}</div>
-              <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Sources</div>
+              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Sources</div>
             </div>
           </div>
 
@@ -142,12 +142,12 @@ export default function HomePage() {
                   />
                   <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <h2 style={{
-                      margin: 0, fontFamily: 'var(--font-display)', fontSize: '12px',
+                      margin: 0, fontFamily: 'var(--font-display)', fontSize: '14px',
                       lineHeight: '13px', fontWeight: 900, letterSpacing: '-0.02em',
                       textTransform: 'uppercase', display: '-webkit-box',
                       WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                     }}>{p.title}</h2>
-                    <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88 }}>
+                    <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88 }}>
                       {p.brand}
                     </div>
                   </div>
@@ -158,7 +158,7 @@ export default function HomePage() {
                     width: '18px', height: '18px', marginTop: '10px', marginRight: '6px',
                     border: '1px solid currentColor', borderRadius: '50%',
                     display: 'grid', placeItems: 'center',
-                    fontSize: '8px', lineHeight: '1', fontWeight: 800,
+                    fontSize: '10px', lineHeight: '1', fontWeight: 800,
                   }}>{String.fromCharCode(65 + i)}</div>
                 </button>
               ))}
@@ -167,7 +167,7 @@ export default function HomePage() {
 
           {/* Brand grid */}
           <div style={{ marginTop: '8px' }}>
-            <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
+            <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
               All Brands
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1px' }}>
@@ -182,7 +182,7 @@ export default function HomePage() {
                   }}
                 >
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>{b.name}</div>
-                  <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88, marginTop: '4px' }}>{b.count} ITEMS</div>
+                  <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88, marginTop: '4px' }}>{b.count} ITEMS</div>
                 </button>
               ))}
             </div>
@@ -190,7 +190,7 @@ export default function HomePage() {
         </>
       ) : (
         <div style={{ padding: '24px var(--page-padding)', textAlign: 'center' }}>
-          <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Loading...</div>
+          <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Loading...</div>
         </div>
       )}
     </div>

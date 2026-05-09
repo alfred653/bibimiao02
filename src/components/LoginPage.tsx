@@ -69,7 +69,7 @@ export default function LoginPage() {
         </AnimatePresence>
       </div>
 
-      <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-muted)', marginTop: '32px' }}>Pull cord to toggle light → Sign In</p>
+      <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-muted)', marginTop: '32px' }}>Pull cord to toggle light → Sign In</p>
     </div>
   )
 }

@@ -34,12 +34,12 @@ interface EstimateResult {
 
 const inputStyle: React.CSSProperties = {
   width: '100%', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)',
-  padding: '8px 10px', fontSize: '11px', fontFamily: 'var(--font-body)',
+  padding: '8px 10px', fontSize: '13px', fontFamily: 'var(--font-body)',
   color: 'var(--text-primary)', outline: 'none',
 }
 
 const labelStyle: React.CSSProperties = {
-  fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)',
+  fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)',
 }
 
 const sectionStyle: React.CSSProperties = {
@@ -183,11 +183,11 @@ export default function ProductDetail() {
     } else { navigator.clipboard.writeText(text).then(() => toast('Copied', 'success')).catch(() => {}) }
   }
 
-  if (loading) return <div style={{ padding: '24px', textAlign: 'center', fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Loading...</div>
+  if (loading) return <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Loading...</div>
   if (!product) return (
     <div style={{ padding: '24px', textAlign: 'center' }}>
-      <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>Product Not Found</p>
-      <button onClick={() => nav('/search')} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Go to Search</button>
+      <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>Product Not Found</p>
+      <button onClick={() => nav('/search')} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Go to Search</button>
     </div>
   )
 
@@ -200,10 +200,10 @@ export default function ProductDetail() {
         borderBottom: 'var(--border-width) solid var(--border-default)',
         marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
       }}>
-        <button onClick={() => (window.history.length > 1 ? nav(-1) : nav('/search'))} style={{ background: 'none', border: 'none', fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
+        <button onClick={() => (window.history.length > 1 ? nav(-1) : nav('/search'))} style={{ background: 'none', border: 'none', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
           ← BACK
         </button>
-        <span style={{ width: '18px', height: '18px', borderRadius: '999px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '9px', fontWeight: 800 }}>03</span>
+        <span style={{ width: '18px', height: '18px', borderRadius: '999px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '13px', fontWeight: 800 }}>03</span>
       </header>
 
       {/* Product image */}
@@ -222,8 +222,8 @@ export default function ProductDetail() {
           {product.title}
         </h1>
         <div style={{ display: 'flex', gap: '12px', marginTop: '6px' }}>
-          <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--brand)' }}>{product.brand}</span>
-          <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7 }}>{product.source}</span>
+          <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--brand)' }}>{product.brand}</span>
+          <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7 }}>{product.source}</span>
         </div>
       </div>
 
@@ -231,29 +231,29 @@ export default function ProductDetail() {
       <div style={sectionStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '12px' }}>
           <div>
-            <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '2px' }}>Price</div>
+            <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '2px' }}>Price</div>
             <div style={{ fontSize: '28px', lineHeight: '1', fontWeight: 900, fontVariantNumeric: 'tabular-nums' }}>
               {formatPrice(product.currency, product.price)}
             </div>
             {product.originalPrice && (
-              <div style={{ fontSize: '11px', textDecoration: 'line-through', opacity: 0.5, marginTop: '2px' }}>
+              <div style={{ fontSize: '13px', textDecoration: 'line-through', opacity: 0.5, marginTop: '2px' }}>
                 {formatPrice(product.currency, product.originalPrice)}
               </div>
             )}
           </div>
           <select value={displayCurrency} onChange={e => setDisplayCurrency(e.target.value)}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 10px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
             {TARGET_CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
-        {rateLoading && <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Fetching rate...</div>}
+        {rateLoading && <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Fetching rate...</div>}
         {dispRate && dispConverted !== null && !rateLoading && (
           <div style={{ background: 'var(--bg-secondary)', padding: '10px', border: 'var(--border-width) solid var(--border-default)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 700, marginBottom: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>
               <span>Converted</span>
               <span style={{ color: 'var(--success)' }}>{formatPrice(displayCurrency, dispConverted)}</span>
             </div>
-            <div style={{ fontSize: '9px', opacity: 0.7 }}>
+            <div style={{ fontSize: '13px', opacity: 0.7 }}>
               1 {product.currency} = {dispRate.rate} {displayCurrency} · {dispRate.source}
             </div>
           </div>
@@ -271,8 +271,8 @@ export default function ProductDetail() {
           product.country && ['Region', product.country],
           ['Currency', product.currency],
         ].filter(Boolean).map((row: any, i: number) => (
-          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < 5 ? 'var(--border-width) solid var(--border-light)' : 'none', fontSize: '10px', fontWeight: 500 }}>
-            <span style={{ opacity: 0.7, fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{row[0]}</span>
+          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < 5 ? 'var(--border-width) solid var(--border-light)' : 'none', fontSize: '12px', fontWeight: 500 }}>
+            <span style={{ opacity: 0.7, fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{row[0]}</span>
             <span style={{ fontWeight: 700 }}>{row[1]}</span>
           </div>
         ))}
@@ -281,7 +281,7 @@ export default function ProductDetail() {
       {/* Cost Estimate */}
       {isSignedIn ? (
         <div style={sectionStyle}>
-          <h2 style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>
+          <h2 style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>
             Cost Estimate <span style={{ fontWeight: 500, opacity: 0.7 }}>(CNY)</span>
           </h2>
 
@@ -289,23 +289,23 @@ export default function ProductDetail() {
           <div style={{ marginBottom: '12px' }}>
             <h3 style={{ ...labelStyle, marginBottom: '6px' }}>Product Parameters</h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-              <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Weight</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Weight</span>
               <input type="number" step="0.1" min="0" value={weight} onChange={e => setWeight(e.target.value)} placeholder="kg" style={{ ...inputStyle, flex: 1 }} />
-              <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px' }}>KG</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px' }}>KG</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-              <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Dims</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Dims</span>
               <input type="number" step="0.1" min="0" value={length} onChange={e => setLength(e.target.value)} placeholder="L" style={{ ...inputStyle, flex: 1 }} />
-              <span style={{ fontSize: '7px', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
               <input type="number" step="0.1" min="0" value={width} onChange={e => setWidth(e.target.value)} placeholder="W" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
-              <span style={{ fontSize: '7px', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
               <input type="number" step="0.1" min="0" value={height} onChange={e => setHeight(e.target.value)} placeholder="H" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
-              <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px', flexShrink: 0 }}>CM</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px', flexShrink: 0 }}>CM</span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '62px' }}>
               {[{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }].map(p => (
                 <button key={p.label} onClick={() => { setLength(p.l); setWidth(p.w); setHeight(p.h) }}
-                  style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '3px 6px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>{p.label}</button>
+                  style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '3px 6px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>{p.label}</button>
               ))}
             </div>
           </div>
@@ -314,17 +314,17 @@ export default function ProductDetail() {
           <div style={{ marginBottom: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
               <h3 style={{ ...labelStyle, margin: 0 }}>Logistics</h3>
-              <button onClick={() => setShowShippingHelp(v => !v)} style={{ width: '14px', height: '14px', borderRadius: '999px', border: 'var(--border-width) solid var(--text-muted)', background: 'none', cursor: 'pointer', fontSize: '8px', lineHeight: '1', display: 'grid', placeItems: 'center', color: 'var(--text-muted)' }}>?</button>
+              <button onClick={() => setShowShippingHelp(v => !v)} style={{ width: '14px', height: '14px', borderRadius: '999px', border: 'var(--border-width) solid var(--text-muted)', background: 'none', cursor: 'pointer', fontSize: '10px', lineHeight: '1', display: 'grid', placeItems: 'center', color: 'var(--text-muted)' }}>?</button>
             </div>
             {showShippingHelp && (
-              <div style={{ background: 'var(--bg-secondary)', padding: '8px', border: 'var(--border-width) solid var(--border-default)', marginBottom: '6px', fontSize: '8px', lineHeight: '1.4' }}>
+              <div style={{ background: 'var(--bg-secondary)', padding: '8px', border: 'var(--border-width) solid var(--border-default)', marginBottom: '6px', fontSize: '10px', lineHeight: '1.4' }}>
                 <p><strong>First Weight:</strong> First weight tier + cost</p>
                 <p><strong>Add. Weight:</strong> Cost per additional weight unit</p>
                 <p><strong>Volume Divisor:</strong> L×W×H(cm) ÷ divisor = volumetric weight</p>
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-              <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Carrier</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Carrier</span>
               <select value={selectedCarrierId ?? ''} onChange={e => {
                 const id = parseInt(e.target.value, 10); setSelectedCarrierId(id)
                 const c = carriers.find(x => x.id === id)
@@ -336,17 +336,17 @@ export default function ProductDetail() {
             </div>
             <div style={{ paddingLeft: '62px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '32px' }}>First</span>
-                <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: '7px', fontWeight: 800 }}>kg</span>
-                <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: '7px', fontWeight: 800 }}>¥</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '32px' }}>First</span>
+                <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>kg</span>
+                <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>¥</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '32px' }}>Add.</span>
-                <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: '7px', fontWeight: 800 }}>kg</span>
-                <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: '7px', fontWeight: 800 }}>¥</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '32px' }}>Add.</span>
+                <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>kg</span>
+                <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>¥</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '32px' }}>VolDiv</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '32px' }}>VolDiv</span>
                 <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVolumeDivisor(e.target.value)} style={{ ...inputStyle, width: '72px' }} />
               </div>
             </div>
@@ -357,44 +357,44 @@ export default function ProductDetail() {
             <h3 style={{ ...labelStyle, marginBottom: '6px' }}>Profit Settings</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Extra</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Extra</span>
                 <input type="number" step="0.01" min="0" value={extraCost} onChange={e => setExtraCost(e.target.value)} style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
-                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>¥</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>¥</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Margin</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Margin</span>
                 <input type="number" step="1" min="0" max="99" value={marginRate} onChange={e => setMarginRate(e.target.value)} style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
-                <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>%</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>%</span>
               </div>
             </div>
           </div>
 
           <button onClick={calcEstimate} disabled={estimating}
-            style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', opacity: estimating ? 0.5 : 1 }}>
+            style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', opacity: estimating ? 0.5 : 1 }}>
             {estimating ? 'Calculating...' : 'Calculate Landed Cost'}
           </button>
 
-          {estimateError && <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--danger)', textAlign: 'center', marginTop: '8px' }}>{estimateError}</p>}
+          {estimateError && <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--danger)', textAlign: 'center', marginTop: '8px' }}>{estimateError}</p>}
 
           <AnimatePresence>
             {estimate && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}
                 style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '16px', marginTop: '12px' }}>
                 <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-                  <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '4px' }}>Estimated Landed Cost</div>
+                  <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '4px' }}>Estimated Landed Cost</div>
                   <div style={{ fontSize: '32px', lineHeight: '1', fontWeight: 900, fontVariantNumeric: 'tabular-nums' }}>{estimate.estimatedCostFormatted}</div>
                 </div>
-                <div style={{ borderTop: 'var(--border-width) solid var(--border-default)', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '10px' }}>
+                <div style={{ borderTop: 'var(--border-width) solid var(--border-default)', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Converted Price</span><span style={{ fontWeight: 700 }}>{estimate.convertedPriceFormatted}</span></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Rate</span><span style={{ fontSize: '9px' }}>{estimate.exchangeRate.source} · {estimate.exchangeRate.rate}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Rate</span><span style={{ fontSize: '13px' }}>{estimate.exchangeRate.source} · {estimate.exchangeRate.rate}</span></div>
                   {estimate.shippingEstimate && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Shipping</span><span style={{ fontWeight: 700 }}>¥{estimate.shippingEstimate.cost} <span style={{ fontSize: '9px', opacity: 0.7 }}>({estimate.shippingEstimate.label})</span></span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Shipping</span><span style={{ fontWeight: 700 }}>¥{estimate.shippingEstimate.cost} <span style={{ fontSize: '13px', opacity: 0.7 }}>({estimate.shippingEstimate.label})</span></span></div>
                   )}
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Extra</span><span style={{ fontWeight: 700 }}>¥{estimate.extraCost}</span></div>
                 </div>
                 {estimate.profitTrial && (
                   <>
-                    <div style={{ borderTop: 'var(--border-width) solid var(--border-default)', paddingTop: '8px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '10px' }}>
+                    <div style={{ borderTop: 'var(--border-width) solid var(--border-default)', paddingTop: '8px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Margin</span><span>{estimate.profitTrial.estimatedMarginRate}</span></div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Suggested Price</span><span style={{ fontWeight: 700 }}>{estimate.profitTrial.suggestedQuotePrice}</span></div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -404,7 +404,7 @@ export default function ProductDetail() {
                     </div>
                   </>
                 )}
-                <button onClick={shareResult} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
+                <button onClick={shareResult} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
                   Share Result
                 </button>
               </motion.div>
@@ -413,8 +413,8 @@ export default function ProductDetail() {
         </div>
       ) : (
         <div style={{ ...sectionStyle, textAlign: 'center' }}>
-          <p style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Login to use cost estimation</p>
-          <button onClick={() => openLogin()} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Login</button>
+          <p style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Login to use cost estimation</p>
+          <button onClick={() => openLogin()} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Login</button>
         </div>
       )}
 
@@ -424,18 +424,18 @@ export default function ProductDetail() {
           <h3 style={{ ...labelStyle, marginBottom: '8px' }}>Price History</h3>
           {product.originalPrice && (
             <div style={{ marginBottom: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '2px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '2px' }}>
                 <span style={{ opacity: 0.7 }}>Original</span>
                 <span style={{ textDecoration: 'line-through', opacity: 0.5 }}>{formatPrice(product.currency, product.originalPrice)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
                 <span style={{ opacity: 0.7 }}>Current</span>
                 <span style={{ fontWeight: 700 }}>{formatPrice(product.currency, product.price)}</span>
               </div>
             </div>
           )}
           {product.updatedAt && (
-            <div style={{ fontSize: '9px', opacity: 0.7 }}>
+            <div style={{ fontSize: '13px', opacity: 0.7 }}>
               Updated: {new Date(product.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </div>
           )}
@@ -446,24 +446,24 @@ export default function ProductDetail() {
       <div style={{ ...sectionStyle, borderBottom: 'none' }}>
         {isSignedIn ? (
           <button onClick={toggleFavorite} disabled={favToggling}
-            style={{ width: '100%', background: favorited ? 'var(--bg-primary)' : 'var(--bg-active)', color: favorited ? 'var(--danger)' : 'var(--text-inverse)', border: favorited ? 'var(--border-width) solid var(--danger)' : 'none', padding: '12px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', marginBottom: '8px' }}>
+            style={{ width: '100%', background: favorited ? 'var(--bg-primary)' : 'var(--bg-active)', color: favorited ? 'var(--danger)' : 'var(--text-inverse)', border: favorited ? 'var(--border-width) solid var(--danger)' : 'none', padding: '12px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', marginBottom: '8px' }}>
             {favorited ? 'Saved' : 'Save to Favorites'}
           </button>
         ) : (
-          <button onClick={() => openLogin()} style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', marginBottom: '8px' }}>
+          <button onClick={() => openLogin()} style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', marginBottom: '8px' }}>
             Login to Save
           </button>
         )}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
           <button onClick={() => { if (product?.sourceUrl) window.open(product.sourceUrl, '_blank', 'noopener,noreferrer') }}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
             Open Source
           </button>
           <button onClick={() => {
             if (!product?.sourceUrl) return
             navigator.clipboard.writeText(product.sourceUrl).then(() => { setSourceCopied(true); setTimeout(() => setSourceCopied(false), 2000) }).catch(() => {})
           }}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
             {sourceCopied ? 'Copied' : 'Copy Link'}
           </button>
         </div>
@@ -479,8 +479,8 @@ export default function ProductDetail() {
               <img src={item.imageUrl || `https://placehold.co/40x40/B8B8AD/5C5D55?text=N/A`} alt="" style={{ width: '32px', height: '32px', objectFit: 'cover' }}
                 onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/40x40/B8B8AD/5C5D55?text=N/A' }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
-                <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7 }}>{item.source}</div>
+                <div style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
+                <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7 }}>{item.source}</div>
               </div>
               <div style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{formatPrice(item.currency, item.price)}</div>
             </button>

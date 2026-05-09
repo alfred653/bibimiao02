@@ -51,7 +51,7 @@ export default function AdminLayout() {
               end={l.end}
               onClick={() => setSidebarOpen(false)}
               style={({ isActive }) => ({
-                padding: '8px 12px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', textDecoration: 'none',
+                padding: '8px 12px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', textDecoration: 'none',
                 background: isActive ? 'var(--brand)' : 'transparent',
                 color: isActive ? 'var(--text-inverse)' : 'var(--text-inverse)',
                 opacity: isActive ? 1 : 0.65,
@@ -65,7 +65,7 @@ export default function AdminLayout() {
         <hr style={{ border: 'none', borderTop: 'var(--border-width) solid var(--admin-border)', marginBottom: '16px' }} />
         <Link
           to="/"
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', textDecoration: 'none', color: 'var(--text-inverse)', opacity: 0.65, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', textDecoration: 'none', color: 'var(--text-inverse)', opacity: 0.65, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M13 7H1M1 7l5-5M1 7l5 5" />

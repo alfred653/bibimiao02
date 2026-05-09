@@ -48,8 +48,8 @@ export default function ExchangeRatePage() {
         borderBottom: 'var(--border-width) solid var(--border-default)',
         marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
       }}>
-        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>BIBIMIAO比比喵</span>
-        <span style={{ width: '18px', height: '18px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '9px', fontWeight: 800 }}>FX</span>
+        <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>BIBIMIAO比比喵</span>
+        <span style={{ width: '18px', height: '18px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '13px', fontWeight: 800 }}>FX</span>
       </header>
 
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', padding: '14px 0 10px', borderBottom: 'var(--border-width) solid var(--border-default)', margin: '0 calc(-1 * var(--page-padding))', marginBottom: '12px' }}>
@@ -57,8 +57,8 @@ export default function ExchangeRatePage() {
       </h1>
 
       <div style={sectionStyle}>
-        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Preferred Currency</label>
-        <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '12px' }}>Default display currency for product prices</p>
+        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Preferred Currency</label>
+        <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '12px' }}>Default display currency for product prices</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {ALL_CURRENCIES.map(c => (
             <button
@@ -74,8 +74,8 @@ export default function ExchangeRatePage() {
               }}
             >
               <div>
-                <span style={{ fontSize: '12px', fontWeight: 700 }}>{c.symbol} {c.code}</span>
-                <span style={{ fontSize: '9px', marginLeft: '8px', opacity: 0.7 }}>{c.name}</span>
+                <span style={{ fontSize: '14px', fontWeight: 700 }}>{c.symbol} {c.code}</span>
+                <span style={{ fontSize: '13px', marginLeft: '8px', opacity: 0.7 }}>{c.name}</span>
               </div>
               {form.preferredCurrency === c.code && (
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
@@ -87,21 +87,21 @@ export default function ExchangeRatePage() {
         </div>
         <button
           onClick={() => { setForm({ preferredCurrency: '' }); localStorage.removeItem('bbm_exchange_settings'); toast('Preference cleared', 'info') }}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', marginTop: '12px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)' }}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', marginTop: '12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)' }}
         >
           Clear preference (follow product original currency)
         </button>
       </div>
 
       <div style={sectionStyle}>
-        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Data Source</label>
-        <p style={{ fontSize: '9px', color: 'var(--text-secondary)', margin: 0 }}>
+        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Data Source</label>
+        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
           Exchange rates provided by Frankfurter API, based on ECB daily reference rates. Cached for 5 minutes after first query. Falls back to preset rates if API is unavailable (CNY bridge algorithm).
         </p>
       </div>
 
       <button onClick={save}
-        style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>
+        style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>
         Save Settings
       </button>
     </div>

@@ -44,13 +44,13 @@ function NameEditModal({ currentName, onClose, onSaved }: { currentName: string;
       <div style={modalBox}>
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Edit Name</h3>
         <div style={{ marginBottom: '16px' }}>
-          <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Name</label>
+          <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Name</label>
           <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Your name"
             style={{ width: '100%', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
-          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
+          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
+          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
         </div>
       </div>
     </div>
@@ -87,14 +87,14 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
           ['Confirm Password', confirmPassword, setConfirmPassword, 'password'],
         ].map(([label, val, setFn, type], i) => (
           <div key={i} style={{ marginBottom: '12px' }}>
-            <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>{label as string}</label>
+            <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>{label as string}</label>
             <input type={type as string} value={val as string} onChange={e => (setFn as any)(e.target.value)}
               style={{ width: '100%', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }} />
           </div>
         ))}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
-          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
+          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
+          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
         </div>
       </div>
     </div>
@@ -124,14 +124,14 @@ function ThemeModal({ current, onClose }: { current: ThemeChoice; onClose: () =>
                 color: selected === opt.value ? 'var(--text-inverse)' : 'var(--text-primary)',
                 borderColor: selected === opt.value ? 'var(--bg-active)' : 'var(--border-default)',
               }}>
-              <div style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>{opt.label}</div>
-              <div style={{ fontSize: '8px', opacity: 0.7, marginTop: '2px' }}>{opt.desc}</div>
+              <div style={{ fontSize: '13px', fontWeight: 900, textTransform: 'uppercase' }}>{opt.label}</div>
+              <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '2px' }}>{opt.desc}</div>
             </button>
           ))}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px' }}>
-          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
-          <button onClick={apply} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Apply</button>
+          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
+          <button onClick={apply} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Apply</button>
         </div>
       </div>
     </div>
@@ -150,7 +150,7 @@ function MembershipModal({ currentTier, onClose }: { currentTier: string; onClos
     <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div style={{ ...modalBox, maxHeight: '80vh', overflowY: 'auto' }}>
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 4px' }}>Membership</h3>
-        <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>
+        <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>
           Current: <span style={{ color: 'var(--brand)' }}>{currentTierInfo?.name || currentTier}</span>
         </p>
         {TIER_BENEFITS.map(tier => (
@@ -161,16 +161,16 @@ function MembershipModal({ currentTier, onClose }: { currentTier: string; onClos
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: '14px', fontWeight: 900, textTransform: 'uppercase' }}>{tier.name}</span>
-              <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--brand)' }}>{tier.price}</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--brand)' }}>{tier.price}</span>
             </div>
             {tier.features.map((f, i) => (
-              <div key={i} style={{ fontSize: '9px', padding: '2px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ color: 'var(--success)', fontSize: '8px' }}>✓</span> {f}
+              <div key={i} style={{ fontSize: '13px', padding: '2px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ color: 'var(--success)', fontSize: '10px' }}>✓</span> {f}
               </div>
             ))}
           </div>
         ))}
-        <button onClick={onClose} style={{ width: '100%', marginTop: '8px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Close</button>
+        <button onClick={onClose} style={{ width: '100%', marginTop: '8px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Close</button>
       </div>
     </div>
   )
@@ -204,7 +204,7 @@ export default function ProfilePage() {
     fetchProfile()
   }, [isSignedIn])
 
-  if (!isSignedIn) return <div style={{ padding: '24px', textAlign: 'center', fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Please login</div>
+  if (!isSignedIn) return <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Please login</div>
 
   const displayName = user?.fullName || profile?.name || 'User'
 
@@ -217,8 +217,8 @@ export default function ProfilePage() {
         borderBottom: 'var(--border-width) solid var(--border-default)',
         marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
       }}>
-        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>BIBIMIAO比比喵</span>
-        <span style={{ width: '18px', height: '18px', borderRadius: '999px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '9px', fontWeight: 800 }}>04</span>
+        <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>BIBIMIAO比比喵</span>
+        <span style={{ width: '18px', height: '18px', borderRadius: '999px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '13px', fontWeight: 800 }}>04</span>
       </header>
 
       {/* Profile header */}
@@ -230,14 +230,14 @@ export default function ProfilePage() {
             <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10 1.5l2.5 2.5L4.5 12H2v-2.5L10 1.5z" /></svg>
           </button>
         </div>
-        <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginTop: '4px' }}>{profile?.email ? maskEmail(profile.email) : ''}</p>
+        <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginTop: '4px' }}>{profile?.email ? maskEmail(profile.email) : ''}</p>
         {profile && (() => {
           const tier = TIER_BENEFITS.find(t => t.tier === profile.membershipTier)
           const name = tier?.name || profile.membershipTier || 'FREE'
           const isAdmin = profile.role === 'admin'
           return (
             <button onClick={() => setShowMembershipModal(true)} style={{
-              marginTop: '6px', padding: '3px 10px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer',
+              marginTop: '6px', padding: '3px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer',
               background: isAdmin ? 'var(--danger)' : 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none',
             }}>
               {name}{isAdmin ? ' · ADMIN' : ''}
@@ -255,8 +255,8 @@ export default function ProfilePage() {
         ].map(([label, value, onClick], i) => (
           <button key={i} onClick={onClick as any} style={rowStyle}>
             <div>
-              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>{label as string}</div>
-              <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginTop: '2px' }}>{value as string}</div>
+              <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase' }}>{label as string}</div>
+              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginTop: '2px' }}>{value as string}</div>
             </div>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 4l4 4-4 4" /></svg>
           </button>
@@ -271,8 +271,8 @@ export default function ProfilePage() {
         ].map(([label, desc, onClick], i) => (
           <button key={i} onClick={onClick as any} style={rowStyle}>
             <div>
-              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>{label as string}</div>
-              <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginTop: '2px' }}>{desc as string}</div>
+              <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase' }}>{label as string}</div>
+              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginTop: '2px' }}>{desc as string}</div>
             </div>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 4l4 4-4 4" /></svg>
           </button>
@@ -281,22 +281,22 @@ export default function ProfilePage() {
 
       {profile?.configuredBrands?.length > 0 && (
         <div style={{ marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px' }}>
-          <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px' }}>Configured Brands</div>
+          <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px' }}>Configured Brands</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {profile.configuredBrands.map((b: string) => (
-              <span key={b} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '4px 8px' }}>{b}</span>
+              <span key={b} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '4px 8px' }}>{b}</span>
             ))}
           </div>
         </div>
       )}
 
       {profile?.role === 'admin' && (
-        <button onClick={() => navigate('/admin')} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}>
+        <button onClick={() => navigate('/admin')} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}>
           Admin Panel
         </button>
       )}
 
-      <button onClick={() => signOut()} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--danger)', color: 'var(--danger)', padding: '12px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>
+      <button onClick={() => signOut()} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--danger)', color: 'var(--danger)', padding: '12px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>
         Sign Out
       </button>
 
