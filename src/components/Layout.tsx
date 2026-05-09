@@ -2,7 +2,7 @@ import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 
 const tabs = [
-  { to: '/', label: 'SEARCH' },
+  { to: '/', label: 'BRANDS' },
   { to: '/search', label: 'SEARCH' },
   { to: '/favorites', label: 'FAVORITES' },
   { to: '/profile', label: 'MY' },
