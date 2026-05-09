@@ -15,10 +15,7 @@ export default function FavoritesPage() {
   const { toast } = useToast()
 
   function loadFavorites() {
-    api('/api/favorites')
-      .then(r => r.json())
-      .then(d => { if (d.success) setItems(d.data.items) })
-      .finally(() => setLoading(false))
+    api('/api/favorites').then(r => r.json()).then(d => { if (d.success) setItems(d.data.items) }).finally(() => setLoading(false))
   }
 
   useEffect(() => {
@@ -27,57 +24,65 @@ export default function FavoritesPage() {
   }, [isSignedIn])
 
   function removeFavorite(productId: number) {
-    apiDelete('/api/favorites', { productId })
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) { setItems(prev => prev.filter(it => it.id !== productId)); toast('已取消收藏', 'success') }
-      })
-      .catch(() => toast('网络错误', 'error'))
+    apiDelete('/api/favorites', { productId }).then(r => r.json()).then(d => {
+      if (d.success) { setItems(prev => prev.filter(it => it.id !== productId)); toast('Removed', 'success') }
+    }).catch(() => toast('Network error', 'error'))
   }
 
-  if (!isSignedIn) return <div className="p-8 text-center text-[var(--text-secondary)]">请先登录</div>
+  if (!isSignedIn) return <div style={{ padding: '24px', textAlign: 'center', fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Please login</div>
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">我的收藏</h1>
-      {loading ? <div className="text-[var(--text-secondary)] text-center">加载中...</div> :
+    <div style={{ padding: 'var(--page-padding)' }}>
+      <header style={{
+        height: 'var(--header-height)', padding: '0 var(--page-padding)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        borderBottom: 'var(--border-width) solid var(--border-default)',
+        marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
+      }}>
+        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Compare Tool V.1</span>
+        <span style={{ width: '18px', height: '18px', borderRadius: '999px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '9px', fontWeight: 800 }}>05</span>
+      </header>
+
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', padding: '14px 0 10px', borderBottom: 'var(--border-width) solid var(--border-default)', margin: '0 calc(-1 * var(--page-padding))', marginBottom: '0' }}>
+        Saved<br />Items
+      </h1>
+
+      {loading ? <div style={{ padding: '24px', textAlign: 'center', fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Loading...</div> :
        !items.length ? (
-        <div className="text-center py-12">
-          <div className="text-4xl mb-4 opacity-30">♡</div>
-          <p className="text-[var(--text-secondary)] mb-2">还没有收藏商品</p>
-          <p className="text-xs text-[var(--text-muted)] mb-5">浏览商品时点击心形即可收藏，方便随时查看价格</p>
-          <button onClick={() => nav('/search')} className="bg-[var(--brand)] text-[var(--button-on-brand)] px-5 py-2 rounded-lg text-sm active:bg-[var(--brand-hover)] transition-colors">去搜索商品</button>
+        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <p style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>No saved items</p>
+          <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginBottom: '16px' }}>Tap the heart icon while browsing</p>
+          <button onClick={() => nav('/search')} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Go to Search</button>
         </div>
-      ) :
-        <div className="space-y-3">
+      ) : (
+        <div>
           {items.map(item => (
-            <div key={item.id} className="bg-[var(--bg-card)] rounded-xl p-3 cursor-pointer hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] flex gap-3 transition-colors" onClick={() => nav(`/product/${item.id}`)}>
-              <img
-                src={item.imageUrl || `https://placehold.co/112x112/1a1a17/#d97757?text=${encodeURIComponent((item.brand || '').slice(0, 8))}`}
-                alt=""
-                className="w-14 h-14 rounded-lg object-cover bg-[var(--bg-card)] shrink-0"
-                loading="lazy"
-                onError={e => {
-                  const el = e.target as HTMLImageElement
-                  el.src = `https://placehold.co/112x112/1a1a17/666?text=N%2FA`
-                }}
-              />
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm truncate">{item.title}</h3>
-                <div className="flex gap-2 mt-1 text-xs text-[var(--text-secondary)]">
-                  <span className="text-[var(--brand)]">{item.brand}</span>
-                  {item.price && <span>{formatPrice(item.currency, item.price)}</span>}
+            <div key={item.id}
+              onClick={() => nav(`/product/${item.id}`)}
+              style={{
+                height: 'var(--row-height)', display: 'grid',
+                gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto',
+                borderBottom: 'var(--border-width) solid var(--border-default)',
+                cursor: 'pointer', background: 'var(--bg-primary)',
+              }}>
+              <img src={item.imageUrl || `https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A`} alt="" loading="lazy"
+                style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover' }}
+                onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A' }} />
+              <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '12px', lineHeight: '13px', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.title}</h2>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--brand)' }}>{item.brand}</span>
+                  {item.price && <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{formatPrice(item.currency, item.price)}</span>}
                 </div>
               </div>
               <button
                 onClick={e => { e.stopPropagation(); removeFavorite(item.id) }}
-                className="shrink-0 text-[var(--text-secondary)] hover:text-[var(--danger)] active:bg-[var(--brand-soft)] text-lg min-w-[36px] min-h-[36px] transition-colors rounded-lg flex items-center justify-center"
-                title="取消收藏"
-              >×</button>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: 'var(--text-muted)', padding: '12px 8px', alignSelf: 'start' }}
+                title="Remove">×</button>
             </div>
           ))}
         </div>
-      }
+      )}
     </div>
   )
 }

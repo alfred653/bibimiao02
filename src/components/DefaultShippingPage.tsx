@@ -39,6 +39,22 @@ function loadDefaults(): ShippingDefaults {
   } catch { return { ...DEFAULT_VALUES } }
 }
 
+const sectionStyle: React.CSSProperties = {
+  background: 'var(--bg-primary)',
+  border: 'var(--border-width) solid var(--border-default)',
+  padding: '16px',
+  marginBottom: '12px',
+}
+
+const inputStyle: React.CSSProperties = {
+  background: 'var(--bg-input)',
+  border: 'var(--border-width) solid var(--border-default)',
+  padding: '6px 8px',
+  fontSize: '12px',
+  color: 'var(--text-primary)',
+  outline: 'none',
+}
+
 export default function DefaultShippingPage() {
   const { toast } = useToast()
   const [carriers, setCarriers] = useState<Carrier[]>([])
@@ -57,101 +73,110 @@ export default function DefaultShippingPage() {
 
   function save() {
     localStorage.setItem('bbm_default_shipping', JSON.stringify(form))
-    toast('默认物流设置已保存', 'success')
+    toast('Shipping defaults saved', 'success')
   }
 
   function reset() {
     setForm({ ...DEFAULT_VALUES })
     localStorage.removeItem('bbm_default_shipping')
-    toast('已恢复默认设置', 'info')
+    toast('Defaults restored', 'info')
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-lg font-bold mb-4">默认物流设置</h1>
-      <p className="text-xs text-[var(--text-secondary)] mb-4">设置后，进入商品详情页时物流参数将自动填充为默认值。</p>
+    <div style={{ padding: 'var(--page-padding)' }}>
+      <header style={{
+        height: 'var(--header-height)', padding: '0 var(--page-padding)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        borderBottom: 'var(--border-width) solid var(--border-default)',
+        marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
+      }}>
+        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Compare Tool V.1</span>
+        <span style={{ width: '18px', height: '18px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '9px', fontWeight: 800 }}>SH</span>
+      </header>
 
-      <div className="space-y-4">
-        {/* Carrier */}
-        <div className="bg-[var(--bg-card)] rounded-xl p-4">
-          <label className="text-sm font-medium block mb-2">默认快递</label>
-          <select
-            value={form.carrierId ?? ''}
-            onChange={e => {
-              const id = e.target.value ? parseInt(e.target.value, 10) : null
-              set('carrierId', id)
-            }}
-            className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)]"
-          >
-            <option value="">不预设（每次手动选择）</option>
-            {carriers.map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-          {form.carrierId && carriers.find(c => c.id === form.carrierId) && (() => {
-            const c = carriers.find(x => x.id === form.carrierId)!
-            return (
-              <div className="mt-2 text-xs text-[var(--text-secondary)] space-y-0.5">
-                <div>首重 {c.firstWeight}kg / {c.firstCost}元，续重 {c.additionalWeight}kg / {c.additionalCost}元，体积除数 {c.volumeDivisor}</div>
-              </div>
-            )
-          })()}
-        </div>
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', padding: '14px 0 10px', borderBottom: 'var(--border-width) solid var(--border-default)', margin: '0 calc(-1 * var(--page-padding))', marginBottom: '12px' }}>
+        Shipping<br />Defaults
+      </h1>
 
-        {/* Weight & Dimensions */}
-        <div className="bg-[var(--bg-card)] rounded-xl p-4">
-          <label className="text-sm font-medium block mb-3">默认商品参数</label>
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[var(--text-secondary)] w-12 shrink-0">重量</span>
-              <input type="number" step="0.1" min="0" value={form.weight} onChange={e => set('weight', e.target.value)}
-                className="flex-1 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]" />
-              <span className="text-[10px] text-[var(--text-muted)] shrink-0">kg</span>
+      {/* Carrier */}
+      <div style={sectionStyle}>
+        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Default Carrier</label>
+        <select
+          value={form.carrierId ?? ''}
+          onChange={e => {
+            const id = e.target.value ? parseInt(e.target.value, 10) : null
+            set('carrierId', id)
+          }}
+          style={{ width: '100%', ...inputStyle }}
+        >
+          <option value="">No preset (select manually each time)</option>
+          {carriers.map(c => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
+        {form.carrierId && carriers.find(c => c.id === form.carrierId) && (() => {
+          const c = carriers.find(x => x.id === form.carrierId)!
+          return (
+            <div style={{ marginTop: '8px', fontSize: '9px', color: 'var(--text-secondary)' }}>
+              First {c.firstWeight}kg / {c.firstCost}yuan, Additional {c.additionalWeight}kg / {c.additionalCost}yuan, Vol divisor {c.volumeDivisor}
             </div>
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-[var(--text-secondary)] w-12 shrink-0">尺寸</span>
-              <input type="number" step="1" min="0" value={form.length} onChange={e => set('length', e.target.value)} placeholder="长"
-                className="w-14 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
-              <span className="text-[10px] text-[var(--text-muted)]">×</span>
-              <input type="number" step="1" min="0" value={form.width} onChange={e => set('width', e.target.value)} placeholder="宽"
-                className="w-14 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
-              <span className="text-[10px] text-[var(--text-muted)]">×</span>
-              <input type="number" step="1" min="0" value={form.height} onChange={e => set('height', e.target.value)} placeholder="高"
-                className="w-14 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-1.5 py-1.5 text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
-              <span className="text-[10px] text-[var(--text-muted)] shrink-0">cm</span>
-            </div>
+          )
+        })()}
+      </div>
+
+      {/* Weight & Dimensions */}
+      <div style={sectionStyle}>
+        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>Default Product Params</label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '9px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Weight</span>
+            <input type="number" step="0.1" min="0" value={form.weight} onChange={e => set('weight', e.target.value)}
+              style={{ flex: 1, ...inputStyle }} />
+            <span style={{ fontSize: '8px', color: 'var(--text-muted)', flexShrink: 0 }}>kg</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ fontSize: '9px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Dimensions</span>
+            <input type="number" step="1" min="0" value={form.length} onChange={e => set('length', e.target.value)} placeholder="L"
+              style={{ width: '56px', textAlign: 'center', ...inputStyle }} />
+            <span style={{ fontSize: '8px', color: 'var(--text-muted)' }}>x</span>
+            <input type="number" step="1" min="0" value={form.width} onChange={e => set('width', e.target.value)} placeholder="W"
+              style={{ width: '56px', textAlign: 'center', ...inputStyle }} />
+            <span style={{ fontSize: '8px', color: 'var(--text-muted)' }}>x</span>
+            <input type="number" step="1" min="0" value={form.height} onChange={e => set('height', e.target.value)} placeholder="H"
+              style={{ width: '56px', textAlign: 'center', ...inputStyle }} />
+            <span style={{ fontSize: '8px', color: 'var(--text-muted)', flexShrink: 0 }}>cm</span>
           </div>
         </div>
+      </div>
 
-        {/* Profit settings */}
-        <div className="bg-[var(--bg-card)] rounded-xl p-4">
-          <label className="text-sm font-medium block mb-3">默认利润设置</label>
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[var(--text-secondary)] w-12 shrink-0">额外成本</span>
-              <input type="number" step="0.01" min="0" value={form.extraCost} onChange={e => set('extraCost', e.target.value)}
-                className="flex-1 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]" />
-              <span className="text-[10px] text-[var(--text-muted)] shrink-0">元</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[var(--text-secondary)] w-12 shrink-0">利润率</span>
-              <input type="number" step="1" min="0" max="100" value={form.marginRate} onChange={e => set('marginRate', e.target.value)}
-                className="flex-1 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]" />
-              <span className="text-[10px] text-[var(--text-muted)] shrink-0">%</span>
-            </div>
+      {/* Profit settings */}
+      <div style={sectionStyle}>
+        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>Default Profit Settings</label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '9px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Extra Cost</span>
+            <input type="number" step="0.01" min="0" value={form.extraCost} onChange={e => set('extraCost', e.target.value)}
+              style={{ flex: 1, ...inputStyle }} />
+            <span style={{ fontSize: '8px', color: 'var(--text-muted)', flexShrink: 0 }}>yuan</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '9px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Margin Rate</span>
+            <input type="number" step="1" min="0" max="100" value={form.marginRate} onChange={e => set('marginRate', e.target.value)}
+              style={{ flex: 1, ...inputStyle }} />
+            <span style={{ fontSize: '8px', color: 'var(--text-muted)', flexShrink: 0 }}>%</span>
           </div>
         </div>
+      </div>
 
-        <div className="flex gap-2">
-          <button onClick={reset}
-            className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] py-2.5 rounded-lg text-sm text-[var(--text-secondary)] active:bg-[var(--bg-hover)] transition-colors">
-            恢复默认
-          </button>
-          <button onClick={save}
-            className="flex-1 bg-[var(--brand)] py-2.5 rounded-lg text-sm font-medium active:bg-[var(--brand-hover)] transition-colors">
-            保存设置
-          </button>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+        <button onClick={reset}
+          style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+          Reset
+        </button>
+        <button onClick={save}
+          style={{ background: 'var(--bg-active)', border: 'none', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-inverse)' }}>
+          Save
+        </button>
       </div>
     </div>
   )

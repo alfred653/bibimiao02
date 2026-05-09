@@ -9,8 +9,35 @@ import { formatPrice } from '../../lib/format'
 const TIERS = ['free', 'monthly', 'annual']
 const STATUSES = ['active', 'disabled']
 
-function statusLabel(s: string) { return s === 'active' ? '已启用' : s === 'disabled' ? '已停用' : s === 'inactive' ? '已停用' : s }
-function tierLabel(t: string) { const m: Record<string, string> = { free: '铁牌', monthly: '月度', annual: '年度' }; return m[t] || t }
+function statusLabel(s: string) { return s === 'active' ? 'Active' : s === 'disabled' ? 'Disabled' : s === 'inactive' ? 'Disabled' : s }
+function tierLabel(t: string) { const m: Record<string, string> = { free: 'Iron', monthly: 'Monthly', annual: 'Annual' }; return m[t] || t }
+
+const modalOverlay: React.CSSProperties = {
+  position: 'fixed', inset: 0, zIndex: 50,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'rgba(37,38,34,0.7)', padding: '16px',
+}
+
+const modalBox: React.CSSProperties = {
+  background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)',
+  padding: '24px', width: '100%', maxWidth: '448px',
+}
+
+const inputClass: React.CSSProperties = {
+  width: '100%', background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)',
+  padding: '6px 12px', fontSize: '13px', color: 'var(--text-primary)', outline: 'none',
+}
+
+const btnPrimary: React.CSSProperties = {
+  background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none',
+  padding: '8px 12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer',
+}
+
+const btnSecondary: React.CSSProperties = {
+  background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)',
+  padding: '8px 12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer',
+  color: 'var(--text-primary)',
+}
 
 function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => void; onSaved: () => void }) {
   const [tier, setTier] = useState(user.membershipTier || 'free')
@@ -28,49 +55,53 @@ function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => v
     apiPut('/api/admin/users', { userId: user.id, membershipTier: tier, status, brands })
       .then(r => r.json())
       .then(d => {
-        if (d.success) { onSaved(); toast('用户已更新', 'success') }
-        else toast(d.error?.message || '保存失败', 'error')
+        if (d.success) { onSaved(); toast('User updated', 'success') }
+        else toast(d.error?.message || 'Save failed', 'error')
       })
       .finally(() => setSaving(false))
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[var(--admin-bg-card)] rounded-xl p-6 w-full max-w-md border border-[var(--admin-border)]">
-        <h3 className="text-lg font-bold mb-4">编辑用户</h3>
-        <div className="space-y-3 text-sm">
+    <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={modalBox}>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Edit User</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div>
-            <span className="text-[var(--text-secondary)] text-xs">邮箱</span>
-            <p className="text-[var(--text-primary)]">{user.email || '—'}</p>
+            <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Email</span>
+            <p style={{ fontSize: '13px', margin: '2px 0 0' }}>{user.email || '—'}</p>
           </div>
           <div>
-            <label className="text-[var(--text-secondary)] text-xs block mb-1">会员等级</label>
-            <select value={tier} onChange={e => setTier(e.target.value)} className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-[var(--text-primary)]">
-              {TIERS.map(t => <option key={t} value={t} className="bg-[var(--bg-input)] text-[var(--text-primary)]">{t}</option>)}
+            <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Membership Tier</label>
+            <select value={tier} onChange={e => setTier(e.target.value)} style={inputClass}>
+              {TIERS.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-[var(--text-secondary)] text-xs block mb-1">状态</label>
-            <select value={status} onChange={e => setStatus(e.target.value)} className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-[var(--text-primary)]">
-              {STATUSES.map(s => <option key={s} value={s} className="bg-[var(--bg-input)] text-[var(--text-primary)]">{s}</option>)}
+            <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Status</label>
+            <select value={status} onChange={e => setStatus(e.target.value)} style={inputClass}>
+              {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-[var(--text-secondary)] text-xs block mb-1">配置品牌（付费用户专属）</label>
-            <div className="flex flex-wrap gap-2">
+            <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Configured Brands</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
               {BRANDS.map(b => (
-                <label key={b} className={`px-2 py-1 rounded text-xs cursor-pointer transition-colors ${brands.includes(b) ? 'bg-[var(--brand)] text-[var(--button-on-brand)]' : 'bg-[var(--bg-hover)] text-[var(--text-secondary)]'}`}>
-                  <input type="checkbox" className="hidden" checked={brands.includes(b)} onChange={() => toggleBrand(b)} />
+                <label key={b} style={{
+                  padding: '4px 8px', fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer',
+                  background: brands.includes(b) ? 'var(--bg-active)' : 'var(--bg-hover)',
+                  color: brands.includes(b) ? 'var(--text-inverse)' : 'var(--text-secondary)',
+                }}>
+                  <input type="checkbox" style={{ display: 'none' }} checked={brands.includes(b)} onChange={() => toggleBrand(b)} />
                   {b}
                 </label>
               ))}
             </div>
           </div>
         </div>
-        <div className="flex gap-2 mt-6">
-          <button onClick={onClose} className="flex-1 bg-[var(--bg-hover)] py-2 rounded-lg text-sm">取消</button>
-          <button onClick={save} disabled={saving} className="flex-1 bg-[var(--brand)] py-2 rounded-lg text-sm disabled:opacity-50 active:bg-[var(--brand-hover)] transition-colors">
-            {saving ? '保存中...' : '保存'}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '24px' }}>
+          <button onClick={onClose} style={btnSecondary}>Cancel</button>
+          <button onClick={save} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.5 : 1 }}>
+            {saving ? 'Saving...' : 'Save'}
           </button>
         </div>
       </div>
@@ -79,16 +110,16 @@ function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => v
 }
 
 const PRODUCT_FIELDS = [
-  { key: 'title', label: '标题', required: true },
-  { key: 'brand', label: '品牌', required: true },
-  { key: 'category', label: '品类' },
-  { key: 'spec', label: '规格' },
-  { key: 'price', label: '价格' },
-  { key: 'currency', label: '币种', placeholder: 'CNY' },
-  { key: 'source', label: '来源' },
-  { key: 'sourceUrl', label: '来源链接' },
-  { key: 'imageUrl', label: '图片 URL' },
-  { key: 'country', label: '国家' },
+  { key: 'title', label: 'Title', required: true },
+  { key: 'brand', label: 'Brand', required: true },
+  { key: 'category', label: 'Category' },
+  { key: 'spec', label: 'Spec' },
+  { key: 'price', label: 'Price' },
+  { key: 'currency', label: 'Currency', placeholder: 'CNY' },
+  { key: 'source', label: 'Source' },
+  { key: 'sourceUrl', label: 'Source URL' },
+  { key: 'imageUrl', label: 'Image URL' },
+  { key: 'country', label: 'Country' },
 ] as const
 
 function ProductEditModal({ product, onClose, onSaved }: { product?: any; onClose: () => void; onSaved: () => void }) {
@@ -113,7 +144,7 @@ function ProductEditModal({ product, onClose, onSaved }: { product?: any; onClos
   }
 
   function save() {
-    if (!form.title || !form.brand) { toast('标题和品牌为必填', 'error'); return }
+    if (!form.title || !form.brand) { toast('Title and brand required', 'error'); return }
     setSaving(true)
     const body = isEdit ? { id: product.id, ...form } : form
     const fetcher = isEdit
@@ -122,33 +153,33 @@ function ProductEditModal({ product, onClose, onSaved }: { product?: any; onClos
     fetcher
       .then(r => r.json())
       .then(d => {
-        if (d.success) { onSaved(); toast(isEdit ? '商品已更新' : '商品已添加', 'success') }
-        else toast(d.error?.message || '保存失败', 'error')
+        if (d.success) { onSaved(); toast(isEdit ? 'Product updated' : 'Product added', 'success') }
+        else toast(d.error?.message || 'Save failed', 'error')
       })
       .finally(() => setSaving(false))
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[var(--admin-bg-card)] rounded-xl p-6 w-full max-w-md border border-[var(--admin-border)] max-h-[90vh] overflow-auto">
-        <h3 className="text-lg font-bold mb-4">{isEdit ? '编辑商品' : '添加商品'}</h3>
-        <div className="space-y-2">
+    <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={{ ...modalBox, maxHeight: '90vh', overflow: 'auto' }}>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>{isEdit ? 'Edit Product' : 'Add Product'}</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {PRODUCT_FIELDS.map(f => (
             <div key={f.key}>
-              <label className="text-[var(--text-secondary)] text-xs block mb-0.5">{f.label}{'required' in f && f.required ? ' *' : ''}</label>
+              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>{f.label}{'required' in f && f.required ? ' *' : ''}</label>
               <input
                 value={form[f.key]}
                 onChange={e => set(f.key, e.target.value)}
                 placeholder={'placeholder' in f ? f.placeholder : undefined}
-                className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-primary)]"
+                style={inputClass}
               />
             </div>
           ))}
         </div>
-        <div className="flex gap-2 mt-4">
-          <button onClick={onClose} className="flex-1 bg-[var(--bg-hover)] py-2 rounded-lg text-sm">取消</button>
-          <button onClick={save} disabled={saving} className="flex-1 bg-[var(--brand)] py-2 rounded-lg text-sm disabled:opacity-50 active:bg-[var(--brand-hover)] transition-colors">
-            {saving ? '保存中...' : isEdit ? '更新' : '添加'}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px' }}>
+          <button onClick={onClose} style={btnSecondary}>Cancel</button>
+          <button onClick={save} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.5 : 1 }}>
+            {saving ? 'Saving...' : isEdit ? 'Update' : 'Add'}
           </button>
         </div>
       </div>
@@ -175,8 +206,8 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
     const data = XLSX.utils.sheet_to_json<any>(sheet)
     const errs: string[] = []
     data.forEach((row, i) => {
-      if (!row.title) errs.push(`行 ${i + 2}: 缺少 title`)
-      if (!row.brand) errs.push(`行 ${i + 2}: 缺少 brand`)
+      if (!row.title) errs.push(`Row ${i + 2}: missing title`)
+      if (!row.brand) errs.push(`Row ${i + 2}: missing brand`)
     })
     setRows(data)
     setPreview(data.slice(0, 5))
@@ -191,12 +222,12 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
       .then(r => r.json())
       .then(d => {
         if (d.success) {
-          const parts = [`导入 ${d.imported} 条`]
-          if (d.skippedCount) parts.push(`跳过 ${d.skippedCount} 条重复`)
-          if (d.failures?.length) parts.push(`失败 ${d.failures.length} 条`)
-          onImported(); onClose(); toast(parts.join('，'), 'success')
+          const parts = [`Imported ${d.imported} rows`]
+          if (d.skippedCount) parts.push(`Skipped ${d.skippedCount} duplicates`)
+          if (d.failures?.length) parts.push(`Failed ${d.failures.length} rows`)
+          onImported(); onClose(); toast(parts.join(', '), 'success')
         } else {
-          toast(d.error?.message || '导入失败', 'error')
+          toast(d.error?.message || 'Import failed', 'error')
         }
       })
       .finally(() => setImporting(false))
@@ -209,53 +240,53 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
     const ws = XLSX.utils.aoa_to_sheet([headers, sampleRow])
     ws['!cols'] = headers.map(h => ({ wch: h === 'title' || h === 'sourceUrl' ? 28 : h === 'tags' ? 18 : 12 }))
     const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, '商品导入模板')
+    XLSX.utils.book_append_sheet(wb, ws, 'Import Template')
     XLSX.writeFile(wb, 'bibimiao_import_template.xlsx')
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[var(--admin-bg-card)] rounded-xl p-6 w-full max-w-lg border border-[var(--admin-border)] max-h-[90vh] overflow-auto">
-        <h3 className="text-lg font-bold mb-4">导入 Excel</h3>
+    <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={{ ...modalBox, maxWidth: '512px', maxHeight: '90vh', overflow: 'auto' }}>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Import Excel</h3>
         {!rows ? (
-          <div className="space-y-4">
-            <div className="bg-[var(--brand-soft)] border border-[var(--brand-soft)] rounded-lg p-3">
-              <p className="text-xs text-[var(--text-secondary)] mb-2">请按照模板格式准备数据，必填列为 <b className="text-[var(--brand)]">title</b> 和 <b className="text-[var(--brand)]">brand</b></p>
-              <button onClick={downloadTemplate} className="bg-[var(--brand)] text-[var(--button-on-brand)] px-4 py-2 rounded-lg text-xs hover:bg-[var(--brand-hover)] active:bg-[var(--brand-hover)] transition-colors">
-                下载模板文件
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ background: 'var(--brand-soft)', border: 'var(--border-width) solid var(--border-default)', padding: '12px' }}>
+              <p style={{ fontSize: '9px', color: 'var(--text-secondary)', margin: '0 0 8px' }}>Prepare data in template format. Required columns: <b style={{ color: 'var(--brand)' }}>title</b> and <b style={{ color: 'var(--brand)' }}>brand</b></p>
+              <button onClick={downloadTemplate} style={{ ...btnPrimary, fontSize: '10px', padding: '8px 16px' }}>
+                Download Template
               </button>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-[var(--text-secondary)]">选择文件：</span>
-              <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFile} className="text-sm text-[var(--text-secondary)] file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-[var(--bg-hover)] file:text-[var(--text-primary)] hover:file:bg-[var(--bg-hover)]" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '9px', color: 'var(--text-secondary)' }}>Select file:</span>
+              <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFile} style={{ fontSize: '13px', color: 'var(--text-secondary)' }} />
             </div>
-            {uploading && <p className="text-[var(--text-secondary)] text-sm">解析中...</p>}
+            {uploading && <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Parsing...</p>}
           </div>
         ) : (
-          <div className="space-y-3">
-            <div className="flex gap-4 text-sm">
-              <span className="text-[var(--text-secondary)]">总行数: <b className="text-[var(--text-primary)]">{rows.length}</b></span>
-              <span className="text-[var(--success)]">有效: <b>{rows.length - errors.filter(e => e.includes('缺少')).length}</b></span>
-              <span className="text-[var(--danger)]">错误: <b>{errors.filter(e => e.includes('缺少')).length}</b></span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '16px', fontSize: '13px' }}>
+              <span style={{ color: 'var(--text-secondary)' }}>Total: <b style={{ color: 'var(--text-primary)' }}>{rows.length}</b></span>
+              <span style={{ color: 'var(--success)' }}>Valid: <b>{rows.length - errors.filter(e => e.includes('missing')).length}</b></span>
+              <span style={{ color: 'var(--danger)' }}>Errors: <b>{errors.filter(e => e.includes('missing')).length}</b></span>
             </div>
 
             {errors.length > 0 && (
-              <div className="bg-[var(--danger)]/10 rounded-lg p-2 text-xs text-[var(--danger)] space-y-0.5 max-h-32 overflow-auto">
-                {errors.map((e, i) => <p key={i}>⚠ {e}</p>)}
+              <div style={{ background: 'var(--danger)', padding: '8px', fontSize: '10px', color: 'var(--text-inverse)', maxHeight: '128px', overflow: 'auto' }}>
+                {errors.map((e, i) => <p key={i} style={{ margin: '2px 0' }}>⚠ {e}</p>)}
               </div>
             )}
 
-            <p className="text-xs text-[var(--text-secondary)]">前 5 行预览：</p>
-            <div className="bg-[var(--bg-hover)] rounded-lg p-2 text-xs max-h-32 overflow-auto">
+            <p style={{ fontSize: '9px', color: 'var(--text-secondary)', margin: 0 }}>First 5 rows preview:</p>
+            <div style={{ background: 'var(--bg-hover)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', fontSize: '10px', maxHeight: '128px', overflow: 'auto' }}>
               {preview.map((row, i) => (
-                <p key={i} className="text-[var(--text-primary)] py-0.5">{row.title} | {row.brand} | {formatPrice(row.currency, row.price)}</p>
+                <p key={i} style={{ color: 'var(--text-primary)', margin: '2px 0' }}>{row.title} | {row.brand} | {formatPrice(row.currency, row.price)}</p>
               ))}
             </div>
 
-            <div className="flex gap-2">
-              <button onClick={onClose} className="flex-1 bg-[var(--bg-hover)] py-2 rounded-lg text-sm">取消</button>
-              <button onClick={confirmImport} disabled={importing} className="flex-1 bg-[var(--brand)] py-2 rounded-lg text-sm disabled:opacity-50 active:bg-[var(--brand-hover)] transition-colors">
-                {importing ? '导入中...' : `确认导入 ${rows.length - errors.filter(e => e.includes('缺少')).length} 条`}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <button onClick={onClose} style={btnSecondary}>Cancel</button>
+              <button onClick={confirmImport} disabled={importing} style={{ ...btnPrimary, opacity: importing ? 0.5 : 1 }}>
+                {importing ? 'Importing...' : `Import ${rows.length - errors.filter(e => e.includes('missing')).length} rows`}
               </button>
             </div>
           </div>
@@ -278,7 +309,7 @@ function CarrierEditModal({ carrier, onClose, onSaved }: { carrier?: any; onClos
   const { toast } = useToast()
 
   function save() {
-    if (!name.trim()) { toast('快递名称不能为空', 'error'); return }
+    if (!name.trim()) { toast('Name cannot be empty', 'error'); return }
     setSaving(true)
     const body = isEdit
       ? { id: carrier.id, name, firstWeight, firstCost, additionalWeight, additionalCost, volumeDivisor, isActive }
@@ -289,67 +320,60 @@ function CarrierEditModal({ carrier, onClose, onSaved }: { carrier?: any; onClos
     fetcher
       .then(r => r.json())
       .then(d => {
-        if (d.success) { onSaved(); toast(isEdit ? '快递已更新' : '快递已添加', 'success') }
-        else toast(d.error?.message || '保存失败', 'error')
+        if (d.success) { onSaved(); toast(isEdit ? 'Carrier updated' : 'Carrier added', 'success') }
+        else toast(d.error?.message || 'Save failed', 'error')
       })
-      .catch((e: Error) => toast(e.message || '网络错误', 'error'))
+      .catch((e: Error) => toast(e.message || 'Network error', 'error'))
       .finally(() => setSaving(false))
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[var(--admin-bg-card)] rounded-xl p-6 w-full max-w-sm border border-[var(--admin-border)]">
-        <h3 className="text-lg font-bold mb-4">{isEdit ? '编辑快递' : '添加快递'}</h3>
-        <div className="space-y-2.5 text-sm">
+    <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={{ ...modalBox, maxWidth: '360px' }}>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>{isEdit ? 'Edit Carrier' : 'Add Carrier'}</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div>
-            <label className="text-[var(--text-secondary)] text-xs block mb-0.5">名称 *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="顺丰"
-              className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] text-sm" />
+            <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Name *</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="SF Express" style={inputClass} />
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div>
-              <label className="text-[var(--text-secondary)] text-xs block mb-0.5">首重 (kg)</label>
-              <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFW(e.target.value)}
-                className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] text-sm" />
+              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>First Weight (kg)</label>
+              <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFW(e.target.value)} style={inputClass} />
             </div>
             <div>
-              <label className="text-[var(--text-secondary)] text-xs block mb-0.5">首重价格 (元)</label>
-              <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFC(e.target.value)}
-                className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] text-sm" />
+              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>First Cost (yuan)</label>
+              <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFC(e.target.value)} style={inputClass} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div>
-              <label className="text-[var(--text-secondary)] text-xs block mb-0.5">续重 (kg)</label>
-              <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAW(e.target.value)}
-                className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] text-sm" />
+              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Add. Weight (kg)</label>
+              <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAW(e.target.value)} style={inputClass} />
             </div>
             <div>
-              <label className="text-[var(--text-secondary)] text-xs block mb-0.5">续重价格 (元)</label>
-              <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAC(e.target.value)}
-                className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] text-sm" />
+              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Add. Cost (yuan)</label>
+              <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAC(e.target.value)} style={inputClass} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div>
-              <label className="text-[var(--text-secondary)] text-xs block mb-0.5">体积除数</label>
-              <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVD(e.target.value)}
-                className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] text-sm" />
+              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Vol Divisor</label>
+              <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVD(e.target.value)} style={inputClass} />
             </div>
             <div>
-              <label className="text-[var(--text-secondary)] text-xs block mb-0.5">状态</label>
-              <select value={isActive} onChange={e => setIsActive(e.target.value)}
-                className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-primary)]">
-                <option value="active">启用</option>
-                <option value="inactive">禁用</option>
+              <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Status</label>
+              <select value={isActive} onChange={e => setIsActive(e.target.value)} style={inputClass}>
+                <option value="active">Active</option>
+                <option value="inactive">Disabled</option>
               </select>
             </div>
           </div>
         </div>
-        <div className="flex gap-2 mt-5">
-          <button onClick={onClose} className="flex-1 bg-[var(--bg-hover)] py-2 rounded-lg text-sm">取消</button>
-          <button onClick={save} disabled={saving} className="flex-1 bg-[var(--brand)] py-2 rounded-lg text-sm disabled:opacity-50 active:bg-[var(--brand-hover)] transition-colors">
-            {saving ? '保存中...' : isEdit ? '更新' : '添加'}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '20px' }}>
+          <button onClick={onClose} style={btnSecondary}>Cancel</button>
+          <button onClick={save} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.5 : 1 }}>
+            {saving ? 'Saving...' : isEdit ? 'Update' : 'Add'}
           </button>
         </div>
       </div>
@@ -373,34 +397,29 @@ function PaginationBar({ page, totalPages, onChange }: { page: number; totalPage
   }
 
   return (
-    <div className="flex flex-col items-center gap-2 mt-6">
-      <div className="flex items-center justify-center gap-2">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginTop: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
         <button disabled={page <= 1} onClick={() => onChange(page - 1)}
-          className="px-3 py-1.5 rounded-lg text-xs bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] disabled:opacity-30">
-          上一页
+          style={{ ...btnSecondary, opacity: page <= 1 ? 0.3 : 1, fontSize: '10px' }}>
+          Prev
         </button>
-        <span className="text-xs text-[var(--text-secondary)]">{page} / {totalPages}</span>
+        <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{page} / {totalPages}</span>
         <button disabled={page >= totalPages} onClick={() => onChange(page + 1)}
-          className="px-3 py-1.5 rounded-lg text-xs bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] disabled:opacity-30">
-          下一页
+          style={{ ...btnSecondary, opacity: page >= totalPages ? 0.3 : 1, fontSize: '10px' }}>
+          Next
         </button>
       </div>
-      <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
-        <span>跳至</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', color: 'var(--text-secondary)' }}>
+        <span>Go to</span>
         <input
-          className="w-12 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1 text-center text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--brand)]"
+          style={{ width: '48px', background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', textAlign: 'center', color: 'var(--text-primary)', fontSize: '10px', outline: 'none' }}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           inputMode="numeric"
         />
-        <button
-          onClick={jump}
-          className="bg-[var(--bg-hover)] hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] rounded-lg px-2 py-1 transition-colors"
-        >
-          跳转
-        </button>
-        <span className="text-[var(--text-secondary)]/70">/ {totalPages} 页</span>
+        <button onClick={jump} style={{ ...btnSecondary, fontSize: '10px', padding: '4px 8px' }}>Go</button>
+        <span style={{ opacity: 0.7 }}>/ {totalPages} pages</span>
       </div>
     </div>
   )
@@ -432,7 +451,6 @@ export default function AdminPage() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [batchLoading, setBatchLoading] = useState(false)
 
-  // Dashboard stats
   const [overview, setOverview] = useState<any>(null)
 
   useEffect(() => {
@@ -441,7 +459,6 @@ export default function AdminPage() {
     }
   }, [loc.pathname])
 
-  // Carrier state
   const [editCarrier, setEditCarrier] = useState<any>(null)
   const [showAddCarrier, setShowAddCarrier] = useState(false)
   const [confirmModal, setConfirmModal] = useState<{ show: boolean; title: string; message: string; confirmLabel?: string; danger?: boolean; onConfirm: () => void } | null>(null)
@@ -465,16 +482,16 @@ export default function AdminPage() {
   function handleBatchDelete() {
     const ids = [...selectedIds]
     setConfirmModal({
-      show: true, title: '确认删除', danger: true, confirmLabel: '删除',
-      message: `确认删除选中的 ${ids.length} 条商品？此操作不可撤销。`,
+      show: true, title: 'Confirm Delete', danger: true, confirmLabel: 'Delete',
+      message: `Delete ${ids.length} selected products? This cannot be undone.`,
       onConfirm: () => {
         setConfirmModal(null)
         setBatchLoading(true)
         apiPost('/api/admin/products/batch-delete', { ids })
           .then(r => r.json())
           .then(d => {
-            if (d.success) { setSelectedIds(new Set()); fetchData(page); toast(`已删除 ${d.data.deleted} 条`, 'success') }
-            else toast(d.error?.message || '批量删除失败', 'error')
+            if (d.success) { setSelectedIds(new Set()); fetchData(page); toast(`Deleted ${d.data.deleted} items`, 'success') }
+            else toast(d.error?.message || 'Batch delete failed', 'error')
           })
           .finally(() => setBatchLoading(false))
       }
@@ -483,18 +500,18 @@ export default function AdminPage() {
 
   function handleBatchUpdate(field: string, value: string) {
     const ids = [...selectedIds]
-    const label = field === 'status' ? '状态' : '品牌'
+    const label = field === 'status' ? 'Status' : 'Brand'
     setConfirmModal({
-      show: true, title: '确认修改', confirmLabel: '确认修改',
-      message: `确认将选中的 ${ids.length} 条商品的${label}改为「${value}」？`,
+      show: true, title: 'Confirm Update', confirmLabel: 'Update',
+      message: `Update ${label} to "${value}" for ${ids.length} selected products?`,
       onConfirm: () => {
         setConfirmModal(null)
         setBatchLoading(true)
         apiPost('/api/admin/products/batch-update', { ids, field, value })
           .then(r => r.json())
           .then(d => {
-            if (d.success) { setSelectedIds(new Set()); fetchData(page); toast(`已更新 ${d.data.updated} 条`, 'success') }
-            else toast(d.error?.message || '批量修改失败', 'error')
+            if (d.success) { setSelectedIds(new Set()); fetchData(page); toast(`Updated ${d.data.updated} items`, 'success') }
+            else toast(d.error?.message || 'Batch update failed', 'error')
           })
           .finally(() => setBatchLoading(false))
       }
@@ -544,139 +561,148 @@ export default function AdminPage() {
   useEffect(() => { setPage(1); fetchData(1) }, [loc.pathname, search, tierFilter, statusFilter, brandFilter, quickFilter])
   useEffect(() => { fetchData(page) }, [page])
 
-  if (!isSignedIn) return <div className="text-[var(--text-secondary)] p-4">请用管理员账号登录</div>
-  if (loading) return <div className="text-[var(--text-secondary)] p-4">加载中...</div>
+  if (!isSignedIn) return <div style={{ color: 'var(--text-secondary)', padding: '16px' }}>Please login with admin account</div>
+  if (loading) return <div style={{ color: 'var(--text-secondary)', padding: '16px' }}>Loading...</div>
 
   if (!isUsers && !isProducts && !isCarriers) {
     return (
       <div>
-        <h1 className="text-xl font-bold mb-6">管理仪表板</h1>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 24px' }}>Dashboard</h1>
         {overview && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-            <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
-              <div className="text-2xl font-bold text-[var(--brand)]">{overview.totalProducts}</div>
-              <div className="text-xs text-[var(--text-secondary)] mt-1">商品总数</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
+            <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px' }}>
+              <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>{overview.totalProducts}</div>
+              <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Total Products</div>
             </div>
-            <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
-              <div className="text-2xl font-bold text-[var(--brand)]">{overview.brandCount}</div>
-              <div className="text-xs text-[var(--text-secondary)] mt-1">品牌数量</div>
+            <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px' }}>
+              <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>{overview.brandCount}</div>
+              <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Brands</div>
             </div>
-            <div className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)]">
-              <div className="text-2xl font-bold text-[var(--brand)]">{overview.sourceCount}</div>
-              <div className="text-xs text-[var(--text-secondary)] mt-1">来源站点</div>
+            <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px' }}>
+              <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>{overview.sourceCount}</div>
+              <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Sources</div>
             </div>
           </div>
         )}
         {overview && (overview.noImageCount > 0 || overview.noSourceCount > 0) && (
-          <div className="mb-6">
-            <h2 className="text-sm text-[var(--text-secondary)] mb-3">待完善</h2>
-            <div className="grid grid-cols-2 gap-3">
+          <div style={{ marginBottom: '24px' }}>
+            <h2 style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-secondary)', margin: '0 0 12px' }}>Needs Attention</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               {overview.noImageCount > 0 && (
-                <a href="/admin/products" className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--warning)]/30 hover:bg-[var(--bg-hover)] transition-colors">
-                  <div className="text-xl font-bold text-[var(--warning)]">{overview.noImageCount}</div>
-                  <div className="text-xs text-[var(--text-secondary)] mt-1">缺图商品</div>
+                <a href="/admin/products" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--warning)', padding: '16px', textDecoration: 'none', display: 'block' }}>
+                  <div style={{ fontSize: '24px', fontWeight: 900, color: 'var(--warning)', fontFamily: 'var(--font-display)' }}>{overview.noImageCount}</div>
+                  <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Missing Images</div>
                 </a>
               )}
               {overview.noSourceCount > 0 && (
-                <a href="/admin/products" className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--warning)]/30 hover:bg-[var(--bg-hover)] transition-colors">
-                  <div className="text-xl font-bold text-[var(--warning)]">{overview.noSourceCount}</div>
-                  <div className="text-xs text-[var(--text-secondary)] mt-1">缺来源商品</div>
+                <a href="/admin/products" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--warning)', padding: '16px', textDecoration: 'none', display: 'block' }}>
+                  <div style={{ fontSize: '24px', fontWeight: 900, color: 'var(--warning)', fontFamily: 'var(--font-display)' }}>{overview.noSourceCount}</div>
+                  <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>Missing Sources</div>
                 </a>
               )}
             </div>
           </div>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <a href="/admin/products" className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)] hover:bg-[var(--bg-hover)] transition-colors">
-            <div className="text-sm font-medium text-[var(--text-primary)]">商品管理</div>
-            <div className="text-xs text-[var(--text-secondary)] mt-1">浏览、搜索、编辑和导入商品</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+          <a href="/admin/products" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px', textDecoration: 'none' }}>
+            <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}>Products</div>
+            <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px' }}>Browse, search, edit and import products</div>
           </a>
-          <a href="/admin/users" className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)] hover:bg-[var(--bg-hover)] transition-colors">
-            <div className="text-sm font-medium text-[var(--text-primary)]">用户管理</div>
-            <div className="text-xs text-[var(--text-secondary)] mt-1">管理用户等级、品牌权限和状态</div>
+          <a href="/admin/users" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px', textDecoration: 'none' }}>
+            <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}>Users</div>
+            <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px' }}>Manage tiers, brand access and status</div>
           </a>
-          <a href="/admin/carriers" className="bg-[var(--admin-bg-card)] rounded-xl p-4 border border-[var(--admin-border)] hover:bg-[var(--bg-hover)] transition-colors">
-            <div className="text-sm font-medium text-[var(--text-primary)]">快递管理</div>
-            <div className="text-xs text-[var(--text-secondary)] mt-1">配置国际运费模板和参数</div>
+          <a href="/admin/carriers" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px', textDecoration: 'none' }}>
+            <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}>Carriers</div>
+            <div style={{ fontSize: '9px', color: 'var(--text-secondary)', marginTop: '4px' }}>Configure shipping rate templates</div>
           </a>
         </div>
       </div>
     )
   }
 
+  const thStyle: React.CSSProperties = { padding: '10px 8px', fontWeight: 700, fontSize: '7px', textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'left' }
+  const tdStyle: React.CSSProperties = { padding: '12px 8px', fontSize: '11px', borderBottom: 'var(--border-width) solid var(--admin-border)' }
+  const filterInput: React.CSSProperties = { background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: '11px', color: 'var(--text-primary)', outline: 'none' }
+  const tagBase: React.CSSProperties = { padding: '2px 8px', fontSize: '9px', fontWeight: 700, textTransform: 'uppercase' }
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold">{isUsers ? '用户管理' : isCarriers ? '快递管理' : '商品管理'}</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: 0 }}>
+          {isUsers ? 'Users' : isCarriers ? 'Carriers' : 'Products'}
+        </h1>
         {isProducts && (
-          <div className="flex gap-2">
-            <button onClick={() => setShowAddProduct(true)} className="bg-[var(--brand)] px-3 py-1.5 rounded text-xs active:bg-[var(--brand-hover)] transition-colors">+ 添加商品</button>
-            <button onClick={() => setShowImport(true)} className="bg-[var(--bg-hover)] px-3 py-1.5 rounded text-xs active:bg-[var(--bg-hover)] transition-colors">导入 Excel</button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => setShowAddProduct(true)} style={btnPrimary}>+ Add Product</button>
+            <button onClick={() => setShowImport(true)} style={btnSecondary}>Import Excel</button>
           </div>
         )}
         {isCarriers && (
-          <button onClick={() => setShowAddCarrier(true)} className="bg-[var(--brand)] px-3 py-1.5 rounded text-xs active:bg-[var(--brand-hover)] transition-colors">+ 添加快递</button>
+          <button onClick={() => setShowAddCarrier(true)} style={btnPrimary}>+ Add Carrier</button>
         )}
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
         <input
-          placeholder="搜索..."
+          placeholder="Search..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-sm w-40 text-[var(--text-primary)] placeholder-[var(--text-muted)]"
+          style={{ ...filterInput, width: '160px' }}
         />
         {isUsers && (
-          <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]">
-            <option value="">全部等级</option>
+          <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} style={filterInput}>
+            <option value="">All Tiers</option>
             {TIERS.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
         )}
         {isProducts && (
           <>
-            <select value={brandFilter} onChange={e => setBrandFilter(e.target.value)} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]">
-              <option value="">全部品牌</option>
+            <select value={brandFilter} onChange={e => setBrandFilter(e.target.value)} style={filterInput}>
+              <option value="">All Brands</option>
               {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
             </select>
-            <select value={quickFilter} onChange={e => setQuickFilter(e.target.value)} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]">
-              <option value="">快捷筛选</option>
-              <option value="noImage">缺图商品</option>
-              <option value="noSource">缺来源商品</option>
+            <select value={quickFilter} onChange={e => setQuickFilter(e.target.value)} style={filterInput}>
+              <option value="">Quick Filter</option>
+              <option value="noImage">Missing Image</option>
+              <option value="noSource">Missing Source</option>
             </select>
           </>
         )}
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]">
-          <option value="">全部状态</option>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={filterInput}>
+          <option value="">All Status</option>
           {STATUSES.map(s => <option key={s} value={s}>{statusLabel(s)}</option>)}
         </select>
       </div>
 
       {/* User Table */}
       {isUsers && (
-        <div className="overflow-x-auto -mx-4 px-4">
+        <div style={{ overflowX: 'auto', marginLeft: '-16px', marginRight: '-16px', paddingLeft: '16px', paddingRight: '16px' }}>
           {!loading && data.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-sm text-[var(--text-secondary)]">暂无用户数据</p>
-              <p className="text-xs text-[var(--text-muted)] mt-1">用户注册后将出现在这里</p>
+            <div style={{ textAlign: 'center', padding: '64px 0' }}>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No user data</p>
+              <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>Users will appear here after registration</p>
             </div>
           ) : (
-            <table className="w-full text-sm min-w-[480px]">
-              <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">邮箱</th><th className="py-2.5 font-medium">等级</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
+            <table style={{ width: '100%', fontSize: '13px', minWidth: '480px', borderCollapse: 'collapse' }}>
+              <thead><tr style={{ color: 'var(--text-secondary)', borderBottom: 'var(--border-width) solid var(--admin-border)' }}>
+                <th style={thStyle}>Email</th><th style={thStyle}>Tier</th><th style={thStyle}>Brands</th><th style={thStyle}>Status</th><th style={thStyle}>Updated</th><th style={thStyle}>Actions</th>
+              </tr></thead>
               <tbody>
                 {data.map(u => (
-                  <tr key={u.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
-                    <td className="py-3 text-xs">{u.email}</td>
-                    <td className="py-3">
-                      <div className="flex items-center gap-1">
-                        <span className={`px-2 py-0.5 rounded text-xs ${u.membershipTier === 'free' ? 'bg-[var(--bg-hover)] text-[var(--text-secondary)]' : 'bg-[var(--brand-soft)] text-[var(--brand)]'}`}>{tierLabel(u.membershipTier)}</span>
-                        {u.role === 'admin' && <span className="px-1.5 py-0.5 rounded text-[10px] bg-[var(--danger)]/10 text-[var(--danger)]">管理</span>}
+                  <tr key={u.id}>
+                    <td style={tdStyle}>{u.email}</td>
+                    <td style={tdStyle}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ ...tagBase, background: u.membershipTier === 'free' ? 'var(--bg-hover)' : 'var(--brand-soft)', color: u.membershipTier === 'free' ? 'var(--text-secondary)' : 'var(--brand)' }}>{tierLabel(u.membershipTier)}</span>
+                        {u.role === 'admin' && <span style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)' }}>Admin</span>}
                       </div>
                     </td>
-                    <td className="py-3 text-xs text-[var(--text-secondary)]">{(u.configuredBrands || []).join(', ') || '—'}</td>
-                    <td className="py-3"><span className={`text-xs ${u.status === 'active' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>{statusLabel(u.status)}</span></td>
-                    <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{u.updatedAt ? new Date(u.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
-                    <td className="py-3"><button onClick={() => setEditUser(u)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button></td>
+                    <td style={{ ...tdStyle, color: 'var(--text-secondary)' }}>{(u.configuredBrands || []).join(', ') || '—'}</td>
+                    <td style={tdStyle}><span style={{ fontSize: '11px', color: u.status === 'active' ? 'var(--success)' : 'var(--danger)' }}>{statusLabel(u.status)}</span></td>
+                    <td style={{ ...tdStyle, fontSize: '9px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{u.updatedAt ? new Date(u.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
+                    <td style={tdStyle}><button onClick={() => setEditUser(u)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button></td>
                   </tr>
                 ))}
               </tbody>
@@ -687,44 +713,46 @@ export default function AdminPage() {
 
       {/* Carrier Table */}
       {isCarriers && (
-        <div className="overflow-x-auto -mx-4 px-4">
+        <div style={{ overflowX: 'auto', marginLeft: '-16px', marginRight: '-16px', paddingLeft: '16px', paddingRight: '16px' }}>
           {!loading && data.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-sm text-[var(--text-secondary)]">暂无快递数据</p>
-              <p className="text-xs text-[var(--text-muted)] mt-1">点击「新增加快递」添加运费模板</p>
+            <div style={{ textAlign: 'center', padding: '64px 0' }}>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No carrier data</p>
+              <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>Click "+ Add Carrier" to add a shipping template</p>
             </div>
           ) : (
-            <table className="w-full text-sm min-w-[600px]">
-              <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 font-medium">名称</th><th className="py-2.5 font-medium">首重(kg)</th><th className="py-2.5 font-medium">首重价格</th><th className="py-2.5 font-medium">续重(kg)</th><th className="py-2.5 font-medium">续重价格</th><th className="py-2.5 font-medium">体积除数</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
+            <table style={{ width: '100%', fontSize: '13px', minWidth: '600px', borderCollapse: 'collapse' }}>
+              <thead><tr style={{ color: 'var(--text-secondary)', borderBottom: 'var(--border-width) solid var(--admin-border)' }}>
+                <th style={thStyle}>Name</th><th style={thStyle}>First Wt</th><th style={thStyle}>First Cost</th><th style={thStyle}>Add. Wt</th><th style={thStyle}>Add. Cost</th><th style={thStyle}>Vol Div</th><th style={thStyle}>Status</th><th style={thStyle}>Updated</th><th style={thStyle}>Actions</th>
+              </tr></thead>
               <tbody>
                 {data.map((c: any) => (
-                  <tr key={c.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
-                    <td className="py-3 text-xs font-medium">{c.name}</td>
-                    <td className="py-3 text-xs">{c.firstWeight}</td>
-                    <td className="py-3 text-xs">¥{c.firstCost}</td>
-                    <td className="py-3 text-xs">{c.additionalWeight}</td>
-                    <td className="py-3 text-xs">¥{c.additionalCost}</td>
-                    <td className="py-3 text-xs">{c.volumeDivisor}</td>
-                    <td className="py-3"><span className={`text-xs px-2 py-0.5 rounded ${c.isActive === 'active' ? 'bg-[var(--brand-soft)] text-[var(--success)]' : 'bg-[var(--bg-hover)] text-[var(--danger)]'}`}>{c.isActive === 'active' ? '已启用' : '已停用'}</span></td>
-                    <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
-                    <td className="py-3 whitespace-nowrap">
-                      <button onClick={() => setEditCarrier(c)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button>
+                  <tr key={c.id}>
+                    <td style={{ ...tdStyle, fontWeight: 700 }}>{c.name}</td>
+                    <td style={tdStyle}>{c.firstWeight}</td>
+                    <td style={tdStyle}>¥{c.firstCost}</td>
+                    <td style={tdStyle}>{c.additionalWeight}</td>
+                    <td style={tdStyle}>¥{c.additionalCost}</td>
+                    <td style={tdStyle}>{c.volumeDivisor}</td>
+                    <td style={tdStyle}><span style={{ ...tagBase, background: c.isActive === 'active' ? 'var(--brand-soft)' : 'var(--bg-hover)', color: c.isActive === 'active' ? 'var(--success)' : 'var(--danger)' }}>{c.isActive === 'active' ? 'Active' : 'Disabled'}</span></td>
+                    <td style={{ ...tdStyle, fontSize: '9px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
+                    <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
+                      <button onClick={() => setEditCarrier(c)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button>
                       <button onClick={() => {
                         setConfirmModal({
-                          show: true, title: '确认删除', danger: true, confirmLabel: '删除',
-                          message: `确认删除快递「${c.name}」？`,
+                          show: true, title: 'Confirm Delete', danger: true, confirmLabel: 'Delete',
+                          message: `Delete carrier "${c.name}"?`,
                           onConfirm: () => {
                             setConfirmModal(null)
                             apiDelete('/api/admin/shipping-carriers', { id: c.id })
                               .then(r => r.json())
                               .then(d => {
-                                if (d.success) { fetchData(page); toast('已删除', 'success') }
-                                else toast(d.error?.message || '删除失败', 'error')
+                                if (d.success) { fetchData(page); toast('Deleted', 'success') }
+                                else toast(d.error?.message || 'Delete failed', 'error')
                               })
-                              .catch(() => toast('网络错误', 'error'))
+                              .catch(() => toast('Network error', 'error'))
                           }
                         })
-                      }} className="bg-[var(--danger)]/10 text-[var(--danger)] px-3 py-1 rounded text-xs hover:bg-[var(--danger)]/20 active:bg-[var(--danger)]/20 transition-colors ml-2">删除</button>
+                      }} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', marginLeft: '8px' }}>Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -737,55 +765,59 @@ export default function AdminPage() {
       {/* Product Table */}
       {isProducts && (() => {
         if (!loading && data.length === 0) return (
-          <div className="text-center py-16">
-            <p className="text-sm text-[var(--text-secondary)]">暂无商品数据</p>
-            <p className="text-xs text-[var(--text-muted)] mt-1">{!search && !brandFilter && !statusFilter && !quickFilter ? '可以手动添加商品，或通过 Excel 批量导入' : '当前筛选条件下无匹配商品'}</p>
+          <div style={{ textAlign: 'center', padding: '64px 0' }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No product data</p>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>{!search && !brandFilter && !statusFilter && !quickFilter ? 'Add products manually or import via Excel' : 'No matching products for current filters'}</p>
           </div>
         )
         return (
-        <div className="overflow-x-auto -mx-4 px-4">
-          <table className="w-full text-sm min-w-[700px]">
-            <thead><tr className="text-left text-[var(--text-secondary)] border-b border-[var(--admin-border)]"><th className="py-2.5 w-8 font-medium"><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></th><th className="py-2.5 w-10 font-medium"></th><th className="py-2.5 font-medium">标题</th><th className="py-2.5 font-medium">品牌</th><th className="py-2.5 font-medium">价格</th><th className="py-2.5 font-medium">来源</th><th className="py-2.5 font-medium">状态</th><th className="py-2.5 font-medium">更新时间</th><th className="py-2.5 font-medium">操作</th></tr></thead>
+        <div style={{ overflowX: 'auto', marginLeft: '-16px', marginRight: '-16px', paddingLeft: '16px', paddingRight: '16px' }}>
+          <table style={{ width: '100%', fontSize: '13px', minWidth: '700px', borderCollapse: 'collapse' }}>
+            <thead><tr style={{ color: 'var(--text-secondary)', borderBottom: 'var(--border-width) solid var(--admin-border)' }}>
+              <th style={{ ...thStyle, width: '32px' }}><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} style={{ width: '14px', height: '14px', accentColor: 'var(--brand)', cursor: 'pointer' }} /></th>
+              <th style={{ ...thStyle, width: '40px' }}></th>
+              <th style={thStyle}>Title</th><th style={thStyle}>Brand</th><th style={thStyle}>Price</th><th style={thStyle}>Source</th><th style={thStyle}>Status</th><th style={thStyle}>Updated</th><th style={thStyle}>Actions</th>
+            </tr></thead>
           <tbody>
             {data.map(p => (
-              <tr key={p.id} className="border-b border-[var(--admin-border)] hover:bg-[var(--bg-hover)]/50 transition-colors">
-                <td className="py-3"><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} className="w-3.5 h-3.5 accent-[var(--brand)] cursor-pointer" /></td>
-                <td className="py-3">
+              <tr key={p.id}>
+                <td style={tdStyle}><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} style={{ width: '14px', height: '14px', accentColor: 'var(--brand)', cursor: 'pointer' }} /></td>
+                <td style={tdStyle}>
                   <img
                     src={p.imageUrl || `https://placehold.co/64x64/1a1a17/d97757?text=${encodeURIComponent((p.brand || '').slice(0, 6))}`}
                     alt=""
-                    className="w-8 h-8 rounded object-cover bg-[var(--bg-hover)]"
+                    style={{ width: '32px', height: '32px', objectFit: 'cover', background: 'var(--bg-hover)' }}
                     loading="lazy"
                     onError={e => {
                       const el = e.target as HTMLImageElement
-                      el.src = `https://placehold.co/64x64/1a1a17/666?text=${encodeURIComponent('暂无')}`
+                      el.src = `https://placehold.co/64x64/1a1a17/666?text=${encodeURIComponent('N/A')}`
                     }}
                   />
                 </td>
-                <td className="py-3 text-xs max-w-48 truncate">{p.title}</td>
-                <td className="py-3 text-[var(--brand)] text-xs">{p.brand}</td>
-                <td className="py-3 text-xs font-mono tabular-nums">{formatPrice(p.currency, p.price)}</td>
-                <td className="py-3 text-xs text-[var(--text-secondary)]">{p.source}</td>
-                <td className="py-3"><span className={`text-xs px-2 py-0.5 rounded ${p.status === 'active' ? 'bg-[var(--brand-soft)] text-[var(--success)]' : 'bg-[var(--bg-hover)] text-[var(--danger)]'}`}>{statusLabel(p.status)}</span></td>
-                <td className="py-3 text-[10px] text-[var(--text-muted)] whitespace-nowrap">{p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
-                <td className="py-3 whitespace-nowrap">
-                  <button onClick={() => setEditProduct(p)} className="bg-[var(--brand-soft)] text-[var(--brand)] px-3 py-1 rounded text-xs hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors">编辑</button>
+                <td style={{ ...tdStyle, maxWidth: '192px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</td>
+                <td style={{ ...tdStyle, color: 'var(--brand)' }}>{p.brand}</td>
+                <td style={{ ...tdStyle, fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums' }}>{formatPrice(p.currency, p.price)}</td>
+                <td style={{ ...tdStyle, color: 'var(--text-secondary)' }}>{p.source}</td>
+                <td style={tdStyle}><span style={{ ...tagBase, background: p.status === 'active' ? 'var(--brand-soft)' : 'var(--bg-hover)', color: p.status === 'active' ? 'var(--success)' : 'var(--danger)' }}>{statusLabel(p.status)}</span></td>
+                <td style={{ ...tdStyle, fontSize: '9px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
+                <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
+                  <button onClick={() => setEditProduct(p)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button>
                   <button onClick={() => {
                     setConfirmModal({
-                      show: true, title: '确认删除', danger: true, confirmLabel: '删除',
-                      message: `确认删除商品「${p.title}」？`,
+                      show: true, title: 'Confirm Delete', danger: true, confirmLabel: 'Delete',
+                      message: `Delete product "${p.title}"?`,
                       onConfirm: () => {
                         setConfirmModal(null)
                         apiDelete('/api/admin/products', { id: p.id })
                           .then(r => r.json())
                           .then(d => {
-                            if (d.success) { fetchData(page); toast('商品已删除', 'success') }
-                            else toast(d.error?.message || '删除失败', 'error')
+                            if (d.success) { fetchData(page); toast('Product deleted', 'success') }
+                            else toast(d.error?.message || 'Delete failed', 'error')
                           })
-                          .catch(() => toast('网络错误', 'error'))
+                          .catch(() => toast('Network error', 'error'))
                       }
                     })
-                  }} className="bg-[var(--danger)]/10 text-[var(--danger)] px-3 py-1 rounded text-xs hover:bg-[var(--danger)]/20 active:bg-[var(--danger)]/20 transition-colors ml-2">删除</button>
+                  }} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', marginLeft: '8px' }}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -805,34 +837,38 @@ export default function AdminPage() {
 
       {/* Batch action bar */}
       {selectedIds.size > 0 && isProducts && (
-        <div className="fixed bottom-4 left-2 right-2 sm:bottom-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-40 bg-[var(--admin-bg-sidebar)] border border-[var(--admin-border)] rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 flex flex-wrap items-center gap-2 shadow-2xl shadow-black/50 max-w-full">
-          <span className="text-xs text-[var(--text-secondary)]">已选 <b className="text-[var(--text-primary)]">{selectedIds.size}</b> 项</span>
-          <button onClick={handleBatchDelete} disabled={batchLoading} className="bg-[var(--danger)]/10 text-[var(--danger)] px-3 py-1 rounded text-xs hover:bg-[var(--danger)]/10 disabled:opacity-50 whitespace-nowrap">
-            批量删除
+        <div style={{
+          position: 'fixed', bottom: '16px', left: '8px', right: '8px', zIndex: 40,
+          background: 'var(--admin-bg-sidebar)', border: 'var(--border-width) solid var(--admin-border)',
+          padding: '10px 16px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px',
+        }}>
+          <span style={{ fontSize: '10px', color: 'var(--text-inverse)' }}>Selected <b>{selectedIds.size}</b> items</span>
+          <button onClick={handleBatchDelete} disabled={batchLoading} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', opacity: batchLoading ? 0.5 : 1 }}>
+            Batch Delete
           </button>
           <select
             defaultValue=""
             onChange={e => { const v = e.target.value; if (v) { handleBatchUpdate('status', v); e.target.value = '' } }}
             disabled={batchLoading}
-            className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded px-2 py-1 text-xs text-[var(--text-primary)] disabled:opacity-50"
+            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '10px', color: 'var(--text-primary)', opacity: batchLoading ? 0.5 : 1 }}
           >
-            <option value="" disabled>修改状态</option>
-            <option value="active">已启用</option>
-            <option value="inactive">已停用</option>
+            <option value="" disabled>Change Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
           </select>
           <select
             defaultValue=""
             onChange={e => { const v = e.target.value; if (v) { handleBatchUpdate('brand', v); e.target.value = '' } }}
             disabled={batchLoading}
-            className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded px-2 py-1 text-xs text-[var(--text-primary)] disabled:opacity-50"
+            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '10px', color: 'var(--text-primary)', opacity: batchLoading ? 0.5 : 1 }}
           >
-            <option value="" disabled>修改品牌</option>
+            <option value="" disabled>Change Brand</option>
             {BRANDS.filter(b => typeof b === 'string').map(b => (
               <option key={b} value={b}>{b}</option>
             ))}
           </select>
-          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:text-[var(--text-primary)] disabled:opacity-50 py-0.5">
-            取消选择
+          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '10px', color: 'var(--text-inverse)', opacity: batchLoading ? 0.5 : 0.7 }}>
+            Deselect All
           </button>
         </div>
       )}

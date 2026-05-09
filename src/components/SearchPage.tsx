@@ -23,67 +23,41 @@ function highlightText(text: string, keyword: string): React.ReactNode {
   const parts = text.split(regex)
   return parts.map((part, i) =>
     escaped.some(w => part.toLowerCase() === w.toLowerCase())
-      ? <mark key={i} className="bg-[var(--brand)]/30 text-[var(--brand)] rounded px-0.5">{part}</mark>
+      ? <mark key={i} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', padding: '0 2px' }}>{part}</mark>
       : part
   )
 }
 
 const SORT_OPTIONS = [
-  { value: 'relevance:desc', label: '相关度' },
-  { value: 'newest:desc', label: '最新' },
-  { value: 'price:asc', label: '价格 ↑' },
-  { value: 'price:desc', label: '价格 ↓' },
+  { value: 'relevance:desc', label: 'SORT: REL.' },
+  { value: 'newest:desc', label: 'SORT: NEW' },
+  { value: 'price:asc', label: 'SORT: PRICE ↑' },
+  { value: 'price:desc', label: 'SORT: PRICE ↓' },
 ]
-
-function SkeletonCard() {
-  return (
-    <div className="bg-[var(--bg-card)] rounded-xl p-3 animate-pulse">
-      <div className="flex gap-3">
-        <div className="w-14 h-14 rounded-lg bg-[var(--bg-card)] shrink-0" />
-        <div className="flex-1 space-y-2">
-          <div className="h-4 bg-[var(--bg-card)] rounded w-3/4" />
-          <div className="flex gap-1.5">
-            <div className="h-3 bg-[var(--bg-card)] rounded w-16" />
-            <div className="h-3 bg-[var(--bg-card)] rounded w-10" />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function PaginationJumper({ current, max, onJump }: { current: number; max: number; onJump: (p: number) => void }) {
   const [input, setInput] = useState(String(current))
-
   useEffect(() => { setInput(String(current)) }, [current])
-
   function handleJump() {
     const n = parseInt(input, 10)
     if (n >= 1 && n <= max && n !== current) onJump(n)
     else setInput(String(current))
   }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') handleJump()
-  }
-
   return (
-    <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
-      <span>跳至</span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+      <span>GO TO</span>
       <input
-        className="w-12 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg px-2 py-1 text-center text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--brand)]"
+        style={{ width: '48px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', textAlign: 'center', fontSize: '11px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }}
         value={input}
         onChange={e => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
+        onKeyDown={e => { if (e.key === 'Enter') handleJump() }}
         inputMode="numeric"
       />
       <button
         onClick={handleJump}
-        className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] rounded-lg px-2 py-1 transition-colors"
-      >
-        跳转
-      </button>
-      <span className="text-[var(--text-secondary)]/70">/ {max} 页</span>
+        style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', cursor: 'pointer', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)' }}
+      >GO</button>
+      <span style={{ opacity: 0.7 }}>/ {max}</span>
     </div>
   )
 }
@@ -111,7 +85,6 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false)
   const [isAnon, setIsAnon] = useState(false)
   const [searched, setSearched] = useState(false)
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set())
   const [favToggling, setFavToggling] = useState<Set<number>>(new Set())
   const [searchHistory, setSearchHistory] = useState<string[]>(loadHistory)
@@ -122,23 +95,14 @@ export default function SearchPage() {
 
   useEffect(() => {
     const q = keyword.trim()
-    if (!q || q.length < 2) {
-      setSuggestions([])
-      setShowSuggestions(false)
-      return
-    }
+    if (!q || q.length < 2) { setSuggestions([]); setShowSuggestions(false); return }
     abortRef.current?.abort()
     const ctrl = new AbortController()
     abortRef.current = ctrl
     const timer = setTimeout(() => {
       fetch(`/api/products/suggest?q=${encodeURIComponent(q)}&limit=5`, { signal: ctrl.signal })
         .then(r => r.json())
-        .then(d => {
-          if (d.success) {
-            setSuggestions(d.data)
-            setShowSuggestions(true)
-          }
-        })
+        .then(d => { if (d.success) { setSuggestions(d.data); setShowSuggestions(true) } })
         .catch(() => {})
     }, 300)
     return () => { clearTimeout(timer); ctrl.abort() }
@@ -151,25 +115,12 @@ export default function SearchPage() {
   }
 
   function addToHistory(q: string) {
-    setSearchHistory(prev => {
-      const next = [q, ...prev.filter(x => x !== q)].slice(0, 5)
-      saveHistory(next)
-      return next
-    })
+    setSearchHistory(prev => { const next = [q, ...prev.filter(x => x !== q)].slice(0, 5); saveHistory(next); return next })
   }
-
   function removeHistoryItem(index: number) {
-    setSearchHistory(prev => {
-      const next = prev.filter((_, i) => i !== index)
-      saveHistory(next)
-      return next
-    })
+    setSearchHistory(prev => { const next = prev.filter((_, i) => i !== index); saveHistory(next); return next })
   }
-
-  function clearHistory() {
-    setSearchHistory([])
-    saveHistory([])
-  }
+  function clearHistory() { setSearchHistory([]); saveHistory([]) }
 
   const filtersRef = useRef({ keyword, brand, source, currency, sortBy, sortOrder, priceMin, priceMax })
   filtersRef.current = { keyword, brand, source, currency, sortBy, sortOrder, priceMin, priceMax }
@@ -177,76 +128,45 @@ export default function SearchPage() {
   function doSearch(p = 1, overrides?: Partial<typeof filtersRef.current>) {
     const f = { ...filtersRef.current, ...overrides }
     if (!f.keyword.trim()) return
-    setLoading(true)
-    setSearched(true)
-    addToHistory(f.keyword.trim())
-    const sortByParam = f.sortBy === 'relevance' ? 'relevance' : f.sortBy
-    const sortOrderParam = f.sortBy === 'relevance' ? 'desc' : f.sortOrder
+    setLoading(true); setSearched(true); addToHistory(f.keyword.trim())
     apiPost('/api/products/search', {
-        keyword: f.keyword.trim(),
-        brand: f.brand || undefined,
-        source: f.source || undefined,
-        currency: f.currency || undefined,
-        sortBy: sortByParam,
-        sortOrder: sortOrderParam,
-        priceMin: f.priceMin || undefined,
-        priceMax: f.priceMax || undefined,
-        page: p,
-        pageSize: 10,
-      })
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) {
-          setResults(d.data.items)
-          setSummary(d.data.summary)
-          setPagination(d.data.pagination)
-          setIsAnon(!isSignedIn)
-          setPage(p)
-          sessionStorage.setItem('bbm_last_search', JSON.stringify({
-            keyword: f.keyword.trim(),
-            brand: f.brand,
-            source: f.source,
-            currency: f.currency,
-            sortBy: sortByParam,
-            sortOrder: sortOrderParam,
-            priceMin: f.priceMin,
-            priceMax: f.priceMax,
-          }))
-        }
-      })
-      .finally(() => setLoading(false))
+      keyword: f.keyword.trim(), brand: f.brand || undefined, source: f.source || undefined,
+      currency: f.currency || undefined, sortBy: f.sortBy === 'relevance' ? 'relevance' : f.sortBy,
+      sortOrder: f.sortBy === 'relevance' ? 'desc' : f.sortOrder,
+      priceMin: f.priceMin || undefined, priceMax: f.priceMax || undefined, page: p, pageSize: 10,
+    }).then(r => r.json()).then(d => {
+      if (d.success) {
+        setResults(d.data.items); setSummary(d.data.summary); setPagination(d.data.pagination)
+        setIsAnon(!isSignedIn); setPage(p)
+        sessionStorage.setItem('bbm_last_search', JSON.stringify({
+          keyword: f.keyword.trim(), brand: f.brand, source: f.source, currency: f.currency,
+          sortBy: f.sortBy, sortOrder: f.sortOrder, priceMin: f.priceMin, priceMax: f.priceMax,
+        }))
+      }
+    }).finally(() => setLoading(false))
   }
 
   useEffect(() => {
-    // POP = back/forward navigation → restore saved search; PUSH/REPLACE = tab click → fresh start
     if (navigationType === 'POP') {
       const saved = sessionStorage.getItem('bbm_last_search')
       if (saved) {
         try {
           const s = JSON.parse(saved)
           if (s.keyword) {
-            setKeyword(s.keyword)
-            if (s.brand) setBrand(s.brand)
-            if (s.source) setSource(s.source)
-            if (s.currency) setCurrency(s.currency)
-            if (s.sortBy) setSortBy(s.sortBy)
-            if (s.sortOrder) setSortOrder(s.sortOrder)
-            if (s.priceMin) setPriceMin(s.priceMin)
+            setKeyword(s.keyword); if (s.brand) setBrand(s.brand); if (s.source) setSource(s.source)
+            if (s.currency) setCurrency(s.currency); if (s.sortBy) setSortBy(s.sortBy)
+            if (s.sortOrder) setSortOrder(s.sortOrder); if (s.priceMin) setPriceMin(s.priceMin)
             if (s.priceMax) setPriceMax(s.priceMax)
             doSearch(1, { keyword: s.keyword, brand: s.brand, source: s.source, currency: s.currency, sortBy: s.sortBy, sortOrder: s.sortOrder, priceMin: s.priceMin, priceMax: s.priceMax })
           }
         } catch {}
       }
-    } else {
-      sessionStorage.removeItem('bbm_last_search')
-    }
+    } else { sessionStorage.removeItem('bbm_last_search') }
   }, [])
 
   useEffect(() => {
     if (!isSignedIn) return
-    api('/api/favorites?idsOnly=1').then(r => r.json())
-      .then(d => { if (d.success) setFavoriteIds(new Set(d.data.ids)) })
-      .catch(() => {})
+    api('/api/favorites?idsOnly=1').then(r => r.json()).then(d => { if (d.success) setFavoriteIds(new Set(d.data.ids)) }).catch(() => {})
   }, [isSignedIn])
 
   function toggleFavorite(productId: number, e: React.MouseEvent) {
@@ -254,84 +174,88 @@ export default function SearchPage() {
     if (!isSignedIn) { openLogin(); return }
     setFavToggling(prev => new Set(prev).add(productId))
     const isFav = favoriteIds.has(productId)
-    const fetcher = isFav
-      ? apiDelete('/api/favorites', { productId })
-      : apiPost('/api/favorites', { productId })
-    fetcher
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) {
-          setFavoriteIds(prev => {
-            const next = new Set(prev)
-            isFav ? next.delete(productId) : next.add(productId)
-            return next
-          })
-        }
-      })
-      .finally(() => setFavToggling(prev => { const n = new Set(prev); n.delete(productId); return n }))
+    const fetcher = isFav ? apiDelete('/api/favorites', { productId }) : apiPost('/api/favorites', { productId })
+    fetcher.then(r => r.json()).then(d => {
+      if (d.success) {
+        setFavoriteIds(prev => { const next = new Set(prev); isFav ? next.delete(productId) : next.add(productId); return next })
+      }
+    }).finally(() => setFavToggling(prev => { const n = new Set(prev); n.delete(productId); return n }))
   }
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') doSearch(1)
-  }
-
+  function handleKeyDown(e: React.KeyboardEvent) { if (e.key === 'Enter') doSearch(1) }
   const showFilters = summary || brand
   const showHistory = !keyword.trim() && !searched && searchHistory.length > 0
 
-  return (
-    <div className="p-4">
-      {/* Search bar */}
-      <div className="flex gap-2 mb-3">
-        <input
-          className="flex-1 h-12 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] px-4 text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors"
-          placeholder="搜索品牌、商品或型号"
-          value={keyword}
-          onChange={e => setKeyword(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <button onClick={() => doSearch(1)} className="bg-[var(--brand)] px-4 rounded-xl text-sm active:bg-[var(--brand-hover)] transition-colors">搜索</button>
-      </div>
+  const rowStyle: React.CSSProperties = {
+    height: 'var(--row-height)',
+    display: 'grid',
+    gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto 24px',
+    borderBottom: 'var(--border-width) solid var(--border-default)',
+    background: 'var(--bg-primary)',
+    color: 'var(--text-primary)',
+    cursor: 'pointer',
+    width: '100%',
+    textAlign: 'left',
+  }
 
-      {/* Search history */}
+  return (
+    <div style={{ padding: 'var(--page-padding)' }}>
+      {/* Header bar */}
+      <header style={{
+        height: 'var(--header-height)', padding: '0 var(--page-padding)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        borderBottom: 'var(--border-width) solid var(--border-default)',
+        marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
+      }}>
+        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Compare Tool V.1</span>
+        <span style={{ width: '18px', height: '18px', borderRadius: '999px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '9px', fontWeight: 800 }}>02</span>
+      </header>
+
+      {/* Title + search */}
+      <section style={{
+        padding: '14px var(--page-padding) 10px',
+        borderBottom: 'var(--border-width) solid var(--border-default)',
+        marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
+      }}>
+        <h1 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', maxWidth: '260px' }}>
+          Product<br />Search
+        </h1>
+        <label style={{ display: 'block' }}>
+          <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '8px', display: 'block' }}>Enter Brand Keyword</span>
+          <input
+            style={{ width: '100%', marginTop: '4px', border: '0', padding: '0', background: 'transparent', color: 'var(--text-primary)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '16px', fontWeight: 500, textTransform: 'uppercase', outline: 'none' }}
+            placeholder="TYPE KEYWORD_"
+            value={keyword}
+            onChange={e => setKeyword(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </label>
+      </section>
+
+      {/* History / suggestions */}
       {showHistory && (
-        <div className="mb-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] text-[var(--text-secondary)]">最近搜索</span>
-            <button onClick={clearHistory} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">清除全部</button>
+        <div style={{ padding: '8px var(--page-padding)', borderBottom: 'var(--border-width) solid var(--border-default)', marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Recent</span>
+            <button onClick={clearHistory} style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>Clear All</button>
           </div>
-          <div className="flex flex-wrap gap-1.5">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {searchHistory.map((q, i) => (
-              <span key={i} className="inline-flex items-center bg-[var(--bg-card)] rounded-lg overflow-hidden">
-                <button
-                  onClick={() => { setKeyword(q); doSearch(1, { keyword: q }) }}
-                  className="px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
-                >
-                  {q}
-                </button>
-                <button
-                  onClick={e => { e.stopPropagation(); removeHistoryItem(i) }}
-                  className="px-1.5 py-1.5 text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
-                  aria-label={`删除 ${q}`}
-                >×</button>
+              <span key={i} style={{ display: 'inline-flex', border: 'var(--border-width) solid var(--border-default)' }}>
+                <button onClick={() => { setKeyword(q); doSearch(1, { keyword: q }) }} style={{ background: 'var(--bg-primary)', border: 'none', padding: '4px 8px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>{q}</button>
+                <button onClick={e => { e.stopPropagation(); removeHistoryItem(i) }} style={{ background: 'var(--bg-primary)', border: 'none', borderLeft: 'var(--border-width) solid var(--border-default)', padding: '4px 6px', fontSize: '10px', cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
               </span>
             ))}
           </div>
         </div>
       )}
 
-      {/* Initial recommendations */}
       {!keyword.trim() && !searched && searchHistory.length === 0 && (
-        <div className="mb-3">
-          <div className="text-[10px] text-[var(--text-secondary)] mb-2">热门品牌</div>
-          <div className="flex flex-wrap gap-1.5">
+        <div style={{ padding: '8px var(--page-padding)', borderBottom: 'var(--border-width) solid var(--border-default)', marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))' }}>
+          <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px' }}>Popular Brands</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {SUGGESTED_BRANDS.map(b => (
-              <button
-                key={b}
-                onClick={() => { setKeyword(b); doSearch(1, { keyword: b }) }}
-                className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors"
-              >
-                {b}
-              </button>
+              <button key={b} onClick={() => { setKeyword(b); doSearch(1, { keyword: b }) }} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>{b}</button>
             ))}
           </div>
         </div>
@@ -339,302 +263,185 @@ export default function SearchPage() {
 
       {/* Autocomplete */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="relative -mt-2 mb-3 mx-1">
-          <div className="absolute top-0 left-0 right-0 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg overflow-hidden z-10 shadow-xl">
-            {suggestions.map(item => (
-              <button
-                key={item.id}
-                className="w-full text-left px-4 py-2.5 text-sm hover:bg-[var(--bg-hover)] transition-colors border-b border-[var(--border-subtle)] last:border-0"
-                onMouseDown={e => { e.preventDefault(); selectSuggestion(item) }}
-              >
-                <span className="text-[var(--text-primary)]">{item.title}</span>
-                <span className="text-[var(--brand)] text-xs ml-2">{item.brand}</span>
-              </button>
-            ))}
-          </div>
+        <div style={{ borderBottom: 'var(--border-width) solid var(--border-default)', marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))' }}>
+          {suggestions.map(item => (
+            <button key={item.id} onMouseDown={e => { e.preventDefault(); selectSuggestion(item) }}
+              style={{ width: '100%', textAlign: 'left', padding: '8px var(--page-padding)', background: 'var(--bg-primary)', border: 'none', borderBottom: 'var(--border-width) solid var(--border-default)', cursor: 'pointer', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}
+            >
+              {item.title} <span style={{ color: 'var(--brand)', marginLeft: '8px' }}>{item.brand}</span>
+            </button>
+          ))}
         </div>
       )}
 
       {/* Active filter pills */}
       {(brand || source || currency || priceMin || priceMax) && (
-        <div className="flex flex-wrap items-center gap-1.5 mb-2">
-          {brand && (
-            <button
-              onClick={() => { setBrand(''); doSearch(1, { brand: '' }) }}
-              className="inline-flex items-center gap-1 bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-1 rounded-full hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors"
-            >
-              {brand} <span className="text-[10px]">×</span>
-            </button>
-          )}
-          {source && (
-            <button
-              onClick={() => { setSource(''); doSearch(1, { source: '' }) }}
-              className="inline-flex items-center gap-1 bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-1 rounded-full hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors"
-            >
-              {source} <span className="text-[10px]">×</span>
-            </button>
-          )}
-          {currency && (
-            <button
-              onClick={() => { setCurrency(''); doSearch(1, { currency: '' }) }}
-              className="inline-flex items-center gap-1 bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-1 rounded-full hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors"
-            >
-              {currency} <span className="text-[10px]">×</span>
-            </button>
-          )}
-          {priceMin && (
-            <button
-              onClick={() => { setPriceMin(''); doSearch(1, { priceMin: '' }) }}
-              className="inline-flex items-center gap-1 bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-1 rounded-full hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors"
-            >
-              ≥{priceMin} <span className="text-[10px]">×</span>
-            </button>
-          )}
-          {priceMax && (
-            <button
-              onClick={() => { setPriceMax(''); doSearch(1, { priceMax: '' }) }}
-              className="inline-flex items-center gap-1 bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-1 rounded-full hover:bg-[var(--brand)]/20 active:bg-[var(--brand)]/20 transition-colors"
-            >
-              ≤{priceMax} <span className="text-[10px]">×</span>
-            </button>
-          )}
-          <button
-            onClick={() => { setBrand(''); setSource(''); setCurrency(''); setPriceMin(''); setPriceMax(''); doSearch(page, { brand: '', source: '', currency: '', priceMin: '', priceMax: '' }) }}
-            className="text-[10px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors ml-1"
-          >
-            清除全部
-          </button>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '8px 0' }}>
+          {brand && <button onClick={() => { setBrand(''); doSearch(1, { brand: '' }) }} style={{ background: 'var(--brand-soft)', border: 'var(--border-width) solid var(--brand)', padding: '3px 8px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--brand)' }}>{brand} ×</button>}
+          {source && <button onClick={() => { setSource(''); doSearch(1, { source: '' }) }} style={{ background: 'var(--brand-soft)', border: 'var(--border-width) solid var(--brand)', padding: '3px 8px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--brand)' }}>{source} ×</button>}
+          {currency && <button onClick={() => { setCurrency(''); doSearch(1, { currency: '' }) }} style={{ background: 'var(--brand-soft)', border: 'var(--border-width) solid var(--brand)', padding: '3px 8px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--brand)' }}>{currency} ×</button>}
+          {priceMin && <button onClick={() => { setPriceMin(''); doSearch(1, { priceMin: '' }) }} style={{ background: 'var(--brand-soft)', border: 'var(--border-width) solid var(--brand)', padding: '3px 8px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--brand)' }}>≥{priceMin} ×</button>}
+          {priceMax && <button onClick={() => { setPriceMax(''); doSearch(1, { priceMax: '' }) }} style={{ background: 'var(--brand-soft)', border: 'var(--border-width) solid var(--brand)', padding: '3px 8px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--brand)' }}>≤{priceMax} ×</button>}
+          <button onClick={() => { setBrand(''); setSource(''); setCurrency(''); setPriceMin(''); setPriceMax(''); doSearch(page, { brand: '', source: '', currency: '', priceMin: '', priceMax: '' }) }}
+            style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', marginLeft: '4px' }}>Clear All</button>
         </div>
       )}
 
-      {/* Filters + Sort */}
+      {/* Filters + sort */}
       {showFilters && (
-        <div className="flex gap-2 mb-4 overflow-x-auto">
-          <select value={brand} onChange={e => { const v = e.target.value; setBrand(v); doSearch(1, { brand: v }) }} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-primary)]">
-            <option value="">全部品牌</option>
-            {(summary?.brands || (brand ? [brand] : [])).map((b: string) => (
-              <option key={b} value={b}>{b}</option>
-            ))}
+        <div style={{ display: 'flex', gap: '4px', padding: '8px 0', overflowX: 'auto', flexWrap: 'wrap' }}>
+          <select value={brand} onChange={e => { const v = e.target.value; setBrand(v); doSearch(1, { brand: v }) }}
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+            <option value="">ALL BRANDS</option>
+            {(summary?.brands || (brand ? [brand] : [])).map((b: string) => <option key={b} value={b}>{b}</option>)}
           </select>
-          <select value={source} onChange={e => { const v = e.target.value; setSource(v); doSearch(1, { source: v }) }} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-primary)]">
-            <option value="">全部来源</option>
-            {(summary?.sources || []).map((s: string) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
+          <select value={source} onChange={e => { const v = e.target.value; setSource(v); doSearch(1, { source: v }) }}
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+            <option value="">ALL SOURCES</option>
+            {(summary?.sources || []).map((s: string) => <option key={s} value={s}>{s}</option>)}
           </select>
-          <select value={currency} onChange={e => { const v = e.target.value; setCurrency(v); doSearch(1, { currency: v }) }} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-primary)]">
-            <option value="">全部币种</option>
-            {(summary?.currencies || []).map((c: string) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
+          <select value={currency} onChange={e => { const v = e.target.value; setCurrency(v); doSearch(1, { currency: v }) }}
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+            <option value="">ALL CURR.</option>
+            {(summary?.currencies || []).map((c: string) => <option key={c} value={c}>{c}</option>)}
           </select>
-          <input
-            type="number"
-            placeholder="最低价"
-            value={priceMin}
-            onChange={e => setPriceMin(e.target.value)}
-            onBlur={() => doSearch(1)}
-            onKeyDown={e => { if (e.key === 'Enter') doSearch(1) }}
-            className="w-16 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)]"
-          />
-          <input
-            type="number"
-            placeholder="最高价"
-            value={priceMax}
-            onChange={e => setPriceMax(e.target.value)}
-            onBlur={() => doSearch(1)}
-            onKeyDown={e => { if (e.key === 'Enter') doSearch(1) }}
-            className="w-16 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)]"
-          />
-          <select value={`${sortBy}:${sortOrder}`} onChange={e => { const [sb, so] = e.target.value.split(':'); setSortBy(sb); setSortOrder(so); doSearch(1, { sortBy: sb, sortOrder: so }) }} className="bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-primary)]">
-            {SORT_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
+          <input type="number" placeholder="MIN" value={priceMin} onChange={e => setPriceMin(e.target.value)} onBlur={() => doSearch(1)} onKeyDown={e => { if (e.key === 'Enter') doSearch(1) }}
+            style={{ width: '56px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '7px', fontWeight: 800, color: 'var(--text-primary)', outline: 'none' }} />
+          <input type="number" placeholder="MAX" value={priceMax} onChange={e => setPriceMax(e.target.value)} onBlur={() => doSearch(1)} onKeyDown={e => { if (e.key === 'Enter') doSearch(1) }}
+            style={{ width: '56px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '7px', fontWeight: 800, color: 'var(--text-primary)', outline: 'none' }} />
+          <select value={`${sortBy}:${sortOrder}`} onChange={e => { const [sb, so] = e.target.value.split(':'); setSortBy(sb); setSortOrder(so); doSearch(1, { sortBy: sb, sortOrder: so }) }}
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+            {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </select>
-          <div className="flex rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] overflow-hidden ml-auto shrink-0">
-            <button onClick={() => setViewMode('list')} className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'list' ? 'bg-[var(--brand)] text-[var(--button-on-brand)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-[var(--bg-hover)]'}`}>☰</button>
-            <button onClick={() => setViewMode('grid')} className={`px-3 py-2 text-sm min-w-[36px] transition-colors active:scale-95 ${viewMode === 'grid' ? 'bg-[var(--brand)] text-[var(--button-on-brand)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-[var(--bg-hover)]'}`}>⊞</button>
-          </div>
         </div>
       )}
 
-      {/* Summary */}
+      {/* Count bar */}
       {summary && (
-        <div className="text-xs text-[var(--text-secondary)] mb-4">
-          找到 {summary.totalResults} 件商品 · {summary.brands.length} 品牌 · {summary.sources.length} 站点
+        <div style={{ height: '36px', padding: '0 var(--page-padding)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: 'var(--border-width) solid var(--border-default)', marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))' }}>
+          <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            Results Found ({summary.totalResults})
+          </span>
         </div>
       )}
 
-      {/* Skeleton loading */}
+      {/* Skeleton */}
       {loading && (
-        <div className="space-y-3">
-          {[1,2,3,4].map(i => <SkeletonCard key={i} />)}
+        <div>
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} style={{ ...rowStyle, cursor: 'default' }}>
+              <div style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', background: 'var(--bg-secondary)' }} />
+              <div style={{ padding: '12px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div style={{ height: '13px', background: 'var(--bg-secondary)', width: '75%' }} />
+                <div style={{ height: '9px', background: 'var(--bg-secondary)', width: '40%' }} />
+              </div>
+              <div />
+              <div />
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Empty */}
       {!results.length && !loading && searched && (
-        <div className="text-center py-10">
-          <p className="text-[var(--text-secondary)] mb-2">没有找到匹配的商品</p>
-          <p className="text-xs text-[var(--text-muted)] mb-5">试试搜索品牌名、英文型号或容量，例如：</p>
-          <div className="flex flex-wrap justify-center gap-2">
+        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>No Results Found</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center' }}>
             {SUGGESTED_BRANDS.map(b => (
-              <button
-                key={b}
-                onClick={() => { setKeyword(b); doSearch(1, { keyword: b }) }}
-                className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] rounded-lg px-3 py-1.5 text-xs text-[var(--brand)] transition-colors"
-              >
-                {b}
-              </button>
+              <button key={b} onClick={() => { setKeyword(b); doSearch(1, { keyword: b }) }} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>{b}</button>
             ))}
           </div>
         </div>
       )}
 
-      {/* List View */}
-      {viewMode === 'list' && !loading && (
-        <div className="space-y-3">
-          <AnimatePresence>
-            {results.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25, delay: i * 0.04 }}
-                className="bg-[var(--bg-card)] rounded-xl p-3 cursor-pointer hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
-                onClick={() => {
-                  if (!isSignedIn) { openLogin(); return }
-                  nav(`/product/${item.id}`)
-                }}
-              >
-                <div className="flex gap-3">
-                  <img
-                    src={item.imageUrl || `https://placehold.co/112x112/1a1a17/d97757?text=${encodeURIComponent((item.brand || '').slice(0, 8))}`}
-                    alt=""
-                    loading="lazy"
-                    className="w-14 h-14 rounded-lg object-contain bg-[var(--bg-card)] shrink-0 p-0.5"
-                    onError={e => {
-                      const el = e.target as HTMLImageElement
-                      el.src = `https://placehold.co/112x112/1a1a17/666?text=${encodeURIComponent('暂无图片')}`
-                    }}
-                  />
-                  <div className="flex-1 min-w-0 space-y-0.5">
-                    <h3 className="text-sm font-medium leading-snug">
-                      {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
-                    </h3>
-                    <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] font-medium px-1.5 py-0.5 rounded text-[11px] whitespace-nowrap">{item.brand}</span>
-                    {item.source && <div className="text-[11px] text-[var(--text-muted)] truncate">{item.source}</div>}
-                  </div>
-                  <div className="shrink-0 flex flex-col items-end gap-1">
-                    {item.price ? (
-                      <div className="text-[var(--brand)] font-bold text-base whitespace-nowrap" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
-                    ) : (
-                      <div className="text-[var(--text-secondary)] text-xs whitespace-nowrap">登录查看</div>
-                    )}
-                    <button
-                      onClick={e => toggleFavorite(item.id, e)}
-                      disabled={favToggling.has(item.id)}
-                      aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
-                      className={`shrink-0 text-lg p-1 min-w-[36px] min-h-[36px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
-                    >
-                      {favoriteIds.has(item.id) ? '♥' : '♡'}
-                    </button>
-                  </div>
+      {/* Product list */}
+      {!loading && (
+        <AnimatePresence>
+          {results.map((item, i) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: i * 0.03 }}
+              onClick={() => { if (!isSignedIn) { openLogin(); return }; nav(`/product/${item.id}`) }}
+              style={rowStyle}
+            >
+              <img
+                src={item.imageUrl || `https://placehold.co/72x92/B8B8AD/5C5D55?text=${encodeURIComponent((item.brand || '').slice(0, 4))}`}
+                alt="" loading="lazy"
+                style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover' }}
+                onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A' }}
+              />
+              <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <h2 style={{
+                  margin: 0, fontFamily: 'var(--font-display)', fontSize: '12px', lineHeight: '13px',
+                  fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase',
+                  display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                }}>
+                  {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
+                </h2>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{item.brand}</span>
+                  {item.source && <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7 }}>{item.source}</span>}
                 </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      )}
-
-      {/* Grid View */}
-      {viewMode === 'grid' && !loading && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          <AnimatePresence>
-            {results.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25, delay: i * 0.04 }}
-                className="bg-[var(--bg-card)] rounded-xl overflow-hidden cursor-pointer hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors flex flex-col"
-                onClick={() => {
-                  if (!isSignedIn) { openLogin(); return }
-                  nav(`/product/${item.id}`)
+              </div>
+              <div style={{ alignSelf: 'end', padding: '0 6px 10px 0', fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                {item.price ? formatPrice(item.currency, item.price) : '—'}
+              </div>
+              <button
+                onClick={e => toggleFavorite(item.id, e)}
+                disabled={favToggling.has(item.id)}
+                style={{
+                  width: '18px', height: '18px', marginTop: '10px', marginRight: '6px',
+                  border: favoriteIds.has(item.id) ? '1px solid currentColor' : '1px solid currentColor',
+                  borderRadius: '50%', display: 'grid', placeItems: 'center',
+                  fontSize: '8px', lineHeight: '1', fontWeight: 800, cursor: 'pointer',
+                  background: 'transparent', color: favoriteIds.has(item.id) ? 'var(--danger)' : 'inherit',
+                  padding: 0,
                 }}
+                aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
               >
-                <img
-                  src={item.imageUrl || `https://placehold.co/400x300/1a1a17/d97757?text=${encodeURIComponent((item.brand || '').slice(0, 12))}`}
-                  alt=""
-                  loading="lazy"
-                  className="w-full aspect-[4/3] object-contain bg-[var(--bg-card)] p-0.5"
-                  onError={e => {
-                    const el = e.target as HTMLImageElement
-                    el.src = `https://placehold.co/400x300/1a1a17/666?text=${encodeURIComponent('暂无图片')}`
-                  }}
-                />
-                <div className="p-2.5 flex flex-col flex-1">
-                  <span className="inline-block bg-[var(--brand)]/10 text-[var(--brand)] text-[10px] px-1.5 py-0.5 rounded mb-1.5 whitespace-nowrap self-start">{item.brand}</span>
-                  <h3 className="text-xs font-medium leading-snug line-clamp-2 mb-1.5 text-[var(--text-primary)]">
-                    {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
-                  </h3>
-                  {item.source && (
-                    <div className="text-[10px] text-[var(--text-muted)] truncate mb-1.5">{item.source}</div>
-                  )}
-                  <div className="mt-auto flex items-end justify-between gap-1">
-                    <div>
-                      {item.price ? (
-                        <div className="text-[var(--brand)] font-bold text-sm" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(item.currency, item.price)}</div>
-                      ) : (
-                        <div className="text-[var(--text-secondary)] text-[11px]">登录查看价格</div>
-                      )}
-                    </div>
-                    <button
-                      onClick={e => toggleFavorite(item.id, e)}
-                      disabled={favToggling.has(item.id)}
-                      aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}
-                      className={`shrink-0 text-base p-1 min-w-[32px] min-h-[32px] rounded-lg transition-all active:scale-90 ${favoriteIds.has(item.id) ? 'text-[var(--danger)] bg-[var(--danger)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/5'}`}
-                    >
-                      {favoriteIds.has(item.id) ? '♥' : '♡'}
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+                {favoriteIds.has(item.id) ? '♥' : String.fromCharCode(65 + i)}
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       )}
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="flex flex-col items-center gap-2 mt-6">
-          <div className="flex items-center justify-center gap-1.5 flex-wrap">
-            <button disabled={page <= 1} onClick={() => doSearch(page - 1)} className="px-2.5 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">上一页</button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '16px 0' }}>
+          <div style={{ display: 'flex', gap: '4px' }}>
+            <button disabled={page <= 1} onClick={() => doSearch(page - 1)}
+              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page <= 1 ? 0.3 : 1 }}>PREV</button>
             {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
               let pageNum: number
-              if (pagination.totalPages <= 5) { pageNum = i + 1 }
-              else if (page <= 3) { pageNum = i + 1 }
-              else if (page >= pagination.totalPages - 2) { pageNum = pagination.totalPages - 4 + i }
-              else { pageNum = page - 2 + i }
+              if (pagination.totalPages <= 5) pageNum = i + 1
+              else if (page <= 3) pageNum = i + 1
+              else if (page >= pagination.totalPages - 2) pageNum = pagination.totalPages - 4 + i
+              else pageNum = page - 2 + i
               return (
-                <button key={pageNum} onClick={() => doSearch(pageNum)} className={`w-8 h-8 rounded-lg text-xs transition-colors ${pageNum === page ? 'bg-[var(--brand)] text-[var(--button-on-brand)]' : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'}`}>{pageNum}</button>
+                <button key={pageNum} onClick={() => doSearch(pageNum)}
+                  style={{
+                    width: '32px', height: '32px', fontSize: '11px', fontWeight: 900,
+                    cursor: 'pointer', border: 'var(--border-width) solid var(--border-default)',
+                    background: pageNum === page ? 'var(--bg-active)' : 'var(--bg-primary)',
+                    color: pageNum === page ? 'var(--text-inverse)' : 'var(--text-primary)',
+                  }}>{pageNum}</button>
               )
             })}
-            <button disabled={page >= pagination.totalPages} onClick={() => doSearch(page + 1)} className="px-2.5 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">下一页</button>
+            <button disabled={page >= pagination.totalPages} onClick={() => doSearch(page + 1)}
+              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page >= pagination.totalPages ? 0.3 : 1 }}>NEXT</button>
           </div>
-          <PaginationJumper
-            current={page}
-            max={pagination.totalPages}
-            onJump={p => doSearch(p)}
-          />
+          <PaginationJumper current={page} max={pagination.totalPages} onJump={p => doSearch(p)} />
         </div>
       )}
 
       {/* Login prompt */}
       {isAnon && (
-        <div className="text-center mt-6 p-4 bg-[var(--brand)]/5 rounded-xl border border-[var(--brand-soft)]">
-          <p className="text-sm text-[var(--text-secondary)] mb-2">登录查看更多结果和实时价格</p>
-          <button onClick={openLogin} className="bg-[var(--brand)] text-[var(--button-on-brand)] px-6 py-2 rounded-lg text-sm active:bg-[var(--brand-hover)] transition-colors">登录</button>
+        <div style={{ textAlign: 'center', padding: '16px', border: 'var(--border-width) solid var(--border-default)', marginTop: '12px' }}>
+          <p style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Login to see full results</p>
+          <button onClick={openLogin} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Login</button>
         </div>
       )}
     </div>

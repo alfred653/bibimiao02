@@ -20,122 +20,170 @@ export default function HomePage() {
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold text-center mt-4 mb-1">比比喵</h1>
-      <p className="text-xs text-[var(--text-secondary)] text-center mb-4">全球商品价格与到手成本查询</p>
-      <form onSubmit={search} className="mb-6">
-        <input
-          className="w-full h-12 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] px-4 text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--brand)] transition-colors"
-          placeholder="搜索品牌、商品或型号"
-          value={keyword}
-          onChange={e => setKeyword(e.target.value)}
-        />
-      </form>
+    <div style={{ padding: 'var(--page-padding)' }}>
+      {/* Header */}
+      <header
+        style={{
+          height: 'var(--header-height)',
+          padding: '0 var(--page-padding)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: 'var(--border-width) solid var(--border-default)',
+          marginLeft: 'calc(-1 * var(--page-padding))',
+          marginRight: 'calc(-1 * var(--page-padding))',
+        }}
+      >
+        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Compare Tool V.1</span>
+        <span
+          style={{
+            width: '18px', height: '18px', borderRadius: '999px',
+            display: 'grid', placeItems: 'center',
+            background: 'var(--brand)', color: 'var(--text-inverse)',
+            fontSize: '9px', fontWeight: 800, letterSpacing: '0',
+          }}
+        >01</span>
+      </header>
 
-      {!overview && (
-        <div className="animate-pulse">
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 text-center">
-            {[0, 1, 2].map(i => (
-              <div key={i} className="bg-[var(--bg-card)] rounded-xl p-3 sm:p-4">
-                <div className="h-6 sm:h-7 w-10 mx-auto bg-[var(--bg-hover)] rounded mb-1" />
-                <div className="h-3 w-14 mx-auto bg-[var(--bg-hover)] rounded" />
-              </div>
-            ))}
-          </div>
-          <div className="mb-6 bg-[var(--bg-card)] rounded-xl p-4">
-            <div className="h-3 w-16 bg-[var(--bg-hover)] rounded mb-3" />
-            <div className="space-y-1.5">
-              {[0, 1, 2].map(i => <div key={i} className="h-3 bg-[var(--bg-hover)] rounded w-full" />)}
-            </div>
-          </div>
-          <div className="h-4 w-16 bg-[var(--bg-hover)] rounded mb-3" />
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} className="bg-[var(--bg-card)] rounded-xl p-3 sm:p-4 min-h-[56px] flex items-center gap-3">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[var(--bg-hover)] shrink-0" />
-                <div className="flex-1 space-y-1.5">
-                  <div className="h-3 bg-[var(--bg-hover)] rounded w-16" />
-                  <div className="h-2.5 bg-[var(--bg-hover)] rounded w-8" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      {overview && (
+      {/* Title area */}
+      <section
+        style={{
+          height: '100px',
+          padding: '14px var(--page-padding) 10px',
+          borderBottom: 'var(--border-width) solid var(--border-default)',
+          marginLeft: 'calc(-1 * var(--page-padding))',
+          marginRight: 'calc(-1 * var(--page-padding))',
+        }}
+      >
+        <h1 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'clamp(24px, 8vw, 32px)',
+          lineHeight: '0.88',
+          fontWeight: 900,
+          letterSpacing: '-0.05em',
+          textTransform: 'uppercase',
+          maxWidth: '260px',
+          margin: 0,
+        }}>
+          Market<br />Intelligence
+        </h1>
+        <form onSubmit={search}>
+          <label style={{ display: 'block' }}>
+            <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '8px', display: 'block' }}>
+              Enter Brand Keyword
+            </span>
+            <input
+              style={{
+                width: '100%', marginTop: '4px', border: '0', padding: '0',
+                background: 'transparent', color: 'var(--text-primary)',
+                fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '16px',
+                fontWeight: 500, textTransform: 'uppercase',
+                outline: 'none', caretColor: 'var(--text-primary)',
+              }}
+              placeholder="BRAND NAME_"
+              value={keyword}
+              onChange={e => setKeyword(e.target.value)}
+            />
+          </label>
+        </form>
+      </section>
+
+      {/* Stats */}
+      {overview ? (
         <>
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 text-center">
-            <div className="bg-[var(--bg-card)] rounded-xl p-3 sm:p-4">
-              <div className="text-xl sm:text-2xl font-bold text-[var(--brand)]">{overview.totalProducts}</div>
-              <div className="text-[10px] sm:text-xs text-[var(--text-secondary)] mt-0.5">收录商品</div>
-            </div>
-            <div className="bg-[var(--bg-card)] rounded-xl p-3 sm:p-4">
-              <div className="text-xl sm:text-2xl font-bold text-[var(--brand)]">{overview.brandCount}</div>
-              <div className="text-[10px] sm:text-xs text-[var(--text-secondary)] mt-0.5">品牌</div>
-            </div>
-            <div className="bg-[var(--bg-card)] rounded-xl p-3 sm:p-4">
-              <div className="text-xl sm:text-2xl font-bold text-[var(--brand)]">{overview.sourceCount}</div>
-              <div className="text-[10px] sm:text-xs text-[var(--text-secondary)] mt-0.5">来源站点</div>
-            </div>
+          <div
+            style={{
+              height: '36px', padding: '0 var(--page-padding)',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              borderBottom: 'var(--border-width) solid var(--border-default)',
+              marginLeft: 'calc(-1 * var(--page-padding))',
+              marginRight: 'calc(-1 * var(--page-padding))',
+            }}
+          >
+            <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              Data ({overview.totalProducts} items · {overview.brandCount} brands · {overview.sourceCount} sources)
+            </span>
           </div>
 
-          {/* Quick start guide */}
-          <div className="mb-6 bg-[var(--bg-card)] rounded-xl p-4">
-            <h2 className="text-xs font-medium text-[var(--text-primary)] mb-2">快速开始</h2>
-            <div className="space-y-1.5 text-xs text-[var(--text-secondary)]">
-              <p className="flex items-center gap-2"><span className="w-4 h-4 rounded-full bg-[var(--brand-soft)] text-[var(--brand)] text-[10px] flex items-center justify-center shrink-0">1</span> 搜索全球品牌的商品</p>
-              <p className="flex items-center gap-2"><span className="w-4 h-4 rounded-full bg-[var(--brand-soft)] text-[var(--brand)] text-[10px] flex items-center justify-center shrink-0">2</span> 查看各平台实时价格</p>
-              <p className="flex items-center gap-2"><span className="w-4 h-4 rounded-full bg-[var(--brand-soft)] text-[var(--brand)] text-[10px] flex items-center justify-center shrink-0">3</span> 计算含运费+关税的到手成本</p>
-            </div>
-          </div>
-
+          {/* Recent products */}
           {overview.recentProducts?.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-sm text-[var(--text-secondary)] mb-3">最近更新</h2>
-              <div className="space-y-2">
-                {overview.recentProducts.map((p, i) => (
-                  <button key={p.id} onClick={() => nav(`/product/${p.id}`)}
-                    className="w-full bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-xl p-3 flex items-center gap-3 text-left transition-colors min-h-[48px]"
-                  >
-                    <img
-                      src={p.imageUrl || `https://placehold.co/56x56/1a1a17/666?text=${encodeURIComponent(p.brand.slice(0, 4))}`}
-                      alt="" className="w-9 h-9 rounded-lg object-cover bg-[var(--bg-card)] shrink-0" loading={i < 3 ? 'eager' : 'lazy'}
-                      onError={e => { (e.target as HTMLImageElement).src = `https://placehold.co/56x56/1a1a17/666?text=${encodeURIComponent(p.brand.slice(0, 2))}` }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm truncate">{p.title}</div>
-                      <div className="text-xs text-[var(--text-secondary)]">{p.brand}</div>
+            <div>
+              {overview.recentProducts.map((p, i) => (
+                <button
+                  key={p.id}
+                  onClick={() => nav(`/product/${p.id}`)}
+                  style={{
+                    height: 'var(--row-height)',
+                    display: 'grid',
+                    gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto 24px',
+                    borderBottom: 'var(--border-width) solid var(--border-default)',
+                    background: 'var(--bg-primary)',
+                    color: 'var(--text-primary)',
+                    cursor: 'pointer',
+                    width: '100%',
+                    textAlign: 'left' as const,
+                    padding: 0,
+                  }}
+                >
+                  <img
+                    src={p.imageUrl || `https://placehold.co/72x92/B8B8AD/5C5D55?text=${encodeURIComponent(p.brand.slice(0, 4))}`}
+                    alt=""
+                    style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover' }}
+                    loading={i < 3 ? 'eager' : 'lazy'}
+                    onError={e => { (e.target as HTMLImageElement).src = `https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A` }}
+                  />
+                  <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <h2 style={{
+                      margin: 0, fontFamily: 'var(--font-display)', fontSize: '12px',
+                      lineHeight: '13px', fontWeight: 900, letterSpacing: '-0.02em',
+                      textTransform: 'uppercase', display: '-webkit-box',
+                      WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                    }}>{p.title}</h2>
+                    <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88 }}>
+                      {p.brand}
                     </div>
-                    <div className="text-sm font-bold text-[var(--brand)] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(p.currency, p.price)}</div>
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] shrink-0"><path d="M5 3l4 4-4 4"/></svg>
-                  </button>
-                ))}
-              </div>
+                  </div>
+                  <div style={{ alignSelf: 'end', padding: '0 6px 10px 0', fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                    {formatPrice(p.currency, p.price)}
+                  </div>
+                  <div style={{
+                    width: '18px', height: '18px', marginTop: '10px', marginRight: '6px',
+                    border: '1px solid currentColor', borderRadius: '50%',
+                    display: 'grid', placeItems: 'center',
+                    fontSize: '8px', lineHeight: '1', fontWeight: 800,
+                  }}>{String.fromCharCode(65 + i)}</div>
+                </button>
+              ))}
             </div>
           )}
 
-          <h2 className="text-sm text-[var(--text-secondary)] mb-3">支持品牌</h2>
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            {overview.brands.map(b => (
-              <button key={b.name} onClick={() => nav(`/search?q=${encodeURIComponent(b.name)}&brand=${encodeURIComponent(b.name)}`)}
-                className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-xl p-3 sm:p-4 flex items-center gap-3 text-left transition-colors min-h-[56px]"
-              >
-                <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0 bg-[var(--brand-soft)] text-[var(--brand)] flex items-center justify-center text-sm sm:text-base font-bold">{b.name.charAt(0)}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium truncate">{b.name}</div>
-                  <div className="text-xs text-[var(--text-secondary)]">{b.count} 件</div>
-                </div>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] shrink-0"><path d="M5 3l4 4-4 4"/></svg>
-              </button>
-            ))}
-            <button onClick={() => nav('/search')}
-              className="bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-xl p-3 sm:p-4 flex items-center justify-center gap-2 text-left transition-colors min-h-[56px] border border-dashed border-[var(--border-subtle)]"
-            >
-              <span className="text-sm text-[var(--text-secondary)]">更多</span>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] shrink-0"><path d="M5 3l4 4-4 4"/></svg>
-            </button>
+          {/* Brand grid */}
+          <div style={{ marginTop: '8px' }}>
+            <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
+              All Brands
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1px' }}>
+              {overview.brands.map(b => (
+                <button
+                  key={b.name}
+                  onClick={() => nav(`/search?q=${encodeURIComponent(b.name)}&brand=${encodeURIComponent(b.name)}`)}
+                  style={{
+                    background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)',
+                    padding: '12px 8px', textAlign: 'left' as const, cursor: 'pointer',
+                    minHeight: '56px', width: '100%',
+                  }}
+                >
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>{b.name}</div>
+                  <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88, marginTop: '4px' }}>{b.count} ITEMS</div>
+                </button>
+              ))}
+            </div>
           </div>
         </>
+      ) : (
+        <div style={{ padding: '24px var(--page-padding)', textAlign: 'center' }}>
+          <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Loading...</div>
+        </div>
       )}
     </div>
   )

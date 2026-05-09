@@ -1,68 +1,60 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 
-const HomeIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
-    <path d="M9 21V12h6v9" />
-  </svg>
-)
-
-const SearchIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="7" />
-    <path d="M20 20l-3.5-3.5" />
-  </svg>
-)
-
-const HeartIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z" />
-  </svg>
-)
-
-const UserIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="8" r="4" />
-    <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-  </svg>
-)
-
 const tabs = [
-  { to: '/', label: '首页', Icon: HomeIcon },
-  { to: '/search', label: '搜索', Icon: SearchIcon },
-  { to: '/favorites', label: '收藏', Icon: HeartIcon },
-  { to: '/profile', label: '我的', Icon: UserIcon },
+  { to: '/', label: 'SEARCH' },
+  { to: '/search', label: 'BRANDS' },
+  { to: '/favorites', label: 'ALERTS' },
+  { to: '/profile', label: 'SAVED' },
 ]
 
 export default function Layout() {
   const location = useLocation()
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg-page)', color: 'var(--text-primary)' }}>
-      <main className="flex-1 overflow-auto pb-16">
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <main className="flex-1 overflow-auto" style={{ paddingBottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom))' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: 0.12 }}
           >
             <Outlet />
           </motion.div>
         </AnimatePresence>
       </main>
-      <nav className="fixed bottom-0 left-0 right-0 h-14 flex items-center justify-around z-40" style={{ background: 'var(--bg-nav)', borderTop: '1px solid var(--border-subtle)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        {tabs.map(({ to, label, Icon }) => (
+
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50"
+        style={{
+          height: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom))',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          background: 'var(--bg-nav)',
+          color: 'var(--text-inverse)',
+        }}
+      >
+        {tabs.map(({ to, label }, i) => (
           <NavLink
             key={to}
             to={to}
-            className="flex flex-col items-center text-xs gap-0.5 transition-colors active:scale-95"
-            style={({ isActive }: { isActive: boolean }) => ({ color: isActive ? 'var(--brand)' : 'var(--text-secondary)' })}
+            className="flex items-center justify-center no-underline"
+            style={({ isActive }: { isActive: boolean }) => ({
+              fontSize: '7px',
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase' as const,
+              color: isActive ? 'var(--text-inverse)' : 'rgba(231,231,220,0.45)',
+              background: isActive ? 'rgba(231,231,220,0.07)' : 'transparent',
+              borderLeft: i > 0 ? '1px solid rgba(231,231,220,0.08)' : 'none',
+              minHeight: 'var(--bottom-nav-height)',
+            })}
           >
-            <Icon />
-            <span>{label}</span>
+            {label}
           </NavLink>
         ))}
       </nav>

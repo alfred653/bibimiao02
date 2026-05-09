@@ -17,11 +17,15 @@ export function LoginModalProvider({ children }: { children: ReactNode }) {
       {children}
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(37,38,34,0.7)', padding: '16px' }}
           onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}
         >
-          <div className="bg-[var(--bg-card)] rounded-xl p-6 w-full max-w-md border border-[var(--border-subtle)]">
-            <button className="text-[var(--text-secondary)] float-right text-xl p-1 min-w-[36px] min-h-[36px] hover:text-[var(--text-primary)] active:text-[var(--text-primary)] transition-colors flex items-center justify-center rounded-lg" onClick={() => setOpen(false)}>✕</button>
+          <div style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '24px', width: '100%', maxWidth: '448px', position: 'relative' }}>
+            <button
+              onClick={() => setOpen(false)}
+              style={{ position: 'absolute', top: '8px', right: '8px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '16px', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              aria-label="Close"
+            >&#10005;</button>
             <SignIn />
           </div>
         </div>

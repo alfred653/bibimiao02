@@ -2,15 +2,15 @@ import { Link } from 'react-router-dom'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] flex flex-col items-center justify-center p-8">
-      <div className="text-6xl mb-4 text-[var(--text-secondary)]">404</div>
-      <h1 className="text-xl font-bold mb-2">页面不存在</h1>
-      <p className="text-[var(--text-secondary)] text-sm mb-6">你访问的页面可能已被移除或地址有误</p>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px' }}>
+      <div style={{ fontSize: '72px', fontFamily: 'var(--font-display)', fontWeight: 900, color: 'var(--text-muted)', marginBottom: '16px' }}>404</div>
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 8px' }}>Page Not Found</h1>
+      <p style={{ color: 'var(--text-secondary)', fontSize: '10px', marginBottom: '24px' }}>The page you're looking for doesn't exist</p>
       <Link
         to="/"
-        className="bg-[var(--brand)] text-[var(--button-on-brand)] px-6 py-2 rounded-lg text-sm hover:bg-[var(--brand-hover)] active:bg-[var(--brand-soft)] transition-colors"
+        style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', padding: '8px 24px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', textDecoration: 'none', border: 'none', cursor: 'pointer' }}
       >
-        返回首页
+        Back to Home
       </Link>
     </div>
   )

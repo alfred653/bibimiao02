@@ -2,22 +2,13 @@ import { createContext, useContext, useState, useCallback, type ReactNode } from
 
 type ToastType = 'success' | 'error' | 'info'
 
-interface Toast {
-  id: number
-  message: string
-  type: ToastType
-  leaving: boolean
-}
+interface Toast { id: number; message: string; type: ToastType; leaving: boolean }
 
-interface ToastContextValue {
-  toast: (message: string, type?: ToastType) => void
-}
+interface ToastContextValue { toast: (message: string, type?: ToastType) => void }
 
 const ToastContext = createContext<ToastContextValue>({ toast: () => {} })
 
-export function useToast() {
-  return useContext(ToastContext)
-}
+export function useToast() { return useContext(ToastContext) }
 
 let nextId = 0
 
@@ -29,27 +20,25 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts(prev => [...prev, { id, message, type, leaving: false }])
     setTimeout(() => {
       setToasts(prev => prev.map(t => t.id === id ? { ...t, leaving: true } : t))
-      setTimeout(() => {
-        setToasts(prev => prev.filter(t => t.id !== id))
-      }, 300)
+      setTimeout(() => { setToasts(prev => prev.filter(t => t.id !== id)) }, 200)
     }, 2500)
   }, [])
 
   return (
     <ToastContext.Provider value={{ toast: addToast }}>
       {children}
-      <div className="fixed bottom-24 left-0 right-0 z-[100] flex flex-col items-center gap-2 pointer-events-none">
+      <div style={{ position: 'fixed', bottom: 'calc(var(--bottom-nav-height) + 16px + env(safe-area-inset-bottom))', left: 0, right: 0, zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', pointerEvents: 'none' }}>
         {toasts.map(t => (
-          <div
-            key={t.id}
-            className={`px-4 py-2.5 rounded-xl text-sm shadow-lg pointer-events-auto transition-all duration-300 ${
-              t.leaving ? 'opacity-0 translate-y-2' : 'opacity-100'
-            } ${
-              t.type === 'success' ? 'bg-[var(--success)] text-white' :
-              t.type === 'error' ? 'bg-[var(--danger)] text-white' :
-              'bg-[var(--bg-card)] text-[var(--text-primary)] border border-[var(--border-subtle)]'
-            }`}
-          >
+          <div key={t.id} style={{
+            padding: '8px 16px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
+            pointerEvents: 'auto',
+            border: 'var(--border-width) solid var(--border-default)',
+            background: t.type === 'success' ? 'var(--bg-active)' : t.type === 'error' ? 'var(--danger)' : 'var(--bg-primary)',
+            color: t.type === 'info' ? 'var(--text-primary)' : 'var(--text-inverse)',
+            opacity: t.leaving ? 0 : 1,
+            transform: t.leaving ? 'translateY(4px)' : 'translateY(0)',
+            transition: 'opacity 200ms linear, transform 200ms linear',
+          }}>
             {t.type === 'success' && '✓ '}
             {t.type === 'error' && '✕ '}
             {t.message}

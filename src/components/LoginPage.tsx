@@ -18,11 +18,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] flex flex-col items-center justify-center p-4">
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
       <div style={{ '--lamp-hue': hue, '--on': isOn ? '1' : '0' } as React.CSSProperties}>
-        <svg viewBox="0 0 200 260" className="w-40 h-auto mx-auto mb-8">
-          <ellipse cx="100" cy="250" rx="44" ry="10" fill="#2a2a24" />
-          <line x1="100" y1="250" x2="100" y2="170" stroke="#4a4a42" strokeWidth="4" strokeLinecap="round" />
+        <svg viewBox="0 0 200 260" style={{ width: '160px', height: 'auto', margin: '0 auto 32px' }}>
+          <ellipse cx="100" cy="250" rx="44" ry="10" fill="#2A2B26" />
+          <line x1="100" y1="250" x2="100" y2="170" stroke="#5C5D55" strokeWidth="4" strokeLinecap="round" />
           <motion.path
             d="M50 170 L150 170 L130 110 L70 110 Z"
             fill={isOn ? `hsl(${hue}, 70%, 60%)` : '#3a3a34'}
@@ -55,13 +55,13 @@ export default function LoginPage() {
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: 'spring', stiffness: 250, damping: 18 }}
-              className="w-full max-w-sm mx-auto"
-              style={{
-                borderColor: `hsl(${hue}, 70%, 60%)`,
-                boxShadow: `0 0 40px hsla(${hue}, 70%, 60%, 0.2)`,
-              }}
+              style={{ width: '100%', maxWidth: '384px', margin: '0 auto' }}
             >
-              <div className="bg-[var(--bg-card)] rounded-xl p-6 border" style={{ borderColor: 'inherit' }}>
+              <div style={{
+                background: 'var(--bg-primary)',
+                border: 'var(--border-width) solid var(--border-default)',
+                padding: '24px',
+              }}>
                 <SignIn />
               </div>
             </motion.div>
@@ -69,7 +69,7 @@ export default function LoginPage() {
         </AnimatePresence>
       </div>
 
-      <p className="text-[var(--text-secondary)] text-xs mt-8">下拉拉绳开灯 → 登录</p>
+      <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-muted)', marginTop: '32px' }}>Pull cord to toggle light → Sign In</p>
     </div>
   )
 }

@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { useToast } from './Toast'
 
 const ALL_CURRENCIES = [
-  { code: 'CNY', name: '人民币', symbol: '¥' },
-  { code: 'USD', name: '美元', symbol: '$' },
-  { code: 'JPY', name: '日元', symbol: '¥' },
-  { code: 'EUR', name: '欧元', symbol: '€' },
-  { code: 'GBP', name: '英镑', symbol: '£' },
-  { code: 'HKD', name: '港币', symbol: 'HK$' },
+  { code: 'CNY', name: 'Renminbi', symbol: '¥' },
+  { code: 'USD', name: 'US Dollar', symbol: '$' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+  { code: 'EUR', name: 'Euro', symbol: '€' },
+  { code: 'GBP', name: 'Pound Sterling', symbol: '£' },
+  { code: 'HKD', name: 'Hong Kong Dollar', symbol: 'HK$' },
 ]
 
 interface ExchangeSettings {
@@ -24,69 +24,86 @@ function load(): ExchangeSettings {
   } catch { return { ...DEFAULT_SETTINGS } }
 }
 
+const sectionStyle: React.CSSProperties = {
+  background: 'var(--bg-primary)',
+  border: 'var(--border-width) solid var(--border-default)',
+  padding: '16px',
+  marginBottom: '12px',
+}
+
 export default function ExchangeRatePage() {
   const { toast } = useToast()
   const [form, setForm] = useState<ExchangeSettings>(load)
 
   function save() {
     localStorage.setItem('bbm_exchange_settings', JSON.stringify(form))
-    toast('汇率设置已保存', 'success')
+    toast('Exchange settings saved', 'success')
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-lg font-bold mb-4">汇率设置</h1>
-      <p className="text-xs text-[var(--text-secondary)] mb-4">
-        设置后，进入商品详情页时将自动切换到您偏好的币种查看价格。汇率数据来自 Frankfurter 开放 API，每小时更新。
-      </p>
+    <div style={{ padding: 'var(--page-padding)' }}>
+      <header style={{
+        height: 'var(--header-height)', padding: '0 var(--page-padding)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        borderBottom: 'var(--border-width) solid var(--border-default)',
+        marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
+      }}>
+        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Compare Tool V.1</span>
+        <span style={{ width: '18px', height: '18px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '9px', fontWeight: 800 }}>FX</span>
+      </header>
 
-      <div className="space-y-4">
-        <div className="bg-[var(--bg-card)] rounded-xl p-4">
-          <label className="text-sm font-medium block mb-3">偏好币种</label>
-          <p className="text-xs text-[var(--text-muted)] mb-3">查看商品价格时默认显示为哪种货币</p>
-          <div className="space-y-2">
-            {ALL_CURRENCIES.map(c => (
-              <button
-                key={c.code}
-                onClick={() => setForm(prev => ({ ...prev, preferredCurrency: c.code }))}
-                className="w-full text-left p-3 rounded-lg border transition-colors flex items-center justify-between"
-                style={{
-                  background: form.preferredCurrency === c.code ? 'var(--brand-soft)' : 'var(--bg-input)',
-                  borderColor: form.preferredCurrency === c.code ? 'var(--brand)' : 'var(--border-subtle)',
-                }}
-              >
-                <div>
-                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{c.symbol} {c.code}</span>
-                  <span className="text-xs ml-2" style={{ color: 'var(--text-secondary)' }}>{c.name}</span>
-                </div>
-                {form.preferredCurrency === c.code && (
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--brand)' }}>
-                    <path d="M3 8l3.5 3.5L13 5" />
-                  </svg>
-                )}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => { setForm({ preferredCurrency: '' }); localStorage.removeItem('bbm_exchange_settings'); toast('已清除偏好币种', 'info') }}
-            className="mt-3 text-xs text-[var(--text-muted)] active:text-[var(--text-secondary)]"
-          >
-            清除偏好（默认跟随商品原币种）
-          </button>
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', padding: '14px 0 10px', borderBottom: 'var(--border-width) solid var(--border-default)', margin: '0 calc(-1 * var(--page-padding))', marginBottom: '12px' }}>
+        Exchange<br />Rates
+      </h1>
+
+      <div style={sectionStyle}>
+        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Preferred Currency</label>
+        <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '12px' }}>Default display currency for product prices</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          {ALL_CURRENCIES.map(c => (
+            <button
+              key={c.code}
+              onClick={() => setForm(prev => ({ ...prev, preferredCurrency: c.code }))}
+              style={{
+                width: '100%', textAlign: 'left', padding: '12px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                border: 'var(--border-width) solid',
+                background: form.preferredCurrency === c.code ? 'var(--bg-active)' : 'var(--bg-input)',
+                color: form.preferredCurrency === c.code ? 'var(--text-inverse)' : 'var(--text-primary)',
+                borderColor: form.preferredCurrency === c.code ? 'var(--bg-active)' : 'var(--border-default)',
+              }}
+            >
+              <div>
+                <span style={{ fontSize: '12px', fontWeight: 700 }}>{c.symbol} {c.code}</span>
+                <span style={{ fontSize: '9px', marginLeft: '8px', opacity: 0.7 }}>{c.name}</span>
+              </div>
+              {form.preferredCurrency === c.code && (
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 8l3.5 3.5L13 5" />
+                </svg>
+              )}
+            </button>
+          ))}
         </div>
-
-        <div className="bg-[var(--bg-card)] rounded-xl p-4">
-          <label className="text-sm font-medium block mb-3">数据来源</label>
-          <p className="text-xs text-[var(--text-secondary)]">
-            汇率数据由 Frankfurter API 提供，基于欧洲央行每日参考汇率。首次查询后缓存 5 分钟，如 API 不可用则使用预设汇率（CNY 桥梁算法）。
-          </p>
-        </div>
-
-        <button onClick={save}
-          className="w-full bg-[var(--brand)] py-3 rounded-lg text-sm font-medium active:bg-[var(--brand-hover)] transition-colors">
-          保存设置
+        <button
+          onClick={() => { setForm({ preferredCurrency: '' }); localStorage.removeItem('bbm_exchange_settings'); toast('Preference cleared', 'info') }}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', marginTop: '12px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)' }}
+        >
+          Clear preference (follow product original currency)
         </button>
       </div>
+
+      <div style={sectionStyle}>
+        <label style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Data Source</label>
+        <p style={{ fontSize: '9px', color: 'var(--text-secondary)', margin: 0 }}>
+          Exchange rates provided by Frankfurter API, based on ECB daily reference rates. Cached for 5 minutes after first query. Falls back to preset rates if API is unavailable (CNY bridge algorithm).
+        </p>
+      </div>
+
+      <button onClick={save}
+        style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>
+        Save Settings
+      </button>
     </div>
   )
 }

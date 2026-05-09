@@ -13,42 +13,44 @@ function maskEmail(email: string) {
   return `${local.slice(0, 4)}***@${domain}`
 }
 
+const modalOverlay: React.CSSProperties = {
+  position: 'fixed', inset: 0, zIndex: 50,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'rgba(37,38,34,0.7)', padding: '16px',
+}
+const modalBox: React.CSSProperties = {
+  background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)',
+  padding: '24px', width: '100%', maxWidth: '360px',
+}
+
 function NameEditModal({ currentName, onClose, onSaved }: { currentName: string; onClose: () => void; onSaved: () => void }) {
   const { user } = useUser()
   const { toast } = useToast()
   const [username, setUsername] = useState(currentName || '')
   const [saving, setSaving] = useState(false)
-
   async function save() {
     const v = username.trim()
-    if (!v) { toast('用户名不能为空', 'error'); return }
+    if (!v) { toast('Name cannot be empty', 'error'); return }
     setSaving(true)
     try {
       await user!.update({ firstName: v, lastName: '' })
       await apiPut('/api/profile', { name: v })
-      toast('用户名已更新', 'success')
-      onSaved()
-    } catch (e: any) {
-      toast(e.errors?.[0]?.message || e.message || '更新失败', 'error')
-    } finally {
-      setSaving(false)
-    }
+      toast('Name updated', 'success'); onSaved()
+    } catch (e: any) { toast(e.errors?.[0]?.message || e.message || 'Update failed', 'error') }
+    finally { setSaving(false) }
   }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[var(--bg-card)] rounded-xl p-6 w-full max-w-sm border border-[var(--border-subtle)]">
-        <h3 className="text-lg font-bold mb-4">修改用户名</h3>
-        <div>
-          <label className="text-[var(--text-secondary)] text-xs block mb-1">用户名</label>
-          <input value={username} onChange={e => setUsername(e.target.value)} placeholder="输入用户名"
-            className="w-full bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
+    <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={modalBox}>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Edit Name</h3>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Name</label>
+          <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Your name"
+            style={{ width: '100%', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }} />
         </div>
-        <div className="flex gap-2 mt-5">
-          <button onClick={onClose} className="flex-1 bg-[var(--bg-card)] py-2 rounded-lg text-sm">取消</button>
-          <button onClick={save} disabled={saving} className="flex-1 bg-[var(--brand)] py-2 rounded-lg text-sm disabled:opacity-50 active:bg-[var(--brand-hover)] transition-colors">
-            {saving ? '保存中...' : '保存'}
-          </button>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
+          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
         </div>
       </div>
     </div>
@@ -62,50 +64,37 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [saving, setSaving] = useState(false)
-
   async function save() {
-    if (!currentPassword) { toast('请输入当前密码', 'error'); return }
-    if (newPassword.length < 8) { toast('新密码至少 8 位', 'error'); return }
-    if (newPassword !== confirmPassword) { toast('两次输入的新密码不一致', 'error'); return }
+    if (!currentPassword) { toast('Enter current password', 'error'); return }
+    if (newPassword.length < 8) { toast('At least 8 characters', 'error'); return }
+    if (newPassword !== confirmPassword) { toast('Passwords do not match', 'error'); return }
     setSaving(true)
     try {
       await user!.updatePassword({ currentPassword, newPassword, signOutOfOtherSessions: false })
-      toast('密码已更新', 'success')
-      onClose()
+      toast('Password updated', 'success'); onClose()
     } catch (e: any) {
-      const msg = e.errors?.[0]?.message || e.message || '修改失败'
-      toast(msg === 'Incorrect password' ? '当前密码错误' : msg, 'error')
-    } finally {
-      setSaving(false)
-    }
+      const msg = e.errors?.[0]?.message || e.message || 'Failed'
+      toast(msg === 'Incorrect password' ? 'Wrong password' : msg, 'error')
+    } finally { setSaving(false) }
   }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[var(--bg-card)] rounded-xl p-6 w-full max-w-sm border border-[var(--border-subtle)]">
-        <h3 className="text-lg font-bold mb-4">修改密码</h3>
-        <div className="space-y-3">
-          <div>
-            <label className="text-[var(--text-secondary)] text-xs block mb-1">当前密码</label>
-            <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="输入当前密码"
-              className="w-full bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
+    <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={modalBox}>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Change Password</h3>
+        {[
+          ['Current Password', currentPassword, setCurrentPassword, 'password'],
+          ['New Password', newPassword, setNewPassword, 'password'],
+          ['Confirm Password', confirmPassword, setConfirmPassword, 'password'],
+        ].map(([label, val, setFn, type], i) => (
+          <div key={i} style={{ marginBottom: '12px' }}>
+            <label style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>{label as string}</label>
+            <input type={type as string} value={val as string} onChange={e => (setFn as any)(e.target.value)}
+              style={{ width: '100%', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }} />
           </div>
-          <div>
-            <label className="text-[var(--text-secondary)] text-xs block mb-1">新密码</label>
-            <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="至少 8 位"
-              className="w-full bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
-          </div>
-          <div>
-            <label className="text-[var(--text-secondary)] text-xs block mb-1">确认新密码</label>
-            <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="再次输入新密码"
-              className="w-full bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]" />
-          </div>
-        </div>
-        <div className="flex gap-2 mt-5">
-          <button onClick={onClose} className="flex-1 bg-[var(--bg-card)] py-2 rounded-lg text-sm">取消</button>
-          <button onClick={save} disabled={saving} className="flex-1 bg-[var(--brand)] py-2 rounded-lg text-sm disabled:opacity-50 active:bg-[var(--brand-hover)] transition-colors">
-            {saving ? '保存中...' : '保存'}
-          </button>
+        ))}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
+          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
         </div>
       </div>
     </div>
@@ -113,46 +102,36 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
 }
 
 const THEME_OPTIONS: { value: ThemeChoice; label: string; desc: string }[] = [
-  { value: 'system', label: '跟随系统', desc: '自动匹配系统外观' },
-  { value: 'dark', label: '暖暗色', desc: '深色背景，适合夜间使用' },
-  { value: 'light', label: '暖浅色', desc: '浅色背景，适合白天浏览' },
+  { value: 'system', label: 'SYSTEM', desc: 'Match system appearance' },
+  { value: 'dark', label: 'INDUSTRIAL', desc: 'Gray-green archival mode' },
+  { value: 'light', label: 'LIGHT', desc: 'Bright archival mode' },
 ]
 
 function ThemeModal({ current, onClose }: { current: ThemeChoice; onClose: () => void }) {
   const { setTheme } = useTheme()
   const [selected, setSelected] = useState<ThemeChoice>(current)
-
-  function apply() {
-    setTheme(selected)
-    onClose()
-  }
-
+  function apply() { setTheme(selected); onClose() }
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[var(--bg-card)] rounded-xl p-6 w-full max-w-sm border border-[var(--border-subtle)]">
-        <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)' }}>主题外观</h3>
-        <div className="space-y-2">
+    <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={modalBox}>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Appearance</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {THEME_OPTIONS.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => setSelected(opt.value)}
-              className="w-full text-left p-3 rounded-lg border transition-colors"
+            <button key={opt.value} onClick={() => setSelected(opt.value)}
               style={{
-                background: selected === opt.value ? 'var(--brand-soft)' : 'var(--bg-input)',
-                borderColor: selected === opt.value ? 'var(--brand)' : 'var(--border-subtle)',
-              }}
-            >
-              <div style={{ color: 'var(--text-primary)' }} className="text-sm font-medium">{opt.label}</div>
-              <div style={{ color: 'var(--text-secondary)' }} className="text-xs mt-0.5">{opt.desc}</div>
+                width: '100%', textAlign: 'left', padding: '12px', cursor: 'pointer', border: 'var(--border-width) solid',
+                background: selected === opt.value ? 'var(--bg-active)' : 'var(--bg-primary)',
+                color: selected === opt.value ? 'var(--text-inverse)' : 'var(--text-primary)',
+                borderColor: selected === opt.value ? 'var(--bg-active)' : 'var(--border-default)',
+              }}>
+              <div style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>{opt.label}</div>
+              <div style={{ fontSize: '8px', opacity: 0.7, marginTop: '2px' }}>{opt.desc}</div>
             </button>
           ))}
         </div>
-        <div className="flex gap-2 mt-5">
-          <button onClick={onClose} className="flex-1 py-2 rounded-lg text-sm" style={{ background: 'var(--bg-hover)', color: 'var(--text-body)' }}>取消</button>
-          <button onClick={apply} className="flex-1 py-2 rounded-lg text-sm font-medium transition-colors active:scale-95"
-            style={{ background: 'var(--brand)', color: 'var(--button-on-brand)' }}>
-            应用
-          </button>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px' }}>
+          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
+          <button onClick={apply} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Apply</button>
         </div>
       </div>
     </div>
@@ -160,41 +139,48 @@ function ThemeModal({ current, onClose }: { current: ThemeChoice; onClose: () =>
 }
 
 const TIER_BENEFITS = [
-  { tier: 'free', name: '铁牌会员', price: '免费注册', features: ['搜索和浏览商品', '查看实时价格', '收藏 10 件商品', '成本估算（每日 5 次）', '历史浏览记录', '主题外观切换', '默认物流设置', '汇率偏好设置'] },
-  { tier: 'monthly', name: '月度会员', price: '按月订阅', features: ['所有铁牌功能', '无限收藏', '无限成本估算', '汇率实时换算', '查看 3 个品牌完整数据'] },
-  { tier: 'annual', name: '年度会员', price: '按年订阅', features: ['所有月度功能', '全部品牌完整数据', '优先客服支持', '新品上架通知', '年度专属折扣'] },
+  { tier: 'free', name: 'IRON TIER', price: 'Free', features: ['Search & browse', 'View real-time prices', '10 favorites', 'Daily cost estimates (5)', 'Browse history', 'Theme switcher', 'Default shipping', 'Exchange rate prefs'] },
+  { tier: 'monthly', name: 'SILVER TIER', price: 'Monthly', features: ['All Iron features', 'Unlimited favorites', 'Unlimited cost estimates', 'Real-time FX rates', '3 brand complete datasets'] },
+  { tier: 'annual', name: 'GOLD TIER', price: 'Annual', features: ['All Silver features', 'All brand datasets', 'Priority support', 'New arrival alerts', 'Annual discount'] },
 ]
 
 function MembershipModal({ currentTier, onClose }: { currentTier: string; onClose: () => void }) {
   const currentTierInfo = TIER_BENEFITS.find(t => t.tier === currentTier)
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[var(--bg-card)] rounded-xl p-5 w-full max-w-sm border border-[var(--border-subtle)] max-h-[80vh] overflow-y-auto">
-        <h3 className="text-lg font-bold mb-1">会员权益</h3>
-        <p className="text-xs text-[var(--text-secondary)] mb-4">
-          当前：<span className="text-[var(--brand)]">{currentTierInfo?.name || currentTier}</span>
+    <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={{ ...modalBox, maxHeight: '80vh', overflowY: 'auto' }}>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 4px' }}>Membership</h3>
+        <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>
+          Current: <span style={{ color: 'var(--brand)' }}>{currentTierInfo?.name || currentTier}</span>
         </p>
-        <div className="space-y-3">
-          {TIER_BENEFITS.map(tier => (
-            <div key={tier.tier} className={`rounded-lg p-3 border ${currentTier === tier.tier ? 'border-[var(--brand)] bg-[var(--brand-soft)]' : 'border-[var(--border-subtle)] bg-[var(--bg-input)]'}`}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold">{tier.name}</span>
-                <span className="text-xs text-[var(--brand)]">{tier.price}</span>
-              </div>
-              <ul className="space-y-1">
-                {tier.features.map((f, i) => (
-                  <li key={i} className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
-                    <span className="text-[var(--success)] text-[10px]">✓</span> {f}
-                  </li>
-                ))}
-              </ul>
+        {TIER_BENEFITS.map(tier => (
+          <div key={tier.tier} style={{
+            border: 'var(--border-width) solid', background: 'var(--bg-primary)',
+            borderColor: currentTier === tier.tier ? 'var(--brand)' : 'var(--border-default)',
+            padding: '12px', marginBottom: '8px',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '14px', fontWeight: 900, textTransform: 'uppercase' }}>{tier.name}</span>
+              <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--brand)' }}>{tier.price}</span>
             </div>
-          ))}
-        </div>
-        <button onClick={onClose} className="w-full mt-4 bg-[var(--bg-hover)] py-2 rounded-lg text-sm">关闭</button>
+            {tier.features.map((f, i) => (
+              <div key={i} style={{ fontSize: '9px', padding: '2px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ color: 'var(--success)', fontSize: '8px' }}>✓</span> {f}
+              </div>
+            ))}
+          </div>
+        ))}
+        <button onClick={onClose} style={{ width: '100%', marginTop: '8px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Close</button>
       </div>
     </div>
   )
+}
+
+const rowStyle: React.CSSProperties = {
+  width: '100%', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)',
+  padding: '12px', textAlign: 'left', cursor: 'pointer',
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+  marginBottom: '-1px',
 }
 
 export default function ProfilePage() {
@@ -207,12 +193,10 @@ export default function ProfilePage() {
   const [showPwdModal, setShowPwdModal] = useState(false)
   const [showThemeModal, setShowThemeModal] = useState(false)
   const [showMembershipModal, setShowMembershipModal] = useState(false)
-  const { choice, resolved } = useTheme()
+  const { choice } = useTheme()
 
   const fetchProfile = () => {
-    api('/api/profile')
-      .then(r => r.json())
-      .then(d => { if (d.success) setProfile(d.data) })
+    api('/api/profile').then(r => r.json()).then(d => { if (d.success) setProfile(d.data) })
   }
 
   useEffect(() => {
@@ -220,145 +204,103 @@ export default function ProfilePage() {
     fetchProfile()
   }, [isSignedIn])
 
-  if (!isSignedIn) return <div className="p-8 text-center text-[var(--text-secondary)]">请先登录</div>
+  if (!isSignedIn) return <div style={{ padding: '24px', textAlign: 'center', fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Please login</div>
 
-  const displayName = user?.fullName || profile?.name || '用户'
+  const displayName = user?.fullName || profile?.name || 'User'
 
   return (
-    <div className="p-4">
-      <div className="text-center mb-6">
-        <img src={user?.imageUrl || ''} alt="" className="w-16 h-16 rounded-full mx-auto mb-2" />
-        <div className="flex items-center justify-center gap-1.5">
-          <h1 className="text-lg font-bold">{displayName}</h1>
-          <button
-            onClick={() => setShowNameModal(true)}
-            className="p-0.5 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:text-[var(--text-primary)]"
-            aria-label="修改用户名"
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M10 1.5l2.5 2.5L4.5 12H2v-2.5L10 1.5z" />
-            </svg>
+    <div style={{ padding: 'var(--page-padding)' }}>
+      {/* Header */}
+      <header style={{
+        height: 'var(--header-height)', padding: '0 var(--page-padding)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        borderBottom: 'var(--border-width) solid var(--border-default)',
+        marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
+      }}>
+        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Compare Tool V.1</span>
+        <span style={{ width: '18px', height: '18px', borderRadius: '999px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '9px', fontWeight: 800 }}>04</span>
+      </header>
+
+      {/* Profile header */}
+      <div style={{ padding: '16px 0', textAlign: 'center', borderBottom: 'var(--border-width) solid var(--border-default)', marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))' }}>
+        <div style={{ width: '48px', height: '48px', borderRadius: '999px', background: 'var(--bg-active)', color: 'var(--text-inverse)', display: 'grid', placeItems: 'center', margin: '0 auto 8px', fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900 }}>{displayName.charAt(0)}</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+          <h1 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em' }}>{displayName}</h1>
+          <button onClick={() => setShowNameModal(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: '4px' }} aria-label="Edit name">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10 1.5l2.5 2.5L4.5 12H2v-2.5L10 1.5z" /></svg>
           </button>
         </div>
-        <p className="text-xs text-[var(--text-secondary)]">{profile?.email ? maskEmail(profile.email) : ''}</p>
+        <p style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginTop: '4px' }}>{profile?.email ? maskEmail(profile.email) : ''}</p>
         {profile && (() => {
           const tier = TIER_BENEFITS.find(t => t.tier === profile.membershipTier)
-          const name = tier?.name || profile.membershipTier || '免费用户'
-          const isFree = profile.membershipTier === 'free'
+          const name = tier?.name || profile.membershipTier || 'FREE'
           const isAdmin = profile.role === 'admin'
           return (
-            <button
-              onClick={() => setShowMembershipModal(true)}
-              className={`inline-block mt-1 px-2 py-0.5 rounded text-xs transition-colors ${isFree ? 'bg-[var(--text-secondary)]/20 text-[var(--text-secondary)] hover:bg-[var(--text-secondary)]/30' : isAdmin ? 'bg-[var(--error)]/10 text-[var(--error)] hover:bg-[var(--error)]/20' : 'bg-[var(--brand-soft)] text-[var(--brand)] hover:bg-[var(--brand)]/20'}`}
-            >
-              {name}{isAdmin ? ' · 管理员' : ''}
+            <button onClick={() => setShowMembershipModal(true)} style={{
+              marginTop: '6px', padding: '3px 10px', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer',
+              background: isAdmin ? 'var(--danger)' : 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none',
+            }}>
+              {name}{isAdmin ? ' · ADMIN' : ''}
             </button>
           )
         })()}
       </div>
 
-      <div className="space-y-3 mb-4">
-        <button
-          onClick={() => setShowNameModal(true)}
-          className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
-        >
-          <div>
-            <div className="text-sm">用户名</div>
-            <div className="text-xs text-[var(--text-secondary)] mt-0.5">{displayName}</div>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]">
-            <path d="M6 4l4 4-4 4" />
-          </svg>
-        </button>
-
-        <button
-          onClick={() => setShowPwdModal(true)}
-          className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
-        >
-          <div>
-            <div className="text-sm">密码</div>
-            <div className="text-xs text-[var(--text-secondary)] mt-0.5">修改登录密码</div>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]">
-            <path d="M6 4l4 4-4 4" />
-          </svg>
-        </button>
-
-        <button
-          onClick={() => setShowThemeModal(true)}
-          className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
-        >
-          <div>
-            <div className="text-sm">主题外观</div>
-            <div className="text-xs text-[var(--text-secondary)] mt-0.5">{THEME_OPTIONS.find(o => o.value === choice)?.label} · {resolved === 'dark' ? '暖暗色' : '暖浅色'}</div>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]">
-            <path d="M6 4l4 4-4 4" />
-          </svg>
-        </button>
+      {/* Settings list */}
+      <div style={{ marginTop: '12px' }}>
+        {[
+          ['USERNAME', displayName, () => setShowNameModal(true)],
+          ['PASSWORD', 'Change your password', () => setShowPwdModal(true)],
+          ['APPEARANCE', `${THEME_OPTIONS.find(o => o.value === choice)?.label}`, () => setShowThemeModal(true)],
+        ].map(([label, value, onClick], i) => (
+          <button key={i} onClick={onClick as any} style={rowStyle}>
+            <div>
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>{label as string}</div>
+              <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginTop: '2px' }}>{value as string}</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 4l4 4-4 4" /></svg>
+          </button>
+        ))}
       </div>
 
-      <div className="space-y-3 mb-4">
-          <button
-            onClick={() => navigate('/recent-views')}
-            className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
-          >
+      <div style={{ marginTop: '12px' }}>
+        {[
+          ['RECENT VIEWS', 'Browse history', () => navigate('/recent-views')],
+          ['SHIPPING DEFAULTS', 'Carrier & weight presets', () => navigate('/default-shipping')],
+          ['EXCHANGE RATES', 'Preferred currency', () => navigate('/exchange-rate')],
+        ].map(([label, desc, onClick], i) => (
+          <button key={i} onClick={onClick as any} style={rowStyle}>
             <div>
-              <div className="text-sm">最近浏览</div>
-              <div className="text-xs text-[var(--text-secondary)] mt-0.5">查看最近浏览过的商品</div>
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>{label as string}</div>
+              <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginTop: '2px' }}>{desc as string}</div>
             </div>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]"><path d="M6 4l4 4-4 4"/></svg>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 4l4 4-4 4" /></svg>
           </button>
-          <button
-            onClick={() => navigate('/default-shipping')}
-            className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
-          >
-            <div>
-              <div className="text-sm">默认物流设置</div>
-              <div className="text-xs text-[var(--text-secondary)] mt-0.5">设置默认快递模板和运费参数</div>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]"><path d="M6 4l4 4-4 4"/></svg>
-          </button>
-          <button
-            onClick={() => navigate('/exchange-rate')}
-            className="w-full bg-[var(--bg-card)] rounded-xl p-4 text-left flex items-center justify-between hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors"
-          >
-            <div>
-              <div className="text-sm">汇率设置</div>
-              <div className="text-xs text-[var(--text-secondary)] mt-0.5">设置偏好币种，查看价格时自动换算</div>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)]"><path d="M6 4l4 4-4 4"/></svg>
-          </button>
-        </div>
+        ))}
+      </div>
 
-	      {profile?.configuredBrands?.length > 0 && (
-        <div className="bg-[var(--bg-card)] rounded-xl p-4 mb-4">
-          <div className="text-xs text-[var(--text-secondary)] mb-2">配置品牌</div>
-          <div className="flex flex-wrap gap-1">
+      {profile?.configuredBrands?.length > 0 && (
+        <div style={{ marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px' }}>
+          <div style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px' }}>Configured Brands</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {profile.configuredBrands.map((b: string) => (
-              <span key={b} className="bg-[var(--brand-soft)] text-[var(--brand)] text-xs px-2 py-0.5 rounded">{b}</span>
+              <span key={b} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', fontSize: '7px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '4px 8px' }}>{b}</span>
             ))}
           </div>
         </div>
       )}
 
       {profile?.role === 'admin' && (
-        <button onClick={() => navigate('/admin')} className="w-full bg-[var(--brand-soft)] text-[var(--brand)] py-3 rounded-xl text-sm active:bg-[var(--brand-soft)] transition-colors mb-4">
-          管理后台
+        <button onClick={() => navigate('/admin')} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}>
+          Admin Panel
         </button>
       )}
 
-      <button onClick={() => signOut()} className="w-full bg-[var(--danger)]/10 text-[var(--danger)] py-3 rounded-xl text-sm active:bg-[var(--danger)]/20 transition-colors">
-        退出登录
+      <button onClick={() => signOut()} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--danger)', color: 'var(--danger)', padding: '12px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>
+        Sign Out
       </button>
 
-      {showNameModal && (
-        <NameEditModal
-          currentName={displayName}
-          onClose={() => setShowNameModal(false)}
-          onSaved={() => { setShowNameModal(false); fetchProfile(); user?.reload() }}
-        />
-      )}
+      {showNameModal && <NameEditModal currentName={displayName} onClose={() => setShowNameModal(false)} onSaved={() => { setShowNameModal(false); fetchProfile(); user?.reload() }} />}
       {showPwdModal && <PasswordModal onClose={() => setShowPwdModal(false)} />}
       {showThemeModal && <ThemeModal current={choice} onClose={() => setShowThemeModal(false)} />}
       {showMembershipModal && <MembershipModal currentTier={profile?.membershipTier || 'free'} onClose={() => setShowMembershipModal(false)} />}

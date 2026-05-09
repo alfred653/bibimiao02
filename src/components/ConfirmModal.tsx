@@ -7,17 +7,22 @@ interface ConfirmModalProps {
   onCancel: () => void
 }
 
-export default function ConfirmModal({ title, message, confirmLabel = '确认', danger = false, onConfirm, onCancel }: ConfirmModalProps) {
+export default function ConfirmModal({ title, message, confirmLabel = 'Confirm', danger = false, onConfirm, onCancel }: ConfirmModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={e => { if (e.target === e.currentTarget) onCancel() }}>
-      <div className="bg-[var(--bg-card)] rounded-xl p-6 w-full max-w-sm border border-[var(--border-subtle)]">
-        <h3 className="text-lg font-bold mb-2">{title}</h3>
-        <p className="text-sm text-[var(--text-secondary)] mb-5">{message}</p>
-        <div className="flex gap-2">
-          <button onClick={onCancel} className="flex-1 bg-[var(--bg-hover)] py-2 rounded-lg text-sm">取消</button>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(37,38,34,0.7)', padding: '16px' }} onClick={e => { if (e.target === e.currentTarget) onCancel() }}>
+      <div style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '24px', width: '100%', maxWidth: '360px' }}>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 8px' }}>{title}</h3>
+        <p style={{ fontSize: '10px', color: 'var(--text-secondary)', marginBottom: '20px' }}>{message}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <button onClick={onCancel} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
           <button
             onClick={onConfirm}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${danger ? 'bg-[var(--danger)] text-white active:bg-[var(--danger)]/80' : 'bg-[var(--brand)] active:bg-[var(--brand-hover)]'}`}
+            style={{
+              padding: '10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer',
+              background: danger ? 'var(--danger)' : 'var(--bg-active)',
+              color: 'var(--text-inverse)',
+              border: 'none',
+            }}
           >
             {confirmLabel}
           </button>
