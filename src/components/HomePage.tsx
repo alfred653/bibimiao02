@@ -152,7 +152,7 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div style={{ alignSelf: 'end', padding: '0 6px 10px 0', fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-                    {<span style={{color:'var(--accent)',fontFamily:'var(--font-mono)'}}>{formatPrice(p.currency, p.price)}</span>
+                    <span style={{color:'var(--accent)',fontFamily:'var(--font-mono)'}}>{formatPrice(p.currency, p.price)}</span>
                   </div>
                   <div style={{
                     width: '18px', height: '18px', marginTop: '10px', marginRight: '6px',
