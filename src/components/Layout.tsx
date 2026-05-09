@@ -3,9 +3,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 const tabs = [
   { to: '/', label: 'SEARCH' },
-  { to: '/search', label: 'BRANDS' },
-  { to: '/favorites', label: 'ALERTS' },
-  { to: '/profile', label: 'SAVED' },
+  { to: '/search', label: 'SEARCH' },
+  { to: '/favorites', label: 'FAVORITES' },
+  { to: '/profile', label: 'MY' },
 ]
 
 export default function Layout() {

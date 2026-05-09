@@ -34,7 +34,7 @@ export default function HomePage() {
           marginRight: 'calc(-1 * var(--page-padding))',
         }}
       >
-        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Compare Tool V.1</span>
+        <span style={{ fontSize: '7px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>BIBIMIAO比比喵</span>
         <span
           style={{
             width: '18px', height: '18px', borderRadius: '999px',
@@ -48,7 +48,6 @@ export default function HomePage() {
       {/* Title area */}
       <section
         style={{
-          height: '100px',
           padding: '14px var(--page-padding) 10px',
           borderBottom: 'var(--border-width) solid var(--border-default)',
           marginLeft: 'calc(-1 * var(--page-padding))',
@@ -65,7 +64,7 @@ export default function HomePage() {
           maxWidth: '260px',
           margin: 0,
         }}>
-          Market<br />Intelligence
+          Brands
         </h1>
         <form onSubmit={search}>
           <label style={{ display: 'block' }}>
