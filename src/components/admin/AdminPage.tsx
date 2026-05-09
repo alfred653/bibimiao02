@@ -3,6 +3,7 @@ import { useUser } from '@clerk/clerk-react'
 import { useLocation } from 'react-router-dom'
 import { api, apiPut, apiPost, apiDelete } from '../../lib/api-client'
 import { useToast } from '../Toast'
+import { getPlaceholderUrl } from '../../lib/format'
 import ConfirmModal from '../ConfirmModal'
 import { BRANDS } from '../../lib/constants'
 import { formatPrice } from '../../lib/format'
@@ -15,7 +16,7 @@ function tierLabel(t: string) { const m: Record<string, string> = { free: 'Iron'
 const modalOverlay: React.CSSProperties = {
   position: 'fixed', inset: 0, zIndex: 50,
   display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'rgba(37,38,34,0.7)', padding: '16px',
+  background: 'var(--overlay)', padding: '16px',
 }
 
 const modalBox: React.CSSProperties = {
@@ -100,7 +101,7 @@ function UserEditModal({ user, onClose, onSaved }: { user: any; onClose: () => v
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '24px' }}>
           <button onClick={onClose} style={btnSecondary}>Cancel</button>
-          <button onClick={save} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.5 : 1 }}>
+          <button onClick={save} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.4 : 1 }}>
             {saving ? 'Saving...' : 'Save'}
           </button>
         </div>
@@ -178,7 +179,7 @@ function ProductEditModal({ product, onClose, onSaved }: { product?: any; onClos
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px' }}>
           <button onClick={onClose} style={btnSecondary}>Cancel</button>
-          <button onClick={save} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.5 : 1 }}>
+          <button onClick={save} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.4 : 1 }}>
             {saving ? 'Saving...' : isEdit ? 'Update' : 'Add'}
           </button>
         </div>
@@ -285,7 +286,7 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               <button onClick={onClose} style={btnSecondary}>Cancel</button>
-              <button onClick={confirmImport} disabled={importing} style={{ ...btnPrimary, opacity: importing ? 0.5 : 1 }}>
+              <button onClick={confirmImport} disabled={importing} style={{ ...btnPrimary, opacity: importing ? 0.4 : 1 }}>
                 {importing ? 'Importing...' : `Import ${rows.length - errors.filter(e => e.includes('missing')).length} rows`}
               </button>
             </div>
@@ -372,7 +373,7 @@ function CarrierEditModal({ carrier, onClose, onSaved }: { carrier?: any; onClos
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '20px' }}>
           <button onClick={onClose} style={btnSecondary}>Cancel</button>
-          <button onClick={save} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.5 : 1 }}>
+          <button onClick={save} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.4 : 1 }}>
             {saving ? 'Saving...' : isEdit ? 'Update' : 'Add'}
           </button>
         </div>
@@ -400,12 +401,12 @@ function PaginationBar({ page, totalPages, onChange }: { page: number; totalPage
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginTop: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
         <button disabled={page <= 1} onClick={() => onChange(page - 1)}
-          style={{ ...btnSecondary, opacity: page <= 1 ? 0.3 : 1, fontSize: '14px' }}>
+          style={{ ...btnSecondary, opacity: page <= 1 ? 0.4 : 1, fontSize: '14px' }}>
           Prev
         </button>
         <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{page} / {totalPages}</span>
         <button disabled={page >= totalPages} onClick={() => onChange(page + 1)}
-          style={{ ...btnSecondary, opacity: page >= totalPages ? 0.3 : 1, fontSize: '14px' }}>
+          style={{ ...btnSecondary, opacity: page >= totalPages ? 0.4 : 1, fontSize: '14px' }}>
           Next
         </button>
       </div>
@@ -784,13 +785,13 @@ export default function AdminPage() {
                 <td style={tdStyle}><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} style={{ width: '14px', height: '14px', accentColor: 'var(--brand)', cursor: 'pointer' }} /></td>
                 <td style={tdStyle}>
                   <img
-                    src={p.imageUrl || `https://placehold.co/64x64/1a1a17/d97757?text=${encodeURIComponent((p.brand || '').slice(0, 6))}`}
+                    src={p.imageUrl || getPlaceholderUrl(p.brand || '?', 64, 64)}
                     alt=""
                     style={{ width: '32px', height: '32px', objectFit: 'cover', background: 'var(--bg-hover)' }}
                     loading="lazy"
                     onError={e => {
                       const el = e.target as HTMLImageElement
-                      el.src = `https://placehold.co/64x64/1a1a17/666?text=${encodeURIComponent('N/A')}`
+                      el.src = getPlaceholderUrl('N/A', 64, 64)
                     }}
                   />
                 </td>
@@ -843,14 +844,14 @@ export default function AdminPage() {
           padding: '10px 16px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px',
         }}>
           <span style={{ fontSize: '14px', color: 'var(--text-inverse)' }}>Selected <b>{selectedIds.size}</b> items</span>
-          <button onClick={handleBatchDelete} disabled={batchLoading} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', opacity: batchLoading ? 0.5 : 1 }}>
+          <button onClick={handleBatchDelete} disabled={batchLoading} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', opacity: batchLoading ? 0.4 : 1 }}>
             Batch Delete
           </button>
           <select
             defaultValue=""
             onChange={e => { const v = e.target.value; if (v) { handleBatchUpdate('status', v); e.target.value = '' } }}
             disabled={batchLoading}
-            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '14px', color: 'var(--text-primary)', opacity: batchLoading ? 0.5 : 1 }}
+            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '14px', color: 'var(--text-primary)', opacity: batchLoading ? 0.4 : 1 }}
           >
             <option value="" disabled>Change Status</option>
             <option value="active">Active</option>
@@ -860,14 +861,14 @@ export default function AdminPage() {
             defaultValue=""
             onChange={e => { const v = e.target.value; if (v) { handleBatchUpdate('brand', v); e.target.value = '' } }}
             disabled={batchLoading}
-            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '14px', color: 'var(--text-primary)', opacity: batchLoading ? 0.5 : 1 }}
+            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '14px', color: 'var(--text-primary)', opacity: batchLoading ? 0.4 : 1 }}
           >
             <option value="" disabled>Change Brand</option>
             {BRANDS.filter(b => typeof b === 'string').map(b => (
               <option key={b} value={b}>{b}</option>
             ))}
           </select>
-          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', color: 'var(--text-inverse)', opacity: batchLoading ? 0.5 : 0.7 }}>
+          <button onClick={() => setSelectedIds(new Set())} disabled={batchLoading} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', color: 'var(--text-inverse)', opacity: batchLoading ? 0.4 : 0.7 }}>
             Deselect All
           </button>
         </div>

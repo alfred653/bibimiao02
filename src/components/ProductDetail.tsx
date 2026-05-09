@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLoginModal } from './LoginModal'
 import { useToast } from './Toast'
 import { api, apiPost, apiDelete } from '../lib/api-client'
-import { formatPrice } from '../lib/format'
+import { formatPrice, getPlaceholderUrl } from '../lib/format'
 
 interface Carrier {
   id: number; name: string; firstWeight: number; firstCost: number;
@@ -49,6 +49,20 @@ const sectionStyle: React.CSSProperties = {
   marginRight: 'calc(-1 * var(--page-padding))',
 }
 
+const sectionHeader: React.CSSProperties = {
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+  padding: '10px var(--page-padding)',
+  marginLeft: 'calc(-1 * var(--page-padding))',
+  marginRight: 'calc(-1 * var(--page-padding))',
+  borderBottom: 'var(--border-width) solid var(--border-default)',
+  background: 'var(--bg-secondary)',
+  cursor: 'pointer',
+  fontSize: 'var(--fs-label)',
+  fontWeight: 800,
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase',
+}
+
 export default function ProductDetail() {
   const { id } = useParams()
   const nav = useNavigate()
@@ -76,6 +90,9 @@ export default function ProductDetail() {
   const [estimateError, setEstimateError] = useState('')
   const [sourceCopied, setSourceCopied] = useState(false)
   const [crossSource, setCrossSource] = useState<any[] | null>(null)
+  const [showInfo, setShowInfo] = useState(true)
+  const [showCalculator, setShowCalculator] = useState(true)
+  const [showHistory, setShowHistory] = useState(false)
 
   const [carriers, setCarriers] = useState<Carrier[]>([])
   const [selectedCarrierId, setSelectedCarrierId] = useState<number | null>(null)
@@ -209,10 +226,10 @@ export default function ProductDetail() {
       {/* Product image */}
       <div style={{ ...sectionStyle, padding: '0', display: 'flex', justifyContent: 'center' }}>
         <img
-          src={product.imageUrl || `https://placehold.co/800x400/B8B8AD/5C5D55?text=${encodeURIComponent(product.brand || '')}`}
-          alt="" style={{ width: '100%', maxHeight: '240px', objectFit: 'contain' }}
+          src={product.imageUrl || getPlaceholderUrl(product.brand || '?', 800, 400)}
+          alt="" style={{ width: '100%', maxHeight: '160px', objectFit: 'contain' }}
           loading="eager"
-          onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/800x400/B8B8AD/5C5D55?text=NO+IMAGE' }}
+          onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 800, 400) }}
         />
       </div>
 
@@ -232,7 +249,7 @@ export default function ProductDetail() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '12px' }}>
           <div>
             <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '2px' }}>Price</div>
-            <div style={{ fontSize: '28px', lineHeight: '1', fontWeight: 900, fontVariantNumeric: 'tabular-nums' }}>
+            <div style={{ fontSize: '28px', lineHeight: '1', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>
               {formatPrice(product.currency, product.price)}
             </div>
             {product.originalPrice && (
@@ -261,24 +278,40 @@ export default function ProductDetail() {
       </div>
 
       {/* Product info panel */}
-      <div style={sectionStyle}>
-        <h3 style={{ ...labelStyle, marginBottom: '8px' }}>Product Information</h3>
-        {[
-          ['Brand', product.brand],
-          product.category && ['Category', product.category],
-          product.spec && ['Spec', product.spec],
-          ['Source', product.source],
-          product.country && ['Region', product.country],
-          ['Currency', product.currency],
-        ].filter(Boolean).map((row: any, i: number) => (
-          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < 5 ? 'var(--border-width) solid var(--border-light)' : 'none', fontSize: '12px', fontWeight: 500 }}>
-            <span style={{ opacity: 0.7, fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{row[0]}</span>
-            <span style={{ fontWeight: 700 }}>{row[1]}</span>
-          </div>
-        ))}
+      <div style={sectionHeader} onClick={() => setShowInfo(!showInfo)}>
+        <span>Product Information</span>
+        <span style={{ fontSize: '10px' }}>{showInfo ? '▼' : '▶'}</span>
       </div>
+      <AnimatePresence>
+        {showInfo && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} style={{ overflow: 'hidden' }}>
+            <div style={sectionStyle}>
+              {[
+                ['Brand', product.brand],
+                product.category && ['Category', product.category],
+                product.spec && ['Spec', product.spec],
+                ['Source', product.source],
+                product.country && ['Region', product.country],
+                ['Currency', product.currency],
+              ].filter(Boolean).map((row: any, i: number) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < 5 ? 'var(--border-width) solid var(--border-light)' : 'none', fontSize: '12px', fontWeight: 500 }}>
+                  <span style={{ opacity: 0.7, fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{row[0]}</span>
+                  <span style={{ fontWeight: 700 }}>{row[1]}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Cost Estimate */}
+      {/* Cost Calculator */}
+      <div style={sectionHeader} onClick={() => setShowCalculator(!showCalculator)}>
+        <span>Cost Calculator</span>
+        <span style={{ fontSize: '10px' }}>{showCalculator ? '▼' : '▶'}</span>
+      </div>
+      <AnimatePresence>
+        {showCalculator && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} style={{ overflow: 'hidden' }}>
       {isSignedIn ? (
         <div style={sectionStyle}>
           <h2 style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>
@@ -370,7 +403,7 @@ export default function ProductDetail() {
           </div>
 
           <button onClick={calcEstimate} disabled={estimating}
-            style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', opacity: estimating ? 0.5 : 1 }}>
+            style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', opacity: estimating ? 0.4 : 1 }}>
             {estimating ? 'Calculating...' : 'Calculate Landed Cost'}
           </button>
 
@@ -417,29 +450,44 @@ export default function ProductDetail() {
           <button onClick={() => openLogin()} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Login</button>
         </div>
       )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       {/* Price history */}
       {(product.originalPrice || product.updatedAt) && (
-        <div style={sectionStyle}>
-          <h3 style={{ ...labelStyle, marginBottom: '8px' }}>Price History</h3>
-          {product.originalPrice && (
-            <div style={{ marginBottom: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '2px' }}>
-                <span style={{ opacity: 0.7 }}>Original</span>
-                <span style={{ textDecoration: 'line-through', opacity: 0.5 }}>{formatPrice(product.currency, product.originalPrice)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                <span style={{ opacity: 0.7 }}>Current</span>
-                <span style={{ fontWeight: 700 }}>{formatPrice(product.currency, product.price)}</span>
-              </div>
-            </div>
-          )}
-          {product.updatedAt && (
-            <div style={{ fontSize: '13px', opacity: 0.7 }}>
-              Updated: {new Date(product.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-            </div>
-          )}
-        </div>
+        <>
+          <div style={sectionHeader} onClick={() => setShowHistory(!showHistory)}>
+            <span>Price History</span>
+            <span style={{ fontSize: '10px' }}>{showHistory ? '▼' : '▶'}</span>
+          </div>
+          <AnimatePresence>
+            {showHistory && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} style={{ overflow: 'hidden' }}>
+                <div style={sectionStyle}>
+                  <h3 style={{ ...labelStyle, marginBottom: '8px' }}>Price History</h3>
+                  {product.originalPrice && (
+                    <div style={{ marginBottom: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '2px' }}>
+                        <span style={{ opacity: 0.7 }}>Original</span>
+                        <span style={{ textDecoration: 'line-through', opacity: 0.5 }}>{formatPrice(product.currency, product.originalPrice)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                        <span style={{ opacity: 0.7 }}>Current</span>
+                        <span style={{ fontWeight: 700 }}>{formatPrice(product.currency, product.price)}</span>
+                      </div>
+                    </div>
+                  )}
+                  {product.updatedAt && (
+                    <div style={{ fontSize: '13px', opacity: 0.7 }}>
+                      Updated: {new Date(product.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
       )}
 
       {/* Actions */}
@@ -476,8 +524,8 @@ export default function ProductDetail() {
           {crossSource.slice(0, 5).map((item: any) => (
             <button key={item.id} onClick={() => nav(`/product/${item.id}`)}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', marginBottom: '4px', cursor: 'pointer', textAlign: 'left' }}>
-              <img src={item.imageUrl || `https://placehold.co/40x40/B8B8AD/5C5D55?text=N/A`} alt="" style={{ width: '32px', height: '32px', objectFit: 'cover' }}
-                onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/40x40/B8B8AD/5C5D55?text=N/A' }} />
+              <img src={item.imageUrl || getPlaceholderUrl('N/A', 40, 40)} alt="" style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+                onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 40, 40) }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
                 <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7 }}>{item.source}</div>

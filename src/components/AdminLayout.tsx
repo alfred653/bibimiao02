@@ -24,7 +24,7 @@ export default function AdminLayout() {
       </button>
 
       {sidebarOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(37,38,34,0.7)' }} onClick={() => setSidebarOpen(false)} />
+        <div style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'var(--overlay)' }} onClick={() => setSidebarOpen(false)} />
       )}
 
       <aside style={{

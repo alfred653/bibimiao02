@@ -16,7 +16,7 @@ function maskEmail(email: string) {
 const modalOverlay: React.CSSProperties = {
   position: 'fixed', inset: 0, zIndex: 50,
   display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'rgba(37,38,34,0.7)', padding: '16px',
+  background: 'var(--overlay)', padding: '16px',
 }
 const modalBox: React.CSSProperties = {
   background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)',
@@ -50,7 +50,7 @@ function NameEditModal({ currentName, onClose, onSaved }: { currentName: string;
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
           <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
-          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
+          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.4 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
         </div>
       </div>
     </div>
@@ -94,7 +94,7 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
         ))}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
           <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
-          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
+          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.4 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
         </div>
       </div>
     </div>

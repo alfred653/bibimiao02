@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
-import { formatPrice } from '../lib/format'
+import { formatPrice, getPlaceholderUrl } from '../lib/format'
 import { useLoginModal } from './LoginModal'
 import { useToast } from './Toast'
 import { api, apiDelete } from '../lib/api-client'
@@ -65,9 +65,9 @@ export default function FavoritesPage() {
                 borderBottom: 'var(--border-width) solid var(--border-default)',
                 cursor: 'pointer', background: 'var(--bg-primary)',
               }}>
-              <img src={item.imageUrl || `https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A`} alt="" loading="lazy"
+              <img src={item.imageUrl || getPlaceholderUrl('N/A', 72, 92)} alt="" loading="lazy"
                 style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover', border: 'var(--border-width) solid var(--border-default)' }}
-                onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A' }} />
+                onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 72, 92) }} />
               <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '14px', lineHeight: '13px', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.title}</h2>
                 <div style={{ display: 'flex', gap: '6px' }}>

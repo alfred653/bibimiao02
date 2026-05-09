@@ -4,7 +4,7 @@
    Archive Market Intelligence UI — Mobile-first */
 
 /* ===== Font ===== */
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
 
 :root {
   font-family:
@@ -16,10 +16,30 @@
     "Noto Sans SC",
     sans-serif;
 
-  /* Font scale */
-  --fs-label: 10px;
-  --fs-body: 12px;
+  /* Font scale — Type Scale + legacy */
+  --fs-display: 28px;
+  --fs-h1: 20px;
+  --fs-h2: 16px;
+  --fs-text: 14px;
+  --fs-caption: 12px;
+  --fs-mono: 13px;
+  --fs-label: 12px;
+  --fs-body: 14px;
   --fs-input: 13px;
+
+  --font-mono: "JetBrains Mono", "Cascadia Code", "Fira Code", monospace;
+
+  /* Accent — theme-independent orange for prices/CTAs */
+  --accent: #E85A2C;
+  --accent-hover: #D05A20;
+
+  /* Overlay */
+  --overlay: rgba(0, 0, 0, 0.55);
+
+  /* Nav */
+  --nav-inactive: rgba(231, 231, 220, 0.45);
+  --nav-active-bg: rgba(231, 231, 220, 0.07);
+  --nav-separator: rgba(231, 231, 220, 0.08);
 }
 
 /* ===== Theme: Industrial Dark (default) ===== */
@@ -44,9 +64,9 @@
   --brand-hover: #7A7C46;
   --brand-soft: rgba(141, 143, 84, 0.12);
 
-  --success: #5A804E;
+  --success: #3A6B5C;
   --warning: #9A8036;
-  --danger: #A04A3E;
+  --danger: #C44536;
 
   --shadow-card: none;
   --button-on-brand: #E7E7DC;
@@ -95,9 +115,9 @@
   --brand-hover: #C56A4C;
   --brand-soft: rgba(217, 119, 87, 0.12);
 
-  --success: #5A8A4E;
+  --success: #3A6B5C;
   --warning: #B8953E;
-  --danger: #C45545;
+  --danger: #C44536;
 
   --shadow-card: 0 1px 3px rgba(44, 36, 22, 0.08);
   --button-on-brand: #FAF7F2;
@@ -155,7 +175,6 @@ body {
 /* ===== Typography ===== */
 h1, h2, h3, h4 {
   font-family: var(--font-display);
-  text-transform: uppercase;
   letter-spacing: -0.02em;
 }
 
@@ -187,7 +206,7 @@ h1, h2, h3, h4 {
 }
 
 .price {
-  color: var(--text-primary);
+  color: var(--accent);
   font-weight: 900;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
@@ -221,10 +240,10 @@ h1, h2, h3, h4 {
   background:
     repeating-linear-gradient(
       -45deg,
-      #B8B8AD,
-      #B8B8AD 4px,
-      #C9C9BD 4px,
-      #C9C9BD 8px
+      var(--bg-secondary),
+      var(--bg-secondary) 4px,
+      var(--bg-hover) 4px,
+      var(--bg-hover) 8px
     );
 }
 
@@ -261,6 +280,45 @@ h1, h2, h3, h4 {
 input:focus, select:focus, button:focus-visible {
   outline: 1px solid var(--border-default);
   outline-offset: -1px;
+}
+
+/* ===== Interaction states ===== */
+.interactive:hover {
+  filter: brightness(0.95);
+}
+.interactive:active {
+  filter: brightness(0.9);
+}
+.interactive:disabled,
+.interactive[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== Skeleton shimmer ===== */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
+}
+.skeleton-light {
+  background: linear-gradient(
+    90deg,
+    var(--bg-primary) 25%,
+    var(--bg-secondary) 50%,
+    var(--bg-primary) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
 }
 
 /* ===== Responsive breakpoints ===== */

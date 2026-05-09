@@ -21,20 +21,20 @@ export default function LoginPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
       <div style={{ '--lamp-hue': hue, '--on': isOn ? '1' : '0' } as React.CSSProperties}>
         <svg viewBox="0 0 200 260" style={{ width: '160px', height: 'auto', margin: '0 auto 32px' }}>
-          <ellipse cx="100" cy="250" rx="44" ry="10" fill="#2A2B26" />
-          <line x1="100" y1="250" x2="100" y2="170" stroke="#5C5D55" strokeWidth="4" strokeLinecap="round" />
+          <ellipse cx="100" cy="250" rx="44" ry="10" fill="var(--bg-secondary)" />
+          <line x1="100" y1="250" x2="100" y2="170" stroke="var(--text-muted)" strokeWidth="4" strokeLinecap="round" />
           <motion.path
             d="M50 170 L150 170 L130 110 L70 110 Z"
-            fill={isOn ? `hsl(${hue}, 70%, 60%)` : '#3a3a34'}
-            animate={{ fill: isOn ? `hsl(${hue}, 70%, 60%)` : '#3a3a34' }}
+            fill={isOn ? `hsl(${hue}, 70%, 60%)` : 'var(--border-default)'}
+            animate={{ fill: isOn ? `hsl(${hue}, 70%, 60%)` : 'var(--border-default)' }}
           />
-          <motion.circle cx="85" cy="145" r="5" fill="#141413"
+          <motion.circle cx="85" cy="145" r="5" fill="var(--bg-primary)"
             animate={{ r: isOn ? 5 : 3 }} />
-          <motion.circle cx="115" cy="145" r="5" fill="#141413"
+          <motion.circle cx="115" cy="145" r="5" fill="var(--bg-primary)"
             animate={{ r: isOn ? 5 : 3 }} />
           <motion.line
             x1="100" y1="170" x2="100" y2="210"
-            stroke="#6a6a60" strokeWidth="2"
+            stroke="var(--text-muted)" strokeWidth="2"
             drag="y"
             dragConstraints={{ top: -10, bottom: 50 }}
             dragElastic={0.1}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api-client'
-import { formatPrice } from '../lib/format'
+import { formatPrice, getPlaceholderUrl } from '../lib/format'
 
 interface Overview { totalProducts: number; brandCount: number; sourceCount: number; brands: { name: string; count: number }[]; lastUpdated: string | null; recentProducts: { id: number; title: string; brand: string; price: string; currency: string; imageUrl: string | null }[] }
 
@@ -134,11 +134,11 @@ export default function HomePage() {
                   }}
                 >
                   <img
-                    src={p.imageUrl || `https://placehold.co/72x92/B8B8AD/5C5D55?text=${encodeURIComponent(p.brand.slice(0, 4))}`}
+                    src={p.imageUrl || getPlaceholderUrl(p.brand, 72, 92)}
                     alt=""
                     style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover', border: 'var(--border-width) solid var(--border-default)' }}
                     loading={i < 3 ? 'eager' : 'lazy'}
-                    onError={e => { (e.target as HTMLImageElement).src = `https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A` }}
+                    onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 72, 92) }}
                   />
                   <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <h2 style={{
@@ -152,7 +152,7 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div style={{ alignSelf: 'end', padding: '0 6px 10px 0', fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-                    {formatPrice(p.currency, p.price)}
+                    {<span style={{color:'var(--accent)',fontFamily:'var(--font-mono)'}}>{formatPrice(p.currency, p.price)}</span>
                   </div>
                   <div style={{
                     width: '18px', height: '18px', marginTop: '10px', marginRight: '6px',

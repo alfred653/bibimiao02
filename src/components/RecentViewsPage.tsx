@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { formatPrice, stripBrandPrefix } from '../lib/format'
+import { formatPrice, stripBrandPrefix, getPlaceholderUrl } from '../lib/format'
 
 interface RecentItem {
   id: number; title: string; brand: string; price: string; currency: string; imageUrl: string | null; viewedAt: number
@@ -54,9 +54,9 @@ export default function RecentViewsPage() {
           {items.map(p => (
             <div key={p.id} style={{ height: 'var(--row-height)', display: 'grid', gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto 28px', borderBottom: 'var(--border-width) solid var(--border-default)', cursor: 'pointer' }}
               onClick={() => nav(`/product/${p.id}`)}>
-              <img src={p.imageUrl || `https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A`} alt="" loading="lazy"
+              <img src={p.imageUrl || getPlaceholderUrl('N/A', 72, 92)} alt="" loading="lazy"
                 style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover' }}
-                onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A' }} />
+                onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 72, 92) }} />
               <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '14px', lineHeight: '13px', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{stripBrandPrefix(p.title, p.brand)}</h2>
                 <div style={{ display: 'flex', gap: '6px' }}>

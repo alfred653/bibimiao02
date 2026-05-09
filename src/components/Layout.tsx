@@ -48,9 +48,9 @@ export default function Layout() {
               fontWeight: 800,
               letterSpacing: '0.14em',
               textTransform: 'uppercase' as const,
-              color: isActive ? 'var(--text-inverse)' : 'rgba(231,231,220,0.45)',
-              background: isActive ? 'rgba(231,231,220,0.07)' : 'transparent',
-              borderLeft: i > 0 ? '1px solid rgba(231,231,220,0.08)' : 'none',
+              color: isActive ? 'var(--text-inverse)' : 'var(--nav-inactive)',
+              background: isActive ? 'var(--nav-active-bg)' : 'transparent',
+              borderLeft: i > 0 ? '1px solid var(--nav-separator)' : 'none',
               minHeight: 'var(--bottom-nav-height)',
             })}
           >

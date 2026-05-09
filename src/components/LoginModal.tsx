@@ -17,7 +17,7 @@ export function LoginModalProvider({ children }: { children: ReactNode }) {
       {children}
       {open && (
         <div
-          style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(37,38,34,0.7)', padding: '16px' }}
+          style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--overlay)', padding: '16px' }}
           onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}
         >
           <div style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '24px', width: '100%', maxWidth: '448px', position: 'relative' }}>

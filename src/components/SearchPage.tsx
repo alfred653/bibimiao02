@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate, useNavigationType } from 'react-router-do
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUser } from '@clerk/clerk-react'
 import { useLoginModal } from './LoginModal'
-import { formatPrice, stripBrandPrefix } from '../lib/format'
+import { formatPrice, stripBrandPrefix, getPlaceholderUrl } from '../lib/format'
 import { api, apiPost, apiDelete } from '../lib/api-client'
 
 const SUGGESTED_BRANDS = ['Osprey', "Arc'teryx", 'Patagonia', 'The North Face', 'Gregory']
@@ -330,10 +330,10 @@ export default function SearchPage() {
         <div>
           {[1, 2, 3, 4].map(i => (
             <div key={i} style={{ ...rowStyle, cursor: 'default' }}>
-              <div style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', background: 'var(--bg-secondary)' }} />
+              <div className="skeleton" style={{ width: 'var(--thumb-width)', height: 'var(--row-height)' }} />
               <div style={{ padding: '12px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <div style={{ height: '13px', background: 'var(--bg-secondary)', width: '75%' }} />
-                <div style={{ height: '9px', background: 'var(--bg-secondary)', width: '40%' }} />
+                <div className="skeleton" style={{ height: '13px', width: '75%' }} />
+                <div className="skeleton" style={{ height: '9px', width: '40%', marginTop: '4px' }} />
               </div>
               <div />
               <div />
@@ -367,10 +367,10 @@ export default function SearchPage() {
               style={rowStyle}
             >
               <img
-                src={item.imageUrl || `https://placehold.co/72x92/B8B8AD/5C5D55?text=${encodeURIComponent((item.brand || '').slice(0, 4))}`}
+                src={item.imageUrl || getPlaceholderUrl(item.brand || '?', 72, 92)}
                 alt="" loading="lazy"
                 style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover', border: 'var(--border-width) solid var(--border-default)' }}
-                onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/72x92/B8B8AD/5C5D55?text=N/A' }}
+                onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 72, 92) }}
               />
               <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <h2 style={{
@@ -386,7 +386,7 @@ export default function SearchPage() {
                 </div>
               </div>
               <div style={{ alignSelf: 'end', padding: '0 6px 10px 0', fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-                {item.price ? formatPrice(item.currency, item.price) : '—'}
+                <span style={{color:'var(--accent)',fontFamily:'var(--font-mono)'}}>{item.price ? formatPrice(item.currency, item.price) : '—'}</span>
               </div>
               <button
                 onClick={e => toggleFavorite(item.id, e)}
@@ -413,7 +413,7 @@ export default function SearchPage() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '16px 0' }}>
           <div style={{ display: 'flex', gap: '4px' }}>
             <button disabled={page <= 1} onClick={() => doSearch(page - 1)}
-              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page <= 1 ? 0.3 : 1 }}>PREV</button>
+              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page <= 1 ? 0.4 : 1 }}>PREV</button>
             {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
               let pageNum: number
               if (pagination.totalPages <= 5) pageNum = i + 1
@@ -431,7 +431,7 @@ export default function SearchPage() {
               )
             })}
             <button disabled={page >= pagination.totalPages} onClick={() => doSearch(page + 1)}
-              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page >= pagination.totalPages ? 0.3 : 1 }}>NEXT</button>
+              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page >= pagination.totalPages ? 0.4 : 1 }}>NEXT</button>
           </div>
           <PaginationJumper current={page} max={pagination.totalPages} onJump={p => doSearch(p)} />
         </div>
