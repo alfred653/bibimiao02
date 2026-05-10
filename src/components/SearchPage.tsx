@@ -345,7 +345,7 @@ export default function SearchPage() {
       {/* Empty */}
       {!results.length && !loading && searched && (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>No Results Found</p>
+          <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>无搜索结果</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center' }}>
             {SUGGESTED_BRANDS.map(b => (
               <button key={b} onClick={() => { setKeyword(b); doSearch(1, { keyword: b }) }} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>{b}</button>
@@ -413,7 +413,7 @@ export default function SearchPage() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '16px 0' }}>
           <div style={{ display: 'flex', gap: '4px' }}>
             <button disabled={page <= 1} onClick={() => doSearch(page - 1)}
-              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page <= 1 ? 0.4 : 1 }}>PREV</button>
+              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page <= 1 ? 0.4 : 1 }}>上一页</button>
             {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
               let pageNum: number
               if (pagination.totalPages <= 5) pageNum = i + 1
@@ -431,7 +431,7 @@ export default function SearchPage() {
               )
             })}
             <button disabled={page >= pagination.totalPages} onClick={() => doSearch(page + 1)}
-              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page >= pagination.totalPages ? 0.4 : 1 }}>NEXT</button>
+              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page >= pagination.totalPages ? 0.4 : 1 }}>下一页</button>
           </div>
           <PaginationJumper current={page} max={pagination.totalPages} onJump={p => doSearch(p)} />
         </div>
@@ -440,8 +440,8 @@ export default function SearchPage() {
       {/* Login prompt */}
       {isAnon && (
         <div style={{ textAlign: 'center', padding: '16px', border: 'var(--border-width) solid var(--border-default)', marginTop: '12px' }}>
-          <p style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Login to see full results</p>
-          <button onClick={openLogin} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Login</button>
+          <p style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>登录查看完整结果</p>
+          <button onClick={openLogin} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>登录</button>
         </div>
       )}
     </div>

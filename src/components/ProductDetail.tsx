@@ -93,6 +93,8 @@ export default function ProductDetail() {
   const [showInfo, setShowInfo] = useState(true)
   const [showCalculator, setShowCalculator] = useState(true)
   const [showHistory, setShowHistory] = useState(false)
+  const [selectedVolume, setSelectedVolume] = useState<number | null>(null)
+  const [crossRates, setCrossRates] = useState<Record<string, { rate: number; source: string }>>({})
 
   const [carriers, setCarriers] = useState<Carrier[]>([])
   const [selectedCarrierId, setSelectedCarrierId] = useState<number | null>(null)
@@ -139,6 +141,32 @@ export default function ProductDetail() {
     }).finally(() => setLoading(false))
   }, [id])
 
+  // Auto-fill calculator from product spec
+  useEffect(() => {
+    if (!product?.spec) return
+    const volMatch = String(product.spec).match(/(\d+)\s*L/i)
+    if (volMatch) {
+      const vol = parseInt(volMatch[1], 10)
+      const presets: Record<number, { l: string; w: string; h: string }> = {
+        20: { l: '45', w: '30', h: '18' },
+        30: { l: '50', w: '30', h: '22' },
+        40: { l: '55', w: '32', h: '25' },
+        50: { l: '60', w: '35', h: '28' },
+        65: { l: '65', w: '38', h: '30' },
+        80: { l: '75', w: '40', h: '35' },
+      }
+      const match = presets[vol]
+      if (match) {
+        setSelectedVolume(vol)
+        if (!length && !width && !height) {
+          setLength(match.l)
+          setWidth(match.w)
+          setHeight(match.h)
+        }
+      }
+    }
+  }, [product])
+
   const [displayCurrency, setDisplayCurrency] = useState('')
   const [dispRate, setDispRate] = useState<{ rate: number; source: string; updatedAt: string } | null>(null)
   const [dispConverted, setDispConverted] = useState<number | null>(null)
@@ -163,6 +191,26 @@ export default function ProductDetail() {
       }).catch(() => { setDispRate(null); setDispConverted(null) })
       .finally(() => setRateLoading(false))
   }, [displayCurrency, product])
+
+  // Fetch cross-rates for Other Sources currency conversion
+  useEffect(() => {
+    if (!crossSource?.length || !displayCurrency) return
+    const currencies = [...new Set(crossSource.map((i: any) => i.currency).filter(Boolean))]
+    if (!currencies.length) return
+    Promise.all(
+      currencies.map((cur: string) =>
+        api(`/api/exchange-rate?from=${encodeURIComponent(cur)}&to=${encodeURIComponent(displayCurrency)}`)
+          .then(r => r.json()).then(d => {
+            if (d.success) return { cur, rate: d.data.rate, source: d.data.source }
+            return null
+          }).catch(() => null)
+      )
+    ).then(results => {
+      const map: Record<string, { rate: number; source: string }> = {}
+      results.filter(Boolean).forEach((r: any) => { map[r.cur] = { rate: r.rate, source: r.source } })
+      setCrossRates(map)
+    })
+  }, [crossSource, displayCurrency])
 
   function calcEstimate() {
     if (!product) return
@@ -200,11 +248,11 @@ export default function ProductDetail() {
     } else { navigator.clipboard.writeText(text).then(() => toast('Copied', 'success')).catch(() => {}) }
   }
 
-  if (loading) return <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Loading...</div>
+  if (loading) return <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>加载中...</div>
   if (!product) return (
     <div style={{ padding: '24px', textAlign: 'center' }}>
-      <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>Product Not Found</p>
-      <button onClick={() => nav('/search')} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Go to Search</button>
+      <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>商品未找到</p>
+      <button onClick={() => nav('/search')} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>去搜索</button>
     </div>
   )
 
@@ -248,13 +296,16 @@ export default function ProductDetail() {
       <div style={sectionStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '12px' }}>
           <div>
-            <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '2px' }}>Price</div>
+            <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '2px' }}>价格</div>
             <div style={{ fontSize: '28px', lineHeight: '1', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>
               {formatPrice(product.currency, product.price)}
             </div>
-            {product.originalPrice && (
+            {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
               <div style={{ fontSize: '13px', textDecoration: 'line-through', opacity: 0.5, marginTop: '2px' }}>
                 {formatPrice(product.currency, product.originalPrice)}
+                <span style={{ marginLeft: '6px', fontSize: '11px', fontWeight: 700, color: 'var(--danger)', textDecoration: 'none', display: 'inline-block' }}>
+                  -{Math.round((1 - parseFloat(product.price) / parseFloat(product.originalPrice)) * 100)}%
+                </span>
               </div>
             )}
           </div>
@@ -263,11 +314,11 @@ export default function ProductDetail() {
             {TARGET_CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
-        {rateLoading && <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Fetching rate...</div>}
+        {rateLoading && <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>获取汇率...</div>}
         {dispRate && dispConverted !== null && !rateLoading && (
           <div style={{ background: 'var(--bg-secondary)', padding: '10px', border: 'var(--border-width) solid var(--border-default)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>
-              <span>Converted</span>
+              <span>换算价</span>
               <span style={{ color: 'var(--success)' }}>{formatPrice(displayCurrency, dispConverted)}</span>
             </div>
             <div style={{ fontSize: '13px', opacity: 0.7 }}>
@@ -279,7 +330,7 @@ export default function ProductDetail() {
 
       {/* Product info panel */}
       <div style={sectionHeader} onClick={() => setShowInfo(!showInfo)}>
-        <span>Product Information</span>
+        <span>商品信息</span>
         <span style={{ fontSize: '10px' }}>{showInfo ? '▼' : '▶'}</span>
       </div>
       <AnimatePresence>
@@ -304,9 +355,9 @@ export default function ProductDetail() {
         )}
       </AnimatePresence>
 
-      {/* Cost Calculator */}
+      {/* 成本计算器 */}
       <div style={sectionHeader} onClick={() => setShowCalculator(!showCalculator)}>
-        <span>Cost Calculator</span>
+        <span>成本计算器</span>
         <span style={{ fontSize: '10px' }}>{showCalculator ? '▼' : '▶'}</span>
       </div>
       <AnimatePresence>
@@ -315,19 +366,19 @@ export default function ProductDetail() {
       {isSignedIn ? (
         <div style={sectionStyle}>
           <h2 style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>
-            Cost Estimate <span style={{ fontWeight: 500, opacity: 0.7 }}>(CNY)</span>
+            成本估算 <span style={{ fontWeight: 500, opacity: 0.7 }}>(CNY)</span>
           </h2>
 
           {/* Weight + Dimensions */}
           <div style={{ marginBottom: '12px' }}>
-            <h3 style={{ ...labelStyle, marginBottom: '6px' }}>Product Parameters</h3>
+            <h3 style={{ ...labelStyle, marginBottom: '6px' }}>商品参数</h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Weight</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>重量</span>
               <input type="number" step="0.1" min="0" value={weight} onChange={e => setWeight(e.target.value)} placeholder="kg" style={{ ...inputStyle, flex: 1 }} />
               <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px' }}>KG</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Dims</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>尺寸</span>
               <input type="number" step="0.1" min="0" value={length} onChange={e => setLength(e.target.value)} placeholder="L" style={{ ...inputStyle, flex: 1 }} />
               <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
               <input type="number" step="0.1" min="0" value={width} onChange={e => setWidth(e.target.value)} placeholder="W" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
@@ -336,17 +387,21 @@ export default function ProductDetail() {
               <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px', flexShrink: 0 }}>CM</span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '62px' }}>
-              {[{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }].map(p => (
-                <button key={p.label} onClick={() => { setLength(p.l); setWidth(p.w); setHeight(p.h) }}
-                  style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '3px 6px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>{p.label}</button>
-              ))}
+              {[{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }].map(p => {
+                const vol = parseInt(p.label, 10)
+                const isActive = selectedVolume === vol
+                return (
+                <button key={p.label} onClick={() => { setLength(p.l); setWidth(p.w); setHeight(p.h); setSelectedVolume(vol) }}
+                  style={{ background: isActive ? 'var(--bg-active)' : 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '3px 6px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: isActive ? 'var(--text-inverse)' : 'var(--text-primary)' }}>{p.label}</button>
+                )
+              })}
             </div>
           </div>
 
           {/* Shipping */}
           <div style={{ marginBottom: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
-              <h3 style={{ ...labelStyle, margin: 0 }}>Logistics</h3>
+              <h3 style={{ ...labelStyle, margin: 0 }}>物流</h3>
               <button onClick={() => setShowShippingHelp(v => !v)} style={{ width: '14px', height: '14px', borderRadius: '999px', border: 'var(--border-width) solid var(--text-muted)', background: 'none', cursor: 'pointer', fontSize: '10px', lineHeight: '1', display: 'grid', placeItems: 'center', color: 'var(--text-muted)' }}>?</button>
             </div>
             {showShippingHelp && (
@@ -357,7 +412,7 @@ export default function ProductDetail() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Carrier</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>承运商</span>
               <select value={selectedCarrierId ?? ''} onChange={e => {
                 const id = parseInt(e.target.value, 10); setSelectedCarrierId(id)
                 const c = carriers.find(x => x.id === id)
@@ -369,17 +424,17 @@ export default function ProductDetail() {
             </div>
             <div style={{ paddingLeft: '62px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '32px' }}>First</span>
-                <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>kg</span>
-                <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>¥</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '40px' }}>First</span>
+                <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)} style={{ ...inputStyle, width: '48px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>kg</span>
+                <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)} style={{ ...inputStyle, width: '48px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>¥</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '32px' }}>Add.</span>
-                <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>kg</span>
-                <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)} style={{ ...inputStyle, width: '52px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>¥</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '40px' }}>Add.</span>
+                <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)} style={{ ...inputStyle, width: '48px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>kg</span>
+                <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)} style={{ ...inputStyle, width: '48px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>¥</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '32px' }}>VolDiv</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '40px' }}>VolDiv</span>
                 <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVolumeDivisor(e.target.value)} style={{ ...inputStyle, width: '72px' }} />
               </div>
             </div>
@@ -387,15 +442,15 @@ export default function ProductDetail() {
 
           {/* Profit */}
           <div style={{ marginBottom: '12px' }}>
-            <h3 style={{ ...labelStyle, marginBottom: '6px' }}>Profit Settings</h3>
+            <h3 style={{ ...labelStyle, marginBottom: '6px' }}>利润设置</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Extra</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>额外</span>
                 <input type="number" step="0.01" min="0" value={extraCost} onChange={e => setExtraCost(e.target.value)} style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
                 <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>¥</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>Margin</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>毛利率</span>
                 <input type="number" step="1" min="0" max="99" value={marginRate} onChange={e => setMarginRate(e.target.value)} style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
                 <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>%</span>
               </div>
@@ -404,7 +459,7 @@ export default function ProductDetail() {
 
           <button onClick={calcEstimate} disabled={estimating}
             style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', opacity: estimating ? 0.4 : 1 }}>
-            {estimating ? 'Calculating...' : 'Calculate Landed Cost'}
+            {estimating ? '计算中...' : '计算到手成本'}
           </button>
 
           {estimateError && <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--danger)', textAlign: 'center', marginTop: '8px' }}>{estimateError}</p>}
@@ -414,7 +469,7 @@ export default function ProductDetail() {
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}
                 style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '16px', marginTop: '12px' }}>
                 <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-                  <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '4px' }}>Estimated Landed Cost</div>
+                  <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '4px' }}>预估到手成本</div>
                   <div style={{ fontSize: '32px', lineHeight: '1', fontWeight: 900, fontVariantNumeric: 'tabular-nums' }}>{estimate.estimatedCostFormatted}</div>
                 </div>
                 <div style={{ borderTop: 'var(--border-width) solid var(--border-default)', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px' }}>
@@ -438,7 +493,7 @@ export default function ProductDetail() {
                   </>
                 )}
                 <button onClick={shareResult} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
-                  Share Result
+                  分享结果
                 </button>
               </motion.div>
             )}
@@ -446,7 +501,7 @@ export default function ProductDetail() {
         </div>
       ) : (
         <div style={{ ...sectionStyle, textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Login to use cost estimation</p>
+          <p style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>登录以使用成本计算</p>
           <button onClick={() => openLogin()} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Login</button>
         </div>
       )}
@@ -458,29 +513,29 @@ export default function ProductDetail() {
       {(product.originalPrice || product.updatedAt) && (
         <>
           <div style={sectionHeader} onClick={() => setShowHistory(!showHistory)}>
-            <span>Price History</span>
+            <span>价格历史</span>
             <span style={{ fontSize: '10px' }}>{showHistory ? '▼' : '▶'}</span>
           </div>
           <AnimatePresence>
             {showHistory && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} style={{ overflow: 'hidden' }}>
                 <div style={sectionStyle}>
-                  <h3 style={{ ...labelStyle, marginBottom: '8px' }}>Price History</h3>
+                  <h3 style={{ ...labelStyle, marginBottom: '8px' }}>价格历史</h3>
                   {product.originalPrice && (
                     <div style={{ marginBottom: '8px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '2px' }}>
-                        <span style={{ opacity: 0.7 }}>Original</span>
+                        <span style={{ opacity: 0.7 }}>原价</span>
                         <span style={{ textDecoration: 'line-through', opacity: 0.5 }}>{formatPrice(product.currency, product.originalPrice)}</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                        <span style={{ opacity: 0.7 }}>Current</span>
+                        <span style={{ opacity: 0.7 }}>现价</span>
                         <span style={{ fontWeight: 700 }}>{formatPrice(product.currency, product.price)}</span>
                       </div>
                     </div>
                   )}
                   {product.updatedAt && (
                     <div style={{ fontSize: '13px', opacity: 0.7 }}>
-                      Updated: {new Date(product.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      更新于: {new Date(product.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </div>
                   )}
                 </div>
@@ -495,24 +550,24 @@ export default function ProductDetail() {
         {isSignedIn ? (
           <button onClick={toggleFavorite} disabled={favToggling}
             style={{ width: '100%', background: favorited ? 'var(--bg-primary)' : 'var(--bg-active)', color: favorited ? 'var(--danger)' : 'var(--text-inverse)', border: favorited ? 'var(--border-width) solid var(--danger)' : 'none', padding: '12px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', marginBottom: '8px' }}>
-            {favorited ? 'Saved' : 'Save to Favorites'}
+            {favorited ? '已收藏' : '收藏商品'}
           </button>
         ) : (
           <button onClick={() => openLogin()} style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', marginBottom: '8px' }}>
-            Login to Save
+            登录后收藏
           </button>
         )}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
           <button onClick={() => { if (product?.sourceUrl) window.open(product.sourceUrl, '_blank', 'noopener,noreferrer') }}
             style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
-            Open Source
+            打开来源
           </button>
           <button onClick={() => {
             if (!product?.sourceUrl) return
             navigator.clipboard.writeText(product.sourceUrl).then(() => { setSourceCopied(true); setTimeout(() => setSourceCopied(false), 2000) }).catch(() => {})
           }}
             style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
-            {sourceCopied ? 'Copied' : 'Copy Link'}
+            {sourceCopied ? '已复制' : '复制链接'}
           </button>
         </div>
       </div>
@@ -520,7 +575,7 @@ export default function ProductDetail() {
       {/* Cross-source comparison */}
       {crossSource && crossSource.length > 0 && (
         <div style={{ ...sectionStyle, borderBottom: 'none', marginTop: '12px', borderTop: 'var(--border-width) solid var(--border-default)' }}>
-          <h3 style={{ ...labelStyle, marginBottom: '8px' }}>Other Sources</h3>
+          <h3 style={{ ...labelStyle, marginBottom: '8px' }}>其他来源</h3>
           {crossSource.slice(0, 5).map((item: any) => (
             <button key={item.id} onClick={() => nav(`/product/${item.id}`)}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', marginBottom: '4px', cursor: 'pointer', textAlign: 'left' }}>
@@ -530,7 +585,14 @@ export default function ProductDetail() {
                 <div style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
                 <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7 }}>{item.source}</div>
               </div>
-              <div style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{formatPrice(item.currency, item.price)}</div>
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{formatPrice(item.currency, item.price)}</div>
+                {crossRates[item.currency] && displayCurrency !== item.currency && (
+                  <div style={{ fontSize: '11px', fontWeight: 700, opacity: 0.7 }}>
+                    ≈ {formatPrice(displayCurrency, Math.round(parseFloat(item.price) * crossRates[item.currency].rate * 100) / 100)}
+                  </div>
+                )}
+              </div>
             </button>
           ))}
         </div>

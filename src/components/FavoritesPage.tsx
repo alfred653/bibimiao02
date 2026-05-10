@@ -25,11 +25,11 @@ export default function FavoritesPage() {
 
   function removeFavorite(productId: number) {
     apiDelete('/api/favorites', { productId }).then(r => r.json()).then(d => {
-      if (d.success) { setItems(prev => prev.filter(it => it.id !== productId)); toast('Removed', 'success') }
-    }).catch(() => toast('Network error', 'error'))
+      if (d.success) { setItems(prev => prev.filter(it => it.id !== productId)); toast('已移除', 'success') }
+    }).catch(() => toast('网络错误', 'error'))
   }
 
-  if (!isSignedIn) return <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Please login</div>
+  if (!isSignedIn) return <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>请先登录</div>
 
   return (
     <div style={{ padding: 'var(--page-padding)' }}>
@@ -44,15 +44,15 @@ export default function FavoritesPage() {
       </header>
 
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', padding: '14px 0 10px', borderBottom: 'var(--border-width) solid var(--border-default)', margin: '0 calc(-1 * var(--page-padding))', marginBottom: '0' }}>
-        Saved<br />Items
+        收藏<br />商品
       </h1>
 
-      {loading ? <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Loading...</div> :
+      {loading ? <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>加载中...</div> :
        !items.length ? (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <p style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>No saved items</p>
-          <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginBottom: '16px' }}>Tap the heart icon while browsing</p>
-          <button onClick={() => nav('/search')} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Go to Search</button>
+          <p style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>暂无收藏商品</p>
+          <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginBottom: '16px' }}>浏览时点击心形图标即可收藏</p>
+          <button onClick={() => nav('/search')} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>去搜索</button>
         </div>
       ) : (
         <div>

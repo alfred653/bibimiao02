@@ -21,9 +21,9 @@ export default function RecentViewsPage() {
   const timeAgo = (ts: number) => {
     const diff = Date.now() - ts
     const mins = Math.floor(diff / 60000)
-    if (mins < 1) return 'JUST NOW'; if (mins < 60) return `${mins}M AGO`
-    const hours = Math.floor(mins / 60); if (hours < 24) return `${hours}H AGO`
-    return `${Math.floor(hours / 24)}D AGO`
+    if (mins < 1) return '刚刚'; if (mins < 60) return `${mins}分钟前`
+    const hours = Math.floor(mins / 60); if (hours < 24) return `${hours}小时前`
+    return `${Math.floor(hours / 24)}天前`
   }
 
   return (
@@ -39,15 +39,15 @@ export default function RecentViewsPage() {
       </header>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0 10px', borderBottom: 'var(--border-width) solid var(--border-default)', marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))' }}>
-        <h1 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase' }}>Recent<br />Views</h1>
+        <h1 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase' }}>最近<br />浏览</h1>
         {items.length > 0 && (
-          <button onClick={clearAll} style={{ background: 'none', border: 'none', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', cursor: 'pointer' }}>Clear All</button>
+          <button onClick={clearAll} style={{ background: 'none', border: 'none', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', cursor: 'pointer' }}>清除全部</button>
         )}
       </div>
 
       {items.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>No browsing history</p>
+          <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>暂无浏览记录</p>
         </div>
       ) : (
         <div>

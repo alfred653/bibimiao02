@@ -69,7 +69,7 @@ export default function HomePage() {
         <form onSubmit={search}>
           <label style={{ display: 'block' }}>
             <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '8px', display: 'block' }}>
-              Enter Brand Keyword
+              输入品牌关键词
             </span>
             <input
               style={{
@@ -79,7 +79,7 @@ export default function HomePage() {
                 fontWeight: 500, textTransform: 'uppercase',
                 outline: 'none', caretColor: 'var(--text-primary)',
               }}
-              placeholder="BRAND NAME_"
+              placeholder="品牌名称_"
               value={keyword}
               onChange={e => setKeyword(e.target.value)}
             />
@@ -101,21 +101,24 @@ export default function HomePage() {
           >
             <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.totalProducts}</div>
-              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Items</div>
+              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>商品</div>
             </div>
             <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.brandCount}</div>
-              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Brands</div>
+              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>品牌</div>
             </div>
             <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.sourceCount}</div>
-              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>Sources</div>
+              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>来源</div>
             </div>
           </div>
 
           {/* Recent products */}
           {overview.recentProducts?.length > 0 && (
             <div>
+              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px', opacity: 0.7 }}>
+                最近添加
+              </div>
               {overview.recentProducts.map((p, i) => (
                 <button
                   key={p.id}
@@ -159,7 +162,7 @@ export default function HomePage() {
                     border: '1px solid currentColor', borderRadius: '50%',
                     display: 'grid', placeItems: 'center',
                     fontSize: '10px', lineHeight: '1', fontWeight: 800,
-                  }}>{String.fromCharCode(65 + i)}</div>
+                  }}>{String(i + 1).padStart(2, '0')}</div>
                 </button>
               ))}
             </div>
@@ -168,7 +171,7 @@ export default function HomePage() {
           {/* Brand grid */}
           <div style={{ marginTop: '8px' }}>
             <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
-              All Brands
+              全部品牌
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1px' }}>
               {overview.brands.map(b => (
@@ -182,7 +185,7 @@ export default function HomePage() {
                   }}
                 >
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>{b.name}</div>
-                  <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88, marginTop: '4px' }}>{b.count} ITEMS</div>
+                  <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88, marginTop: '4px' }}>{b.count} 件商品</div>
                 </button>
               ))}
             </div>
@@ -190,7 +193,7 @@ export default function HomePage() {
         </>
       ) : (
         <div style={{ padding: '24px var(--page-padding)', textAlign: 'center' }}>
-          <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Loading...</div>
+          <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>加载中...</div>
         </div>
       )}
     </div>
