@@ -23,7 +23,7 @@ function highlightText(text: string, keyword: string): React.ReactNode {
   const parts = text.split(regex)
   return parts.map((part, i) =>
     escaped.some(w => part.toLowerCase() === w.toLowerCase())
-      ? <mark key={i} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', padding: '0 2px' }}>{part}</mark>
+      ? <mark key={i} style={{ background: 'var(--brand-soft)', color: 'var(--brand)', padding: '0 2px', fontWeight: 700 }}>{part}</mark>
       : part
   )
 }
@@ -88,6 +88,31 @@ export default function SearchPage() {
   const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set())
   const [favToggling, setFavToggling] = useState<Set<number>>(new Set())
   const [searchHistory, setSearchHistory] = useState<string[]>(loadHistory)
+  const [filterDrawer, setFilterDrawer] = useState(false)
+
+  // Temp filter state for drawer
+  const [dfBrand, setDfBrand] = useState('')
+  const [dfSource, setDfSource] = useState('')
+  const [dfCurrency, setDfCurrency] = useState('')
+  const [dfSort, setDfSort] = useState('relevance:desc')
+  const [dfPriceMin, setDfPriceMin] = useState('')
+  const [dfPriceMax, setDfPriceMax] = useState('')
+
+  function openFilterDrawer() {
+    setDfBrand(brand); setDfSource(source); setDfCurrency(currency)
+    setDfSort(`${sortBy}:${sortOrder}`); setDfPriceMin(priceMin); setDfPriceMax(priceMax)
+    setFilterDrawer(true)
+  }
+  function applyFilters() {
+    const [sb, so] = dfSort.split(':')
+    setBrand(dfBrand); setSource(dfSource); setCurrency(dfCurrency)
+    setSortBy(sb); setSortOrder(so); setPriceMin(dfPriceMin); setPriceMax(dfPriceMax)
+    setFilterDrawer(false)
+    doSearch(1, { brand: dfBrand, source: dfSource, currency: dfCurrency, sortBy: sb, sortOrder: so, priceMin: dfPriceMin, priceMax: dfPriceMax })
+  }
+  function resetFilters() {
+    setDfBrand(''); setDfSource(''); setDfCurrency(''); setDfSort('relevance:desc'); setDfPriceMin(''); setDfPriceMax('')
+  }
 
   const [suggestions, setSuggestions] = useState<{ id: number; title: string; brand: string }[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -287,32 +312,76 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* Filters + sort */}
+      {/* Filter trigger + sort */}
       {showFilters && (
-        <div style={{ display: 'flex', gap: '4px', padding: '8px 0', overflowX: 'auto', flexWrap: 'wrap' }}>
-          <select value={brand} onChange={e => { const v = e.target.value; setBrand(v); doSearch(1, { brand: v }) }}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
-            <option value="">ALL BRANDS</option>
-            {(summary?.brands || (brand ? [brand] : [])).map((b: string) => <option key={b} value={b}>{b}</option>)}
-          </select>
-          <select value={source} onChange={e => { const v = e.target.value; setSource(v); doSearch(1, { source: v }) }}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
-            <option value="">ALL SOURCES</option>
-            {(summary?.sources || []).map((s: string) => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <select value={currency} onChange={e => { const v = e.target.value; setCurrency(v); doSearch(1, { currency: v }) }}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
-            <option value="">ALL CURR.</option>
-            {(summary?.currencies || []).map((c: string) => <option key={c} value={c}>{c}</option>)}
-          </select>
-          <input type="number" placeholder="MIN" value={priceMin} onChange={e => setPriceMin(e.target.value)} onBlur={() => doSearch(1)} onKeyDown={e => { if (e.key === 'Enter') doSearch(1) }}
-            style={{ width: '56px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, color: 'var(--text-primary)', outline: 'none' }} />
-          <input type="number" placeholder="MAX" value={priceMax} onChange={e => setPriceMax(e.target.value)} onBlur={() => doSearch(1)} onKeyDown={e => { if (e.key === 'Enter') doSearch(1) }}
-            style={{ width: '56px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, color: 'var(--text-primary)', outline: 'none' }} />
+        <div style={{ display: 'flex', gap: '8px', padding: '8px 0', alignItems: 'center' }}>
+          <button onClick={openFilterDrawer}
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 14px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 3h10M2.5 6h7M4 9h4"/></svg>
+            筛选
+          </button>
           <select value={`${sortBy}:${sortOrder}`} onChange={e => { const [sb, so] = e.target.value.split(':'); setSortBy(sb); setSortOrder(so); doSearch(1, { sortBy: sb, sortOrder: so }) }}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none', minHeight: '44px' }}>
             {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </select>
+        </div>
+      )}
+
+      {/* Filter drawer overlay */}
+      {filterDrawer && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'var(--overlay)' }} onClick={() => setFilterDrawer(false)} />
+          <div style={{ position: 'relative', background: 'var(--bg-primary)', borderTop: 'var(--border-width) solid var(--border-default)', padding: '20px var(--page-padding)', maxHeight: '70vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>筛选条件</h3>
+              <button onClick={() => setFilterDrawer(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--text-muted)', width: '44px', height: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            </div>
+
+            <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>品牌</span>
+              <select value={dfBrand} onChange={e => setDfBrand(e.target.value)}
+                style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px 12px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+                <option value="">全部品牌</option>
+                {(summary?.brands || (brand ? [brand] : [])).map((b: string) => <option key={b} value={b}>{b}</option>)}
+              </select>
+            </label>
+
+            <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>来源</span>
+              <select value={dfSource} onChange={e => setDfSource(e.target.value)}
+                style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px 12px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+                <option value="">全部来源</option>
+                {(summary?.sources || []).map((s: string) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </label>
+
+            <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>币种</span>
+              <select value={dfCurrency} onChange={e => setDfCurrency(e.target.value)}
+                style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px 12px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+                <option value="">全部币种</option>
+                {(summary?.currencies || []).map((c: string) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
+
+            <div>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>价格区间</span>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input type="number" placeholder="最低价" value={dfPriceMin} onChange={e => setDfPriceMin(e.target.value)}
+                  style={{ flex: 1, background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px 12px', fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', outline: 'none' }} />
+                <span style={{ opacity: 0.5 }}>—</span>
+                <input type="number" placeholder="最高价" value={dfPriceMax} onChange={e => setDfPriceMax(e.target.value)}
+                  style={{ flex: 1, background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px 12px', fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', outline: 'none' }} />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+              <button onClick={() => { resetFilters(); setFilterDrawer(false); setBrand(''); setSource(''); setCurrency(''); setPriceMin(''); setPriceMax(''); doSearch(page, { brand: '', source: '', currency: '', priceMin: '', priceMax: '' }) }}
+                style={{ flex: 1, background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-muted)', minHeight: '44px' }}>重置</button>
+              <button onClick={applyFilters}
+                style={{ flex: 1, background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', minHeight: '44px' }}>应用筛选</button>
+            </div>
+          </div>
         </div>
       )}
 

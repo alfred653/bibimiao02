@@ -460,6 +460,9 @@ export default function ProductDetail() {
                 <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>%</span>
               </div>
             </div>
+            <p style={{ fontSize: '10px', opacity: 0.5, margin: '6px 0 0', lineHeight: '1.5' }}>
+              目标售价 = 总成本 ÷ (1 − 毛利率)
+            </p>
           </div>
 
           <button onClick={calcEstimate} disabled={estimating}
@@ -478,20 +481,20 @@ export default function ProductDetail() {
                   <div style={{ fontSize: '32px', lineHeight: '1', fontWeight: 900, fontVariantNumeric: 'tabular-nums' }}>{estimate.estimatedCostFormatted}</div>
                 </div>
                 <div style={{ borderTop: 'var(--border-width) solid var(--border-default)', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Converted Price</span><span style={{ fontWeight: 700 }}>{estimate.convertedPriceFormatted}</span></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Rate</span><span style={{ fontSize: '13px' }}>{estimate.exchangeRate.source} · {estimate.exchangeRate.rate}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>商品成本</span><span style={{ fontWeight: 700 }}>{estimate.convertedPriceFormatted}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>汇率</span><span style={{ fontSize: '13px' }}>{estimate.exchangeRate.source} · {estimate.exchangeRate.rate}</span></div>
                   {estimate.shippingEstimate && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Shipping</span><span style={{ fontWeight: 700 }}>¥{estimate.shippingEstimate.cost} <span style={{ fontSize: '13px', opacity: 0.7 }}>({estimate.shippingEstimate.label})</span></span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>运费</span><span style={{ fontWeight: 700 }}>¥{estimate.shippingEstimate.cost} <span style={{ fontSize: '13px', opacity: 0.7 }}>({estimate.shippingEstimate.label})</span></span></div>
                   )}
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Extra</span><span style={{ fontWeight: 700 }}>¥{estimate.extraCost}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>额外成本</span><span style={{ fontWeight: 700 }}>¥{estimate.extraCost}</span></div>
                 </div>
                 {estimate.profitTrial && (
                   <>
                     <div style={{ borderTop: 'var(--border-width) solid var(--border-default)', paddingTop: '8px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Margin</span><span>{estimate.profitTrial.estimatedMarginRate}</span></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>Suggested Price</span><span style={{ fontWeight: 700 }}>{estimate.profitTrial.suggestedQuotePrice}</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>利润率</span><span>{estimate.profitTrial.estimatedMarginRate}</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>建议售价</span><span style={{ fontWeight: 700 }}>{estimate.profitTrial.suggestedQuotePrice}</span></div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ opacity: 0.7 }}>Profit</span>
+                        <span style={{ opacity: 0.7 }}>预估利润</span>
                         <span style={{ fontWeight: 900, fontSize: '16px', color: estimate.profitTrial.status === 'positive' ? 'var(--success)' : 'var(--danger)' }}>{estimate.profitTrial.estimatedProfit}</span>
                       </div>
                     </div>
@@ -526,18 +529,37 @@ export default function ProductDetail() {
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} style={{ overflow: 'hidden' }}>
                 <div style={sectionStyle}>
                   <h3 style={{ ...labelStyle, marginBottom: '8px' }}>价格历史</h3>
-                  {product.originalPrice && (
-                    <div style={{ marginBottom: '8px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '2px' }}>
-                        <span style={{ opacity: 0.7 }}>原价</span>
-                        <span style={{ textDecoration: 'line-through', opacity: 0.5 }}>{formatPrice(product.currency, product.originalPrice)}</span>
+                  {product.originalPrice && (() => {
+                    const orig = parseFloat(product.originalPrice)
+                    const curr = parseFloat(product.price)
+                    const max = Math.max(orig, curr)
+                    const currPct = (curr / max) * 100
+                    const dropPct = orig > curr ? Math.round((1 - curr / orig) * 100) : 0
+                    return (
+                      <div style={{ marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
+                          <span style={{ opacity: 0.7 }}>原价</span>
+                          <span style={{ textDecoration: orig > curr ? 'line-through' : 'none', opacity: orig > curr ? 0.5 : 1 }}>
+                            {formatPrice(product.currency, product.originalPrice)}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '6px' }}>
+                          <span style={{ opacity: 0.7 }}>现价</span>
+                          <span style={{ fontWeight: 700 }}>{formatPrice(product.currency, product.price)}</span>
+                        </div>
+                        {orig !== curr && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                            <div style={{ flex: 1, height: '6px', background: 'var(--border-default)', position: 'relative', overflow: 'hidden' }}>
+                              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${currPct}%`, background: 'var(--success)', transition: 'width 300ms' }} />
+                            </div>
+                            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--success)', whiteSpace: 'nowrap' }}>
+                              {dropPct > 0 ? `-${dropPct}%` : `+${Math.abs(dropPct)}%`}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                        <span style={{ opacity: 0.7 }}>现价</span>
-                        <span style={{ fontWeight: 700 }}>{formatPrice(product.currency, product.price)}</span>
-                      </div>
-                    </div>
-                  )}
+                    )
+                  })()}
                   {product.updatedAt && (
                     <div style={{ fontSize: '13px', opacity: 0.7 }}>
                       更新于: {new Date(product.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}

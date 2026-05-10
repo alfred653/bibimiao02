@@ -4,7 +4,7 @@ import { useUser } from '@clerk/clerk-react'
 import { formatPrice, getPlaceholderUrl } from '../lib/format'
 import { useLoginModal } from './LoginModal'
 import { useToast } from './Toast'
-import { api, apiDelete } from '../lib/api-client'
+import { api, apiPost, apiDelete } from '../lib/api-client'
 
 export default function FavoritesPage() {
   const { isSignedIn } = useUser()
@@ -24,8 +24,19 @@ export default function FavoritesPage() {
   }, [isSignedIn])
 
   function removeFavorite(productId: number) {
+    const item = items.find(it => it.id === productId)
     apiDelete('/api/favorites', { productId }).then(r => r.json()).then(d => {
-      if (d.success) { setItems(prev => prev.filter(it => it.id !== productId)); toast('已移除', 'success') }
+      if (d.success) {
+        setItems(prev => prev.filter(it => it.id !== productId))
+        toast('已移除', 'success', {
+          label: '撤销',
+          onClick: () => {
+            apiPost('/api/favorites', { productId }).then(r => r.json()).then(d2 => {
+              if (d2.success && item) { setItems(prev => [...prev, item]); toast('已恢复', 'success') }
+            }).catch(() => {})
+          }
+        })
+      }
     }).catch(() => toast('网络错误', 'error'))
   }
 
