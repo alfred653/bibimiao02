@@ -77,7 +77,7 @@ export default function FavoritesPage() {
               </div>
               <button
                 onClick={e => { e.stopPropagation(); removeFavorite(item.id) }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: 'var(--text-muted)', padding: '12px 8px', alignSelf: 'start' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: 'var(--text-muted)', padding: '12px 10px', alignSelf: 'start', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                 title="Remove">×</button>
             </div>
           ))}

@@ -322,8 +322,13 @@ export default function ProductDetail() {
               <span style={{ color: 'var(--success)' }}>{formatPrice(displayCurrency, dispConverted)}</span>
             </div>
             <div style={{ fontSize: '13px', opacity: 0.7 }}>
-              1 {product.currency} = {dispRate.rate} {displayCurrency} · {dispRate.source}
+              1 {product.currency} = {dispRate.rate} {displayCurrency} · {dispRate.source === 'frankfurter' ? '实时汇率' : dispRate.source === 'cache' ? '缓存汇率' : '预设汇率'}
             </div>
+            {dispRate.updatedAt && (
+              <div style={{ fontSize: '11px', opacity: 0.55, marginTop: '2px' }}>
+                更新于 {new Date(dispRate.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -392,7 +397,7 @@ export default function ProductDetail() {
                 const isActive = selectedVolume === vol
                 return (
                 <button key={p.label} onClick={() => { setLength(p.l); setWidth(p.w); setHeight(p.h); setSelectedVolume(vol) }}
-                  style={{ background: isActive ? 'var(--bg-active)' : 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '3px 6px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: isActive ? 'var(--text-inverse)' : 'var(--text-primary)' }}>{p.label}</button>
+                  style={{ background: isActive ? 'var(--bg-active)' : 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: isActive ? 'var(--text-inverse)' : 'var(--text-primary)', minHeight: '44px', minWidth: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{p.label}</button>
                 )
               })}
             </div>

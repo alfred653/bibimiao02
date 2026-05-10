@@ -90,6 +90,7 @@
   --admin-bg-row: #D8D8CC;
   --admin-bg-row-hover: #C0C0B4;
   --admin-border: #9D9E92;
+  --admin-badge: #7C3AED;
 
   --radius: 0;
 }
@@ -139,6 +140,7 @@
   --admin-bg-row: #FAF7F2;
   --admin-bg-row-hover: #F0EBE3;
   --admin-border: #D4C9B8;
+  --admin-badge: #7C3AED;
 
   --radius: 6px;
 }

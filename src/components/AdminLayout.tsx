@@ -13,9 +13,21 @@ export default function AdminLayout() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--admin-bg-page)', color: 'var(--text-primary)', display: 'flex' }}>
+      {/* Admin mode banner */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60,
+        height: '28px', background: 'var(--admin-bg-sidebar)',
+        borderBottom: 'var(--border-width) solid var(--admin-border)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        gap: '6px',
+      }}>
+        <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-inverse)', opacity: 0.7 }}>ADMIN MODE</span>
+        <Link to="/" style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-inverse)', opacity: 0.45, textDecoration: 'none' }}>← 返回应用</Link>
+      </div>
+
       <button
         onClick={() => setSidebarOpen(true)}
-        style={{ position: 'fixed', top: '12px', left: '12px', zIndex: 30, padding: '8px', background: 'var(--admin-bg-sidebar)', border: 'var(--border-width) solid var(--admin-border)', cursor: 'pointer', color: 'var(--text-inverse)' }}
+        style={{ position: 'fixed', top: '40px', left: '12px', zIndex: 30, padding: '8px', background: 'var(--admin-bg-sidebar)', border: 'var(--border-width) solid var(--admin-border)', cursor: 'pointer', color: 'var(--text-inverse)' }}
         aria-label="Open menu"
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
@@ -74,7 +86,7 @@ export default function AdminLayout() {
         </Link>
       </aside>
 
-      <main style={{ flex: 1, padding: '24px', overflow: 'auto', paddingTop: '56px', width: '100%' }}>
+      <main style={{ flex: 1, padding: '24px', overflow: 'auto', paddingTop: '72px', width: '100%' }}>
         <Outlet />
       </main>
     </div>

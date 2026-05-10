@@ -392,10 +392,10 @@ export default function SearchPage() {
                 onClick={e => toggleFavorite(item.id, e)}
                 disabled={favToggling.has(item.id)}
                 style={{
-                  width: '18px', height: '18px', marginTop: '10px', marginRight: '6px',
+                  width: '44px', height: '44px', marginTop: '4px', marginRight: '2px',
                   border: favoriteIds.has(item.id) ? '1px solid currentColor' : '1px solid currentColor',
                   borderRadius: '50%', display: 'grid', placeItems: 'center',
-                  fontSize: '10px', lineHeight: '1', fontWeight: 800, cursor: 'pointer',
+                  fontSize: '16px', lineHeight: '1', fontWeight: 800, cursor: 'pointer',
                   background: 'transparent', color: favoriteIds.has(item.id) ? 'var(--danger)' : 'inherit',
                   padding: 0,
                 }}

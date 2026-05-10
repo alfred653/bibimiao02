@@ -66,7 +66,7 @@ export default function RecentViewsPage() {
               </div>
               <div style={{ alignSelf: 'end', padding: '0 4px 10px 0', fontSize: '13px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{formatPrice(p.currency, p.price)}</div>
               <button onClick={e => { e.stopPropagation(); removeOne(p.id) }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '14px', padding: '8px 4px', alignSelf: 'start' }} aria-label="Remove">×</button>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '18px', padding: '12px 10px', alignSelf: 'start', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Remove">×</button>
             </div>
           ))}
         </div>

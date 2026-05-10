@@ -697,7 +697,7 @@ export default function AdminPage() {
                     <td style={tdStyle}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <span style={{ ...tagBase, background: u.membershipTier === 'free' ? 'var(--bg-hover)' : 'var(--brand-soft)', color: u.membershipTier === 'free' ? 'var(--text-secondary)' : 'var(--brand)' }}>{tierLabel(u.membershipTier)}</span>
-                        {u.role === 'admin' && <span style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)' }}>Admin</span>}
+                        {u.role === 'admin' && <span style={{ ...tagBase, background: 'var(--admin-badge)', color: 'var(--text-inverse)' }}>Admin</span>}
                       </div>
                     </td>
                     <td style={{ ...tdStyle, color: 'var(--text-secondary)' }}>{(u.configuredBrands || []).join(', ') || '—'}</td>

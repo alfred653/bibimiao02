@@ -238,7 +238,7 @@ export default function ProfilePage() {
           return (
             <button onClick={() => setShowMembershipModal(true)} style={{
               marginTop: '6px', padding: '3px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer',
-              background: isAdmin ? 'var(--danger)' : 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none',
+              background: isAdmin ? 'var(--admin-badge)' : 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none',
             }}>
               {name}{isAdmin ? ' · ADMIN' : ''}
             </button>
