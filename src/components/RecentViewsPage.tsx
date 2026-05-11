@@ -27,7 +27,7 @@ export default function RecentViewsPage() {
   }
 
   return (
-    <div style={{ padding: 'var(--page-padding)' }}>
+    <div style={{ padding: 'var(--page-padding)', paddingBottom: 'calc(var(--bottom-nav-height) + 24px)' }}>
       <header style={{
         height: 'var(--header-height)', padding: '0 var(--page-padding)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -52,21 +52,21 @@ export default function RecentViewsPage() {
       ) : (
         <div>
           {items.map(p => (
-            <div key={p.id} style={{ height: 'var(--row-height)', display: 'grid', gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto 28px', borderBottom: 'var(--border-width) solid var(--border-default)', cursor: 'pointer' }}
+            <div key={p.id} style={{ height: 'var(--row-height)', display: 'grid', gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto 44px', borderBottom: 'var(--border-width) solid var(--border-default)', cursor: 'pointer' }}
               onClick={() => nav(`/product/${p.id}`)}>
               <img src={p.imageUrl || getPlaceholderUrl('N/A', 72, 92)} alt="" loading="lazy"
                 style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover' }}
                 onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 72, 92) }} />
               <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '14px', lineHeight: '13px', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{stripBrandPrefix(p.title, p.brand)}</h2>
-                <div style={{ display: 'flex', gap: '6px' }}>
+                <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '14px', lineHeight: '1.1', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{stripBrandPrefix(p.title, p.brand)}</h2>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--brand)' }}>{p.brand}</span>
-                  <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7 }}>{timeAgo(p.viewedAt)}</span>
+                  <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7, whiteSpace: 'nowrap' }}>{timeAgo(p.viewedAt)}</span>
                 </div>
               </div>
               <div style={{ alignSelf: 'end', padding: '0 4px 10px 0', fontSize: '13px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{formatPrice(p.currency, p.price)}</div>
               <button onClick={e => { e.stopPropagation(); removeOne(p.id) }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '18px', padding: '12px 10px', alignSelf: 'start', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Remove">×</button>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '18px', padding: 0, alignSelf: 'start', width: '44px', height: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Remove">×</button>
             </div>
           ))}
         </div>

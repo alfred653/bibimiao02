@@ -589,25 +589,25 @@ export default function AdminPage() {
       <div>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 24px' }}>管理后台</h1>
         {overview && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
-            <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
+            <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>{overview.totalProducts}</div>
-              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>商品总数</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>商品总数</div>
             </div>
-            <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px' }}>
+            <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>{overview.brandCount}</div>
-              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>品牌</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>品牌</div>
             </div>
-            <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px' }}>
+            <div style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>{overview.sourceCount}</div>
-              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>来源</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>来源</div>
             </div>
           </div>
         )}
         {overview && (overview.noImageCount > 0 || overview.noSourceCount > 0) && (
           <div style={{ marginBottom: '24px' }}>
             <h2 style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-secondary)', margin: '0 0 12px' }}>待处理</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px' }}>
               {overview.noImageCount > 0 && (
                 <Link to="/admin/products?missingImage=1" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--warning)', padding: '16px', textDecoration: 'none', display: 'block' }}>
                   <div style={{ fontSize: '24px', fontWeight: 900, color: 'var(--warning)', fontFamily: 'var(--font-display)' }}>{overview.noImageCount}</div>
@@ -623,7 +623,7 @@ export default function AdminPage() {
             </div>
           </div>
         )}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '12px' }}>
           <Link to="/admin/products" style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '16px', textDecoration: 'none' }}>
             <div style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-primary)' }}>商品管理</div>
             <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>浏览、搜索、编辑和导入商品</div>

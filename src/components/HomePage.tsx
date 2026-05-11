@@ -20,7 +20,7 @@ export default function HomePage() {
   }
 
   return (
-    <div style={{ padding: 'var(--page-padding)' }}>
+    <div style={{ padding: 'var(--page-padding)', paddingBottom: 'calc(var(--bottom-nav-height) + 24px)' }}>
       {/* Header */}
       <header
         style={{

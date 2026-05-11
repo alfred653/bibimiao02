@@ -43,7 +43,7 @@ export default function FavoritesPage() {
   if (!isSignedIn) return <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>请先登录</div>
 
   return (
-    <div style={{ padding: 'var(--page-padding)' }}>
+    <div style={{ padding: 'var(--page-padding)', paddingBottom: 'calc(var(--bottom-nav-height) + 24px)' }}>
       <header style={{
         height: 'var(--header-height)', padding: '0 var(--page-padding)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',

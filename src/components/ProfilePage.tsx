@@ -209,7 +209,7 @@ export default function ProfilePage() {
   const displayName = user?.fullName || profile?.name || 'User'
 
   return (
-    <div style={{ padding: 'var(--page-padding)' }}>
+    <div style={{ padding: 'var(--page-padding)', paddingBottom: 'calc(var(--bottom-nav-height) + 24px)' }}>
       {/* Header */}
       <header style={{
         height: 'var(--header-height)', padding: '0 var(--page-padding)',

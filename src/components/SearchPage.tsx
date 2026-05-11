@@ -89,6 +89,8 @@ export default function SearchPage() {
   const [favToggling, setFavToggling] = useState<Set<number>>(new Set())
   const [searchHistory, setSearchHistory] = useState<string[]>(loadHistory)
   const [filterDrawer, setFilterDrawer] = useState(false)
+  const [displayCurrency, setDisplayCurrency] = useState('CNY')
+  const [rates, setRates] = useState<Record<string, { rate: number }>>({})
 
   // Temp filter state for drawer
   const [dfBrand, setDfBrand] = useState('')
@@ -190,6 +192,33 @@ export default function SearchPage() {
   }, [])
 
   useEffect(() => {
+    try {
+      const settings = JSON.parse(localStorage.getItem('bbm_exchange_settings') || '{}')
+      if (settings.preferredCurrency) setDisplayCurrency(settings.preferredCurrency)
+    } catch {}
+  }, [])
+
+  // Fetch exchange rates for non-display currencies in results
+  useEffect(() => {
+    if (!results.length) return
+    const currencies = [...new Set(results.map((i: any) => i.currency).filter((c: string) => c && c !== displayCurrency))]
+    if (!currencies.length) return
+    Promise.all(
+      currencies.map((cur: string) =>
+        api(`/api/exchange-rate?from=${encodeURIComponent(cur)}&to=${encodeURIComponent(displayCurrency)}`)
+          .then(r => r.json()).then(d => {
+            if (d.success) return { cur, rate: d.data.rate }
+            return null
+          }).catch(() => null)
+      )
+    ).then(items => {
+      const map: Record<string, { rate: number }> = {}
+      items.filter(Boolean).forEach((r: any) => { map[r.cur] = { rate: r.rate } })
+      setRates(map)
+    })
+  }, [results, displayCurrency])
+
+  useEffect(() => {
     if (!isSignedIn) return
     api('/api/favorites?idsOnly=1').then(r => r.json()).then(d => { if (d.success) setFavoriteIds(new Set(d.data.ids)) }).catch(() => {})
   }, [isSignedIn])
@@ -224,7 +253,7 @@ export default function SearchPage() {
   }
 
   return (
-    <div style={{ padding: 'var(--page-padding)' }}>
+    <div style={{ padding: 'var(--page-padding)', paddingBottom: 'calc(var(--bottom-nav-height) + 24px)' }}>
       {/* Header bar */}
       <header style={{
         height: 'var(--header-height)', padding: '0 var(--page-padding)',
@@ -454,8 +483,13 @@ export default function SearchPage() {
                   {item.source && <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7 }}>{item.source}</span>}
                 </div>
               </div>
-              <div style={{ alignSelf: 'end', padding: '0 6px 10px 0', fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-                <span style={{color:'var(--accent)',fontFamily:'var(--font-mono)'}}>{item.price ? formatPrice(item.currency, item.price) : '—'}</span>
+              <div style={{ alignSelf: 'end', padding: '0 6px 10px 0', textAlign: 'right' }}>
+                <div style={{ fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{item.price ? formatPrice(item.currency, item.price) : '—'}</div>
+                {item.currency && item.currency !== displayCurrency && rates[item.currency] && (
+                  <div style={{ fontSize: 'var(--fs-label)', fontWeight: 700, opacity: 0.6, marginTop: '2px', whiteSpace: 'nowrap' }}>
+                    ≈ {formatPrice(displayCurrency, Math.round(parseFloat(item.price) * rates[item.currency].rate * 100) / 100)}
+                  </div>
+                )}
               </div>
               <button
                 onClick={e => toggleFavorite(item.id, e)}

@@ -34,7 +34,8 @@ interface EstimateResult {
 
 const inputStyle: React.CSSProperties = {
   width: '100%', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)',
-  padding: '8px 10px', fontSize: '13px', fontFamily: 'var(--font-body)',
+  padding: '0 10px', height: '44px', boxSizing: 'border-box',
+  fontSize: '13px', fontFamily: 'var(--font-body)',
   color: 'var(--text-primary)', outline: 'none',
 }
 
@@ -310,7 +311,7 @@ export default function ProductDetail() {
             )}
           </div>
           <select value={displayCurrency} onChange={e => setDisplayCurrency(e.target.value)}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '0 10px', height: '44px', boxSizing: 'border-box', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
             {TARGET_CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
@@ -343,12 +344,12 @@ export default function ProductDetail() {
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} style={{ overflow: 'hidden' }}>
             <div style={sectionStyle}>
               {[
-                ['Brand', product.brand],
-                product.category && ['Category', product.category],
-                product.spec && ['Spec', product.spec],
-                ['Source', product.source],
-                product.country && ['Region', product.country],
-                ['Currency', product.currency],
+                ['品牌', product.brand],
+                product.category && ['分类', product.category],
+                product.spec && ['规格', product.spec],
+                ['来源', product.source],
+                product.country && ['地区', product.country],
+                ['币种', product.currency],
               ].filter(Boolean).map((row: any, i: number) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < 5 ? 'var(--border-width) solid var(--border-light)' : 'none', fontSize: '12px', fontWeight: 500 }}>
                   <span style={{ opacity: 0.7, fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{row[0]}</span>
@@ -379,12 +380,12 @@ export default function ProductDetail() {
             <h3 style={{ ...labelStyle, marginBottom: '6px' }}>商品参数</h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
               <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>重量</span>
-              <input type="number" step="0.1" min="0" value={weight} onChange={e => setWeight(e.target.value)} placeholder="kg" style={{ ...inputStyle, flex: 1 }} />
+              <input type="number" step="0.1" min="0" value={weight} onChange={e => setWeight(e.target.value)} placeholder="kg" style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
               <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px' }}>KG</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
               <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>尺寸</span>
-              <input type="number" step="0.1" min="0" value={length} onChange={e => setLength(e.target.value)} placeholder="L" style={{ ...inputStyle, flex: 1 }} />
+              <input type="number" step="0.1" min="0" value={length} onChange={e => setLength(e.target.value)} placeholder="L" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
               <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
               <input type="number" step="0.1" min="0" value={width} onChange={e => setWidth(e.target.value)} placeholder="W" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
               <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
@@ -411,9 +412,9 @@ export default function ProductDetail() {
             </div>
             {showShippingHelp && (
               <div style={{ background: 'var(--bg-secondary)', padding: '8px', border: 'var(--border-width) solid var(--border-default)', marginBottom: '6px', fontSize: '10px', lineHeight: '1.4' }}>
-                <p><strong>First Weight:</strong> First weight tier + cost</p>
-                <p><strong>Add. Weight:</strong> Cost per additional weight unit</p>
-                <p><strong>Volume Divisor:</strong> L×W×H(cm) ÷ divisor = volumetric weight</p>
+                <p><strong>首重：</strong>首重段重量 + 费用</p>
+                <p><strong>续重：</strong>每个续重单位的费用</p>
+                <p><strong>体积重系数：</strong>长×宽×高(cm) ÷ 系数 = 体积重</p>
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
@@ -422,25 +423,25 @@ export default function ProductDetail() {
                 const id = parseInt(e.target.value, 10); setSelectedCarrierId(id)
                 const c = carriers.find(x => x.id === id)
                 if (c) { setFirstWeight(String(c.firstWeight)); setFirstCost(String(c.firstCost)); setAdditionalWeight(String(c.additionalWeight)); setAdditionalCost(String(c.additionalCost)); setVolumeDivisor(String(c.volumeDivisor)) }
-              }} style={{ ...inputStyle, flex: 1 }}>
+              }} style={{ ...inputStyle, flex: 1, height: '44px' }}>
                 <option value="">Custom</option>
                 {carriers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
-            <div style={{ paddingLeft: '62px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ paddingLeft: '62px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '40px' }}>First</span>
-                <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)} style={{ ...inputStyle, width: '48px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>kg</span>
-                <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)} style={{ ...inputStyle, width: '48px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>¥</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>首重</span>
+                <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)} style={{ ...inputStyle, width: '56px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '20px', textAlign: 'center' }}>kg</span>
+                <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)} style={{ ...inputStyle, width: '64px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '16px', textAlign: 'center' }}>¥</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '40px' }}>Add.</span>
-                <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)} style={{ ...inputStyle, width: '48px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>kg</span>
-                <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)} style={{ ...inputStyle, width: '48px' }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800 }}>¥</span>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>续重</span>
+                <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)} style={{ ...inputStyle, width: '56px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '20px', textAlign: 'center' }}>kg</span>
+                <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)} style={{ ...inputStyle, width: '64px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '16px', textAlign: 'center' }}>¥</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '40px' }}>VolDiv</span>
-                <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVolumeDivisor(e.target.value)} style={{ ...inputStyle, width: '72px' }} />
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>体积系数</span>
+                <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVolumeDivisor(e.target.value)} style={{ ...inputStyle, width: '80px', flexShrink: 0 }} />
               </div>
             </div>
           </div>
