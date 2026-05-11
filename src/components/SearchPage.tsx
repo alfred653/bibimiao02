@@ -29,10 +29,10 @@ function highlightText(text: string, keyword: string): React.ReactNode {
 }
 
 const SORT_OPTIONS = [
-  { value: 'relevance:desc', label: 'SORT: REL.' },
-  { value: 'newest:desc', label: 'SORT: NEW' },
-  { value: 'price:asc', label: 'SORT: PRICE ↑' },
-  { value: 'price:desc', label: 'SORT: PRICE ↓' },
+  { value: 'relevance:desc', label: '排序：相关度' },
+  { value: 'newest:desc', label: '排序：最新' },
+  { value: 'price:asc', label: '排序：价格↑' },
+  { value: 'price:desc', label: '排序：价格↓' },
 ]
 
 function PaginationJumper({ current, max, onJump }: { current: number; max: number; onJump: (p: number) => void }) {
@@ -45,7 +45,7 @@ function PaginationJumper({ current, max, onJump }: { current: number; max: numb
   }
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-      <span>GO TO</span>
+      <span>跳至</span>
       <input
         style={{ width: '48px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', textAlign: 'center', fontSize: '13px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }}
         value={input}
@@ -272,13 +272,13 @@ export default function SearchPage() {
         marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
       }}>
         <h1 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', maxWidth: '260px' }}>
-          Product<br />Search
+          商品<br />搜索
         </h1>
         <label style={{ display: 'block' }}>
-          <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '8px', display: 'block' }}>Enter Brand Keyword</span>
+          <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '8px', display: 'block' }}>搜索关键词</span>
           <input
             style={{ width: '100%', marginTop: '4px', border: '0', padding: '0', background: 'transparent', color: 'var(--text-primary)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '16px', fontWeight: 500, textTransform: 'uppercase', outline: 'none' }}
-            placeholder="TYPE KEYWORD_"
+            placeholder="输入关键词_"
             value={keyword}
             onChange={e => setKeyword(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -290,8 +290,8 @@ export default function SearchPage() {
       {showHistory && (
         <div style={{ padding: '8px var(--page-padding)', borderBottom: 'var(--border-width) solid var(--border-default)', marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-            <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Recent</span>
-            <button onClick={clearHistory} style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>Clear All</button>
+            <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>最近搜索</span>
+            <button onClick={clearHistory} style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>清除全部</button>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {searchHistory.map((q, i) => (
@@ -306,7 +306,7 @@ export default function SearchPage() {
 
       {!keyword.trim() && !searched && searchHistory.length === 0 && (
         <div style={{ padding: '8px var(--page-padding)', borderBottom: 'var(--border-width) solid var(--border-default)', marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))' }}>
-          <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px' }}>Popular Brands</div>
+          <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px' }}>热门品牌</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {SUGGESTED_BRANDS.map(b => (
               <button key={b} onClick={() => { setKeyword(b); doSearch(1, { keyword: b }) }} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>{b}</button>
@@ -337,7 +337,7 @@ export default function SearchPage() {
           {priceMin && <button onClick={() => { setPriceMin(''); doSearch(1, { priceMin: '' }) }} style={{ background: 'var(--brand-soft)', border: 'var(--border-width) solid var(--brand)', padding: '3px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--brand)' }}>≥{priceMin} ×</button>}
           {priceMax && <button onClick={() => { setPriceMax(''); doSearch(1, { priceMax: '' }) }} style={{ background: 'var(--brand-soft)', border: 'var(--border-width) solid var(--brand)', padding: '3px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--brand)' }}>≤{priceMax} ×</button>}
           <button onClick={() => { setBrand(''); setSource(''); setCurrency(''); setPriceMin(''); setPriceMax(''); doSearch(page, { brand: '', source: '', currency: '', priceMin: '', priceMax: '' }) }}
-            style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', marginLeft: '4px' }}>Clear All</button>
+            style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', marginLeft: '4px' }}>清除全部</button>
         </div>
       )}
 
@@ -418,7 +418,7 @@ export default function SearchPage() {
       {summary && (
         <div style={{ height: '36px', padding: '0 var(--page-padding)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: 'var(--border-width) solid var(--border-default)', marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))' }}>
           <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-            Results Found ({summary.totalResults})
+            搜索结果 ({summary.totalResults})
           </span>
         </div>
       )}

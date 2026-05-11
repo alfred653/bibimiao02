@@ -680,13 +680,13 @@ export default function AdminPage() {
         {isProducts && (
           <>
             <select value={brandFilter} onChange={e => setBrandFilter(e.target.value)} style={filterInput}>
-              <option value="">All Brands</option>
+              <option value="">全部品牌</option>
               {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
             </select>
             <select value={quickFilter} onChange={e => setQuickFilter(e.target.value)} style={filterInput}>
-              <option value="">Quick Filter</option>
-              <option value="noImage">Missing Image</option>
-              <option value="noSource">Missing Source</option>
+              <option value="">快速筛选</option>
+              <option value="noImage">缺少图片</option>
+              <option value="noSource">缺少来源</option>
             </select>
           </>
         )}
@@ -722,7 +722,7 @@ export default function AdminPage() {
                     <div>品牌权限: {(u.configuredBrands || []).join(', ') || '—'}</div>
                     <div style={{ marginTop: '2px' }}>更新: {u.updatedAt ? new Date(u.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</div>
                   </div>
-                  <button onClick={() => setEditUser(u)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button>
+                  <button onClick={() => setEditUser(u)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>编辑</button>
                 </div>
               ))}
             </div>
@@ -745,7 +745,7 @@ export default function AdminPage() {
                       <td style={{ ...tdStyle, color: 'var(--text-secondary)' }}>{(u.configuredBrands || []).join(', ') || '—'}</td>
                       <td style={tdStyle}><span style={{ fontSize: '13px', color: u.status === 'active' ? 'var(--success)' : 'var(--danger)' }}>{statusLabel(u.status)}</span></td>
                       <td style={{ ...tdStyle, fontSize: '13px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{u.updatedAt ? new Date(u.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
-                      <td style={tdStyle}><button onClick={() => setEditUser(u)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button></td>
+                      <td style={tdStyle}><button onClick={() => setEditUser(u)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>编辑</button></td>
                     </tr>
                   ))}
                 </tbody>
@@ -780,7 +780,7 @@ export default function AdminPage() {
                     <td style={tdStyle}><span style={{ ...tagBase, background: c.isActive === 'active' ? 'var(--brand-soft)' : 'var(--bg-hover)', color: c.isActive === 'active' ? 'var(--success)' : 'var(--danger)' }}>{c.isActive === 'active' ? 'Active' : 'Disabled'}</span></td>
                     <td style={{ ...tdStyle, fontSize: '13px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
                     <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
-                      <button onClick={() => setEditCarrier(c)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button>
+                      <button onClick={() => setEditCarrier(c)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>编辑</button>
                       <button onClick={() => {
                         setConfirmModal({
                           show: true, title: '确认删除', danger: true, confirmLabel: '删除',
@@ -796,7 +796,7 @@ export default function AdminPage() {
                               .catch(() => toast('网络错误', 'error'))
                           }
                         })
-                      }} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', marginLeft: '8px' }}>Delete</button>
+                      }} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', marginLeft: '8px' }}>删除</button>
                     </td>
                   </tr>
                 ))}
@@ -856,7 +856,7 @@ export default function AdminPage() {
                     <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '6px' }}>
-                    <button onClick={() => setEditProduct(p)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button>
+                    <button onClick={() => setEditProduct(p)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>编辑</button>
                     <button onClick={() => setConfirmModal({
                       show: true, title: '确认删除', danger: true, confirmLabel: '删除',
                       message: `删除商品 "${p.title}"？`,
@@ -868,7 +868,7 @@ export default function AdminPage() {
                             else toast(d.error?.message || '删除失败', 'error')
                           }).catch(() => toast('网络错误', 'error'))
                       }
-                    })} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer' }}>Delete</button>
+                    })} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer' }}>删除</button>
                   </div>
                 </div>
               </div>
@@ -906,7 +906,7 @@ export default function AdminPage() {
                 <td style={tdStyle}><span style={{ ...tagBase, background: p.status === 'active' ? 'var(--brand-soft)' : 'var(--bg-hover)', color: p.status === 'active' ? 'var(--success)' : 'var(--danger)' }}>{statusLabel(p.status)}</span></td>
                 <td style={{ ...tdStyle, fontSize: '13px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
                 <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
-                  <button onClick={() => setEditProduct(p)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>Edit</button>
+                  <button onClick={() => setEditProduct(p)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>编辑</button>
                   <button onClick={() => {
                     setConfirmModal({
                       show: true, title: '确认删除', danger: true, confirmLabel: '删除',
@@ -922,7 +922,7 @@ export default function AdminPage() {
                           .catch(() => toast('网络错误', 'error'))
                       }
                     })
-                  }} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', marginLeft: '8px' }}>Delete</button>
+                  }} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', marginLeft: '8px' }}>删除</button>
                 </td>
               </tr>
             ))}

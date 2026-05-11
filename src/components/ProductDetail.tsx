@@ -323,7 +323,7 @@ export default function ProductDetail() {
               <span style={{ color: 'var(--success)' }}>{formatPrice(displayCurrency, dispConverted)}</span>
             </div>
             <div style={{ fontSize: '13px', opacity: 0.7 }}>
-              1 {product.currency} = {dispRate.rate} {displayCurrency} · {dispRate.source === 'frankfurter' ? '实时汇率' : dispRate.source === 'cache' ? '缓存汇率' : '预设汇率'}
+              1 {product.currency} = {dispRate.rate} {displayCurrency} · {dispRate.source === 'frankfurter' ? '实时汇率' : dispRate.source === 'cache' ? '最近汇率' : '预设汇率'}
             </div>
             {dispRate.updatedAt && (
               <div style={{ fontSize: '11px', opacity: 0.55, marginTop: '2px' }}>
@@ -483,7 +483,7 @@ export default function ProductDetail() {
                 </div>
                 <div style={{ borderTop: 'var(--border-width) solid var(--border-default)', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>商品成本</span><span style={{ fontWeight: 700 }}>{estimate.convertedPriceFormatted}</span></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>汇率</span><span style={{ fontSize: '13px' }}>{estimate.exchangeRate.source} · {estimate.exchangeRate.rate}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>汇率</span><span style={{ fontSize: '13px' }}>{estimate.exchangeRate.source === 'frankfurter' ? '实时汇率' : estimate.exchangeRate.source === 'cache' ? '最近汇率' : '预设汇率'} · {estimate.exchangeRate.rate}</span></div>
                   {estimate.shippingEstimate && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>运费</span><span style={{ fontWeight: 700 }}>¥{estimate.shippingEstimate.cost} <span style={{ fontSize: '13px', opacity: 0.7 }}>({estimate.shippingEstimate.label})</span></span></div>
                   )}

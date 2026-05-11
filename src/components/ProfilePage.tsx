@@ -30,27 +30,27 @@ function NameEditModal({ currentName, onClose, onSaved }: { currentName: string;
   const [saving, setSaving] = useState(false)
   async function save() {
     const v = username.trim()
-    if (!v) { toast('Name cannot be empty', 'error'); return }
+    if (!v) { toast('名称不能为空', 'error'); return }
     setSaving(true)
     try {
       await user!.update({ firstName: v, lastName: '' })
       await apiPut('/api/profile', { name: v })
-      toast('Name updated', 'success'); onSaved()
-    } catch (e: any) { toast(e.errors?.[0]?.message || e.message || 'Update failed', 'error') }
+      toast('名称已更新', 'success'); onSaved()
+    } catch (e: any) { toast(e.errors?.[0]?.message || e.message || '更新失败', 'error') }
     finally { setSaving(false) }
   }
   return (
     <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div style={modalBox}>
-        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Edit Name</h3>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>编辑用户名</h3>
         <div style={{ marginBottom: '16px' }}>
-          <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Name</label>
-          <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Your name"
+          <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>用户名</label>
+          <input value={username} onChange={e => setUsername(e.target.value)} placeholder="你的名字"
             style={{ width: '100%', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
-          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.4 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
+          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>取消</button>
+          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.4 : 1 }}>{saving ? '保存中...' : '保存'}</button>
         </div>
       </div>
     </div>
@@ -65,26 +65,26 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [saving, setSaving] = useState(false)
   async function save() {
-    if (!currentPassword) { toast('Enter current password', 'error'); return }
-    if (newPassword.length < 8) { toast('At least 8 characters', 'error'); return }
-    if (newPassword !== confirmPassword) { toast('Passwords do not match', 'error'); return }
+    if (!currentPassword) { toast('请输入当前密码', 'error'); return }
+    if (newPassword.length < 8) { toast('至少8位字符', 'error'); return }
+    if (newPassword !== confirmPassword) { toast('两次密码不一致', 'error'); return }
     setSaving(true)
     try {
       await user!.updatePassword({ currentPassword, newPassword, signOutOfOtherSessions: false })
-      toast('Password updated', 'success'); onClose()
+      toast('密码已更新', 'success'); onClose()
     } catch (e: any) {
       const msg = e.errors?.[0]?.message || e.message || 'Failed'
-      toast(msg === 'Incorrect password' ? 'Wrong password' : msg, 'error')
+      toast(msg === 'Incorrect password' ? '密码错误' : msg, 'error')
     } finally { setSaving(false) }
   }
   return (
     <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div style={modalBox}>
-        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Change Password</h3>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>修改密码</h3>
         {[
-          ['Current Password', currentPassword, setCurrentPassword, 'password'],
-          ['New Password', newPassword, setNewPassword, 'password'],
-          ['Confirm Password', confirmPassword, setConfirmPassword, 'password'],
+          ['当前密码', currentPassword, setCurrentPassword, 'password'],
+          ['新密码', newPassword, setNewPassword, 'password'],
+          ['确认密码', confirmPassword, setConfirmPassword, 'password'],
         ].map(([label, val, setFn, type], i) => (
           <div key={i} style={{ marginBottom: '12px' }}>
             <label style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>{label as string}</label>
@@ -93,8 +93,8 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
           </div>
         ))}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
-          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.4 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
+          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>取消</button>
+          <button onClick={save} disabled={saving} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.4 : 1 }}>{saving ? '保存中...' : '保存'}</button>
         </div>
       </div>
     </div>
@@ -102,9 +102,9 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
 }
 
 const THEME_OPTIONS: { value: ThemeChoice; label: string; desc: string }[] = [
-  { value: 'system', label: 'SYSTEM', desc: 'Follow OS preference' },
-  { value: 'light', label: 'CLAUDE', desc: 'Warm amber mode' },
-  { value: 'dark', label: 'INDUSTRIAL', desc: 'Gray-green archival mode' },
+  { value: 'system', label: '系统', desc: '跟随系统设置' },
+  { value: 'light', label: '暖色', desc: '琥珀暖色模式' },
+  { value: 'dark', label: '工业风', desc: '灰绿档案风格' },
 ]
 
 function ThemeModal({ current, onClose }: { current: ThemeChoice; onClose: () => void }) {
@@ -114,7 +114,7 @@ function ThemeModal({ current, onClose }: { current: ThemeChoice; onClose: () =>
   return (
     <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div style={modalBox}>
-        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Appearance</h3>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 16px' }}>外观主题</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {THEME_OPTIONS.map(opt => (
             <button key={opt.value} onClick={() => setSelected(opt.value)}
@@ -130,8 +130,8 @@ function ThemeModal({ current, onClose }: { current: ThemeChoice; onClose: () =>
           ))}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px' }}>
-          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Cancel</button>
-          <button onClick={apply} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Apply</button>
+          <button onClick={onClose} style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>取消</button>
+          <button onClick={apply} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>应用</button>
         </div>
       </div>
     </div>
@@ -139,9 +139,9 @@ function ThemeModal({ current, onClose }: { current: ThemeChoice; onClose: () =>
 }
 
 const TIER_BENEFITS = [
-  { tier: 'free', name: 'IRON TIER', price: 'Free', features: ['Search & browse', 'View real-time prices', '10 favorites', 'Daily cost estimates (5)', 'Browse history', 'Theme switcher', 'Default shipping', 'Exchange rate prefs'] },
-  { tier: 'monthly', name: 'SILVER TIER', price: 'Monthly', features: ['All Iron features', 'Unlimited favorites', 'Unlimited cost estimates', 'Real-time FX rates', '3 brand complete datasets'] },
-  { tier: 'annual', name: 'GOLD TIER', price: 'Annual', features: ['All Silver features', 'All brand datasets', 'Priority support', 'New arrival alerts', 'Annual discount'] },
+  { tier: 'free', name: '免费会员', price: '免费', features: ['搜索与浏览', '查看实时价格', '10 个收藏', '每日 5 次成本估算', '浏览历史', '主题切换', '默认物流设置', '汇率偏好'] },
+  { tier: 'monthly', name: '月付会员', price: '月付', features: ['所有免费功能', '无限收藏', '无限成本估算', '实时汇率', '3 个品牌完整数据'] },
+  { tier: 'annual', name: '年付会员', price: '年付', features: ['所有月付功能', '全部品牌数据', '优先支持', '新品提醒', '年付折扣'] },
 ]
 
 function MembershipModal({ currentTier, onClose }: { currentTier: string; onClose: () => void }) {
@@ -149,9 +149,9 @@ function MembershipModal({ currentTier, onClose }: { currentTier: string; onClos
   return (
     <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div style={{ ...modalBox, maxHeight: '80vh', overflowY: 'auto' }}>
-        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 4px' }}>Membership</h3>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.03em', margin: '0 0 4px' }}>会员等级</h3>
         <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '16px' }}>
-          Current: <span style={{ color: 'var(--brand)' }}>{currentTierInfo?.name || currentTier}</span>
+          当前: <span style={{ color: 'var(--brand)' }}>{currentTierInfo?.name || currentTier}</span>
         </p>
         {TIER_BENEFITS.map(tier => (
           <div key={tier.tier} style={{
@@ -170,7 +170,7 @@ function MembershipModal({ currentTier, onClose }: { currentTier: string; onClos
             ))}
           </div>
         ))}
-        <button onClick={onClose} style={{ width: '100%', marginTop: '8px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>Close</button>
+        <button onClick={onClose} style={{ width: '100%', marginTop: '8px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>关闭</button>
       </div>
     </div>
   )
@@ -204,7 +204,7 @@ export default function ProfilePage() {
     fetchProfile()
   }, [isSignedIn])
 
-  if (!isSignedIn) return <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Please login</div>
+  if (!isSignedIn) return <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>请先登录</div>
 
   const displayName = user?.fullName || profile?.name || 'User'
 
@@ -249,9 +249,9 @@ export default function ProfilePage() {
       {/* Settings list */}
       <div style={{ marginTop: '12px' }}>
         {[
-          ['USERNAME', displayName, () => setShowNameModal(true)],
-          ['PASSWORD', 'Change your password', () => setShowPwdModal(true)],
-          ['APPEARANCE', `${THEME_OPTIONS.find(o => o.value === choice)?.label}`, () => setShowThemeModal(true)],
+          ['用户名', displayName, () => setShowNameModal(true)],
+          ['密码', '修改登录密码', () => setShowPwdModal(true)],
+          ['外观主题', `${THEME_OPTIONS.find(o => o.value === choice)?.label}`, () => setShowThemeModal(true)],
         ].map(([label, value, onClick], i) => (
           <button key={i} onClick={onClick as any} style={rowStyle}>
             <div>
@@ -265,9 +265,9 @@ export default function ProfilePage() {
 
       <div style={{ marginTop: '12px' }}>
         {[
-          ['RECENT VIEWS', 'Browse history', () => navigate('/recent-views')],
-          ['SHIPPING DEFAULTS', 'Carrier & weight presets', () => navigate('/default-shipping')],
-          ['EXCHANGE RATES', 'Preferred currency', () => navigate('/exchange-rate')],
+          ['最近浏览', '查看浏览记录', () => navigate('/recent-views')],
+          ['默认运费', '承运商与重量预设', () => navigate('/default-shipping')],
+          ['汇率设置', '默认显示币种', () => navigate('/exchange-rate')],
         ].map(([label, desc, onClick], i) => (
           <button key={i} onClick={onClick as any} style={rowStyle}>
             <div>
@@ -281,7 +281,7 @@ export default function ProfilePage() {
 
       {profile?.configuredBrands?.length > 0 && (
         <div style={{ marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px' }}>
-          <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px' }}>Configured Brands</div>
+          <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px' }}>已配置品牌</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {profile.configuredBrands.map((b: string) => (
               <span key={b} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '4px 8px' }}>{b}</span>
@@ -292,12 +292,12 @@ export default function ProfilePage() {
 
       {profile?.role === 'admin' && (
         <button onClick={() => navigate('/admin')} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}>
-          Admin Panel
+          进入管理后台
         </button>
       )}
 
       <button onClick={() => signOut()} style={{ width: '100%', marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--danger)', color: 'var(--danger)', padding: '12px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>
-        Sign Out
+        退出登录
       </button>
 
       {showNameModal && <NameEditModal currentName={displayName} onClose={() => setShowNameModal(false)} onSaved={() => { setShowNameModal(false); fetchProfile(); user?.reload() }} />}

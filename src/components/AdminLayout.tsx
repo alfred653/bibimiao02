@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { Outlet, NavLink, Link } from 'react-router-dom'
 
 const links = [
-  { to: '/admin', label: 'Dashboard', end: true },
-  { to: '/admin/users', label: 'Users', end: false },
-  { to: '/admin/products', label: 'Products', end: false },
-  { to: '/admin/carriers', label: 'Carriers', end: false },
+  { to: '/admin', label: '管理后台', end: true },
+  { to: '/admin/users', label: '用户', end: false },
+  { to: '/admin/products', label: '商品', end: false },
+  { to: '/admin/carriers', label: '承运商', end: false },
 ]
 
 export default function AdminLayout() {
@@ -21,7 +21,7 @@ export default function AdminLayout() {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         gap: '6px',
       }}>
-        <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-inverse)', opacity: 0.7 }}>ADMIN MODE</span>
+        <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-inverse)', opacity: 0.7 }}>管理模式</span>
         <Link to="/" style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-inverse)', opacity: 0.45, textDecoration: 'none' }}>← 返回应用</Link>
       </div>
 
