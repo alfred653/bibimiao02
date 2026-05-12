@@ -393,11 +393,29 @@ export default function ProductDetail() {
               <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px', flexShrink: 0 }}>CM</span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '62px' }}>
-              {[{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }].map(p => {
-                const vol = parseInt(p.label, 10)
-                const isActive = selectedVolume === vol
+              {(product?.category ? (() => {
+                const cat = String(product.category).toLowerCase()
+                if (cat.includes('backpack') || cat.includes('背包') || cat.includes('rucksack')) {
+                  return [{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }]
+                }
+                if (cat.includes('bag') || cat.includes('包') || cat.includes('purse') || cat.includes('tote')) {
+                  return [{ label: '小包', l: '30', w: '20', h: '10' }, { label: '中包', l: '40', w: '28', h: '15' }, { label: '大包', l: '50', w: '35', h: '20' }]
+                }
+                if (cat.includes('shoe') || cat.includes('鞋') || cat.includes('boot') || cat.includes('sneaker')) {
+                  return [{ label: '小鞋盒', l: '30', w: '20', h: '12' }, { label: '鞋盒', l: '35', w: '25', h: '15' }, { label: '大鞋盒', l: '40', w: '30', h: '18' }]
+                }
+                if (cat.includes('jewel') || cat.includes('首饰') || cat.includes('accessor') || cat.includes('配饰')) {
+                  return [{ label: '小件', l: '10', w: '8', h: '3' }, { label: '礼盒', l: '20', w: '15', h: '5' }]
+                }
+                if (cat.includes('cloth') || cat.includes('服装') || cat.includes('apparel') || cat.includes('wear') || cat.includes('shirt') || cat.includes('jacket') || cat.includes('coat')) {
+                  return [{ label: 'T恤', l: '30', w: '20', h: '5' }, { label: '毛衣', l: '35', w: '25', h: '8' }, { label: '外套', l: '45', w: '30', h: '12' }]
+                }
+                // Default: generic backpack presets
+                return [{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }]
+              })() : [{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }]).map(p => {
+                const isActive = selectedVolume === (p.label.includes('L') ? parseInt(p.label, 10) : p.label.length)
                 return (
-                <button key={p.label} onClick={() => { setLength(p.l); setWidth(p.w); setHeight(p.h); setSelectedVolume(vol) }}
+                <button key={p.label} onClick={() => { setLength(p.l); setWidth(p.w); setHeight(p.h); setSelectedVolume(p.label.includes('L') ? parseInt(p.label, 10) : p.label.length) }}
                   style={{ background: isActive ? 'var(--bg-active)' : 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: isActive ? 'var(--text-inverse)' : 'var(--text-primary)', minHeight: '44px', minWidth: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{p.label}</button>
                 )
               })}
@@ -487,6 +505,17 @@ export default function ProductDetail() {
                   {estimate.shippingEstimate && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>运费</span><span style={{ fontWeight: 700 }}>¥{estimate.shippingEstimate.cost} <span style={{ fontSize: '13px', opacity: 0.7 }}>({estimate.shippingEstimate.label})</span></span></div>
                   )}
+                  {(parseFloat(length) > 0 && parseFloat(width) > 0 && parseFloat(height) > 0 && parseFloat(volumeDivisor) > 0) && (() => {
+                    const vol = (parseFloat(length) * parseFloat(width) * parseFloat(height) / parseFloat(volumeDivisor)).toFixed(2)
+                    const actualW = parseFloat(weight) || 0
+                    const billingW = Math.max(actualW, parseFloat(vol)).toFixed(2)
+                    return (
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>体积重</span><span style={{ fontSize: '13px' }}>{parseFloat(length) * parseFloat(width) * parseFloat(height)} ÷ {volumeDivisor} = {vol} kg</span></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>计费重量</span><span style={{ fontWeight: 700 }}>{billingW} kg <span style={{ fontSize: '13px', opacity: 0.7 }}>(max {actualW}, {vol})</span></span></div>
+                      </>
+                    )
+                  })()}
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ opacity: 0.7 }}>额外成本</span><span style={{ fontWeight: 700 }}>¥{estimate.extraCost}</span></div>
                 </div>
                 {estimate.profitTrial && (

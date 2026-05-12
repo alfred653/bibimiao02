@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { formatPrice, stripBrandPrefix, getPlaceholderUrl } from '../lib/format'
+import { useToast } from './Toast'
 
 interface RecentItem {
   id: number; title: string; brand: string; price: string; currency: string; imageUrl: string | null; viewedAt: number
@@ -12,11 +13,24 @@ function loadRecent(): RecentItem[] {
 export default function RecentViewsPage() {
   const nav = useNavigate()
   const [items, setItems] = useState<RecentItem[]>(loadRecent)
+  const { toast } = useToast()
 
   function clearAll() { localStorage.removeItem('bbm_recent_views'); setItems([]) }
   function removeOne(id: number) {
+    const item = items.find(i => i.id === id)
     const next = items.filter(i => i.id !== id)
     localStorage.setItem('bbm_recent_views', JSON.stringify(next)); setItems(next)
+    if (item) {
+      toast('已移除', 'success', {
+        label: '撤销',
+        onClick: () => {
+          const restored = [item, ...next].slice(0, 20)
+          localStorage.setItem('bbm_recent_views', JSON.stringify(restored))
+          setItems(restored)
+          toast('已恢复', 'success')
+        }
+      })
+    }
   }
   const timeAgo = (ts: number) => {
     const diff = Date.now() - ts

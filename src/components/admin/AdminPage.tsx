@@ -796,7 +796,7 @@ export default function AdminPage() {
                               .catch(() => toast('网络错误', 'error'))
                           }
                         })
-                      }} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', marginLeft: '8px' }}>删除</button>
+                      }} style={{ ...tagBase, background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', cursor: 'pointer', marginLeft: '8px' }}>删除</button>
                     </td>
                   </tr>
                 ))}
@@ -868,7 +868,7 @@ export default function AdminPage() {
                             else toast(d.error?.message || '删除失败', 'error')
                           }).catch(() => toast('网络错误', 'error'))
                       }
-                    })} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer' }}>删除</button>
+                    })} style={{ ...tagBase, background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', cursor: 'pointer' }}>删除</button>
                   </div>
                 </div>
               </div>
@@ -922,7 +922,7 @@ export default function AdminPage() {
                           .catch(() => toast('网络错误', 'error'))
                       }
                     })
-                  }} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', marginLeft: '8px' }}>删除</button>
+                  }} style={{ ...tagBase, background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', cursor: 'pointer', marginLeft: '8px' }}>删除</button>
                 </td>
               </tr>
             ))}
