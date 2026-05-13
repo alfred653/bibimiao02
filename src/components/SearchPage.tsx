@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate, useNavigationType } from 'react-router-do
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUser } from '@clerk/clerk-react'
 import { useLoginModal } from './LoginModal'
+import { useToast } from './Toast'
 import { formatPrice, stripBrandPrefix, getPlaceholderUrl } from '../lib/format'
 import { api, apiPost, apiDelete } from '../lib/api-client'
 
@@ -68,6 +69,7 @@ export default function SearchPage() {
   const navigationType = useNavigationType()
   const { isSignedIn } = useUser()
   const { openLogin } = useLoginModal()
+  const { toast } = useToast()
 
   const [keyword, setKeyword] = useState(params.get('q') || '')
   const [brand, setBrand] = useState(params.get('brand') || '')
@@ -89,6 +91,7 @@ export default function SearchPage() {
   const [favToggling, setFavToggling] = useState<Set<number>>(new Set())
   const [searchHistory, setSearchHistory] = useState<string[]>(loadHistory)
   const [filterDrawer, setFilterDrawer] = useState(false)
+  const [confirmClearHistory, setConfirmClearHistory] = useState(false)
   const [displayCurrency, setDisplayCurrency] = useState('CNY')
   const [rates, setRates] = useState<Record<string, { rate: number }>>({})
 
@@ -147,7 +150,7 @@ export default function SearchPage() {
   function removeHistoryItem(index: number) {
     setSearchHistory(prev => { const next = prev.filter((_, i) => i !== index); saveHistory(next); return next })
   }
-  function clearHistory() { setSearchHistory([]); saveHistory([]) }
+  function clearHistory() { setSearchHistory([]); saveHistory([]); setConfirmClearHistory(false) }
 
   const filtersRef = useRef({ keyword, brand, source, currency, sortBy, sortOrder, priceMin, priceMax })
   filtersRef.current = { keyword, brand, source, currency, sortBy, sortOrder, priceMin, priceMax }
@@ -232,6 +235,7 @@ export default function SearchPage() {
     fetcher.then(r => r.json()).then(d => {
       if (d.success) {
         setFavoriteIds(prev => { const next = new Set(prev); isFav ? next.delete(productId) : next.add(productId); return next })
+        toast(isFav ? '已取消收藏' : '已收藏', 'success')
       }
     }).finally(() => setFavToggling(prev => { const n = new Set(prev); n.delete(productId); return n }))
   }
@@ -241,9 +245,9 @@ export default function SearchPage() {
   const showHistory = !keyword.trim() && !searched && searchHistory.length > 0
 
   const rowStyle: React.CSSProperties = {
-    height: 'var(--row-height)',
+    minHeight: 'var(--row-height)',
     display: 'grid',
-    gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto 24px',
+    gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto',
     borderBottom: 'var(--border-width) solid var(--border-default)',
     background: 'var(--bg-primary)',
     color: 'var(--text-primary)',
@@ -291,7 +295,15 @@ export default function SearchPage() {
         <div style={{ padding: '8px var(--page-padding)', borderBottom: 'var(--border-width) solid var(--border-default)', marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
             <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>最近搜索</span>
-            <button onClick={clearHistory} style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>清除全部</button>
+            {confirmClearHistory ? (
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--danger)' }}>确认？</span>
+                <button onClick={() => setConfirmClearHistory(false)} style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>取消</button>
+                <button onClick={clearHistory} style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'transparent', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', padding: '2px 8px' }}>确认</button>
+              </div>
+            ) : (
+              <button onClick={() => setConfirmClearHistory(true)} style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>清除全部</button>
+            )}
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {searchHistory.map((q, i) => (
@@ -432,8 +444,8 @@ export default function SearchPage() {
               <div style={{ padding: '12px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div className="skeleton" style={{ height: '13px', width: '75%' }} />
                 <div className="skeleton" style={{ height: '9px', width: '40%', marginTop: '4px' }} />
+                <div className="skeleton" style={{ height: '11px', width: '55%', marginTop: '4px' }} />
               </div>
-              <div />
               <div />
             </div>
           ))}
@@ -470,26 +482,26 @@ export default function SearchPage() {
                 style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover', border: 'var(--border-width) solid var(--border-default)' }}
                 onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 72, 92) }}
               />
-              <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ minWidth: 0, padding: '12px 8px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <h2 style={{
-                  margin: 0, fontFamily: 'var(--font-display)', fontSize: '14px', lineHeight: '13px',
-                  fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase',
+                  margin: 0, fontFamily: 'var(--font-display)', fontSize: '14px', lineHeight: '1.2',
+                  fontWeight: 700, letterSpacing: '-0.02em', textTransform: 'uppercase',
                   display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                 }}>
                   {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
                 </h2>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{item.brand}</span>
-                  {item.source && <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7 }}>{item.source}</span>}
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center', minWidth: 0 }}>
+                  <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{item.brand}</span>
+                  {item.source && <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{item.source}</span>}
                 </div>
-              </div>
-              <div style={{ alignSelf: 'end', padding: '0 6px 10px 0', textAlign: 'right' }}>
-                <div style={{ fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{item.price ? formatPrice(item.currency, item.price) : '—'}</div>
-                {item.currency && item.currency !== displayCurrency && rates[item.currency] && (
-                  <div style={{ fontSize: 'var(--fs-label)', fontWeight: 700, opacity: 0.6, marginTop: '2px', whiteSpace: 'nowrap' }}>
-                    ≈ {formatPrice(displayCurrency, Math.round(parseFloat(item.price) * rates[item.currency].rate * 100) / 100)}
-                  </div>
-                )}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '15px', lineHeight: '16px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{item.price ? formatPrice(item.currency, item.price) : '—'}</span>
+                  {item.currency && item.currency !== displayCurrency && rates[item.currency] && (
+                    <span style={{ fontSize: 'var(--fs-label)', fontWeight: 700, opacity: 0.6, whiteSpace: 'nowrap' }}>
+                      ≈ {formatPrice(displayCurrency, Math.round(parseFloat(item.price) * rates[item.currency].rate * 100) / 100)}
+                    </span>
+                  )}
+                </div>
               </div>
               <button
                 onClick={e => toggleFavorite(item.id, e)}

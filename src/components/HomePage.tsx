@@ -64,7 +64,7 @@ export default function HomePage() {
           maxWidth: '260px',
           margin: 0,
         }}>
-          Brands
+          品牌
         </h1>
         <form onSubmit={search}>
           <label style={{ display: 'block' }}>
@@ -92,24 +92,25 @@ export default function HomePage() {
         <>
           <div
             style={{
-              padding: '12px var(--page-padding)',
-              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px',
+              padding: '10px var(--page-padding)',
+              display: 'flex', gap: '12px',
               borderBottom: 'var(--border-width) solid var(--border-default)',
               marginLeft: 'calc(-1 * var(--page-padding))',
               marginRight: 'calc(-1 * var(--page-padding))',
+              overflowX: 'auto',
             }}
           >
-            <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.totalProducts}</div>
-              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>商品</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', whiteSpace: 'nowrap' }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.totalProducts}</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>商品</span>
             </div>
-            <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.brandCount}</div>
-              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>品牌</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', whiteSpace: 'nowrap' }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.brandCount}</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>品牌</span>
             </div>
-            <div style={{ background: 'var(--bg-secondary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.sourceCount}</div>
-              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)', marginTop: '2px' }}>来源</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', whiteSpace: 'nowrap' }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, lineHeight: '1', color: 'var(--brand)' }}>{overview.sourceCount}</span>
+              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>来源</span>
             </div>
           </div>
 
@@ -124,9 +125,9 @@ export default function HomePage() {
                   key={p.id}
                   onClick={() => nav(`/product/${p.id}`)}
                   style={{
-                    height: 'var(--row-height)',
+                    minHeight: 'var(--row-height)',
                     display: 'grid',
-                    gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto 24px',
+                    gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto',
                     borderBottom: 'var(--border-width) solid var(--border-default)',
                     background: 'var(--bg-primary)',
                     color: 'var(--text-primary)',
@@ -143,19 +144,17 @@ export default function HomePage() {
                     loading={i < 3 ? 'eager' : 'lazy'}
                     onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 72, 92) }}
                   />
-                  <div style={{ minWidth: 0, padding: '12px 6px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div style={{ minWidth: 0, padding: '12px 8px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <h2 style={{
                       margin: 0, fontFamily: 'var(--font-display)', fontSize: '14px',
-                      lineHeight: '13px', fontWeight: 900, letterSpacing: '-0.02em',
+                      lineHeight: '1.2', fontWeight: 700, letterSpacing: '-0.02em',
                       textTransform: 'uppercase', display: '-webkit-box',
                       WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                     }}>{p.title}</h2>
-                    <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88 }}>
-                      {p.brand}
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88 }}>{p.brand}</span>
+                      <span style={{ fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{formatPrice(p.currency, p.price)}</span>
                     </div>
-                  </div>
-                  <div style={{ alignSelf: 'end', padding: '0 6px 10px 0', fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-                    <span style={{color:'var(--accent)',fontFamily:'var(--font-mono)'}}>{formatPrice(p.currency, p.price)}</span>
                   </div>
                   <div style={{
                     width: '18px', height: '18px', marginTop: '10px', marginRight: '6px',
@@ -180,12 +179,16 @@ export default function HomePage() {
                   onClick={() => nav(`/search?q=${encodeURIComponent(b.name)}&brand=${encodeURIComponent(b.name)}`)}
                   style={{
                     background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)',
-                    padding: '12px 8px', textAlign: 'left' as const, cursor: 'pointer',
-                    minHeight: '56px', width: '100%',
+                    padding: '12px 10px', cursor: 'pointer',
+                    minHeight: '72px', width: '100%',
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   }}
                 >
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>{b.name}</div>
-                  <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88, marginTop: '4px' }}>{b.count} 件商品</div>
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>{b.name}</div>
+                    <div style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7, marginTop: '4px' }}>{b.count} 件商品</div>
+                  </div>
+                  <span style={{ fontSize: '18px', fontWeight: 700, opacity: 0.3 }}>›</span>
                 </button>
               ))}
             </div>

@@ -40,7 +40,7 @@ const inputStyle: React.CSSProperties = {
 }
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)',
+  fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)',
 }
 
 const sectionStyle: React.CSSProperties = {
@@ -59,7 +59,7 @@ const sectionHeader: React.CSSProperties = {
   background: 'var(--bg-secondary)',
   cursor: 'pointer',
   fontSize: 'var(--fs-label)',
-  fontWeight: 800,
+  fontWeight: 600,
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
 }
@@ -94,6 +94,7 @@ export default function ProductDetail() {
   const [showInfo, setShowInfo] = useState(true)
   const [showCalculator, setShowCalculator] = useState(true)
   const [showHistory, setShowHistory] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(false)
   const [selectedVolume, setSelectedVolume] = useState<number | null>(null)
   const [crossRates, setCrossRates] = useState<Record<string, { rate: number; source: string }>>({})
 
@@ -226,7 +227,7 @@ export default function ProductDetail() {
       },
       extraCost: parseFloat(extraCost) || 0, targetMarginRate: parseFloat(marginRate) || undefined,
     }).then(r => r.json()).then(d => {
-      if (d.success) setEstimate(d.data); else setEstimateError(d.error?.message || 'Calculation failed')
+      if (d.success) { setEstimate(d.data); toast('已更新成本估算', 'success') } else setEstimateError(d.error?.message || 'Calculation failed')
     }).catch((e: Error) => setEstimateError(e.message || 'Network error'))
     .finally(() => setEstimating(false))
   }
@@ -234,7 +235,7 @@ export default function ProductDetail() {
   function toggleFavorite() {
     if (!product) return; setFavToggling(true)
     const fetcher = favorited ? apiDelete('/api/favorites', { productId: product.id }) : apiPost('/api/favorites', { productId: product.id })
-    fetcher.then(r => r.json()).then(d => { if (d.success) setFavorited(!favorited) }).finally(() => setFavToggling(false))
+    fetcher.then(r => r.json()).then(d => { if (d.success) { setFavorited(!favorited); toast(favorited ? '已取消收藏' : '已收藏', 'success') } }).finally(() => setFavToggling(false))
   }
 
   function shareResult() {
@@ -245,8 +246,8 @@ export default function ProductDetail() {
     if (estimate.profitTrial) { lines.push(`Suggested Price: ${estimate.profitTrial.suggestedQuotePrice}`, `Profit: ${estimate.profitTrial.estimatedProfit}`, `Margin: ${estimate.profitTrial.estimatedMarginRate}`) }
     const text = lines.join('\n')
     if (navigator.share) {
-      navigator.share({ title: product.title, text }).catch(() => { navigator.clipboard.writeText(text).then(() => toast('Copied', 'success')).catch(() => {}) })
-    } else { navigator.clipboard.writeText(text).then(() => toast('Copied', 'success')).catch(() => {}) }
+      navigator.share({ title: product.title, text }).catch(() => { navigator.clipboard.writeText(text).then(() => toast('链接已复制', 'success')).catch(() => {}) })
+    } else { navigator.clipboard.writeText(text).then(() => toast('链接已复制', 'success')).catch(() => {}) }
   }
 
   if (loading) return <div style={{ padding: '24px', textAlign: 'center', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>加载中...</div>
@@ -267,7 +268,7 @@ export default function ProductDetail() {
         marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
       }}>
         <button onClick={() => (window.history.length > 1 ? nav(-1) : nav('/search'))} style={{ background: 'none', border: 'none', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
-          ← BACK
+          ← 返回
         </button>
         <span style={{ width: '18px', height: '18px', borderRadius: '999px', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: 'var(--text-inverse)', fontSize: '13px', fontWeight: 800 }}>03</span>
       </header>
@@ -375,118 +376,125 @@ export default function ProductDetail() {
             成本估算 <span style={{ fontWeight: 500, opacity: 0.7 }}>(CNY)</span>
           </h2>
 
-          {/* Weight + Dimensions */}
-          <div style={{ marginBottom: '12px' }}>
-            <h3 style={{ ...labelStyle, marginBottom: '6px' }}>商品参数</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>重量</span>
-              <input type="number" step="0.1" min="0" value={weight} onChange={e => setWeight(e.target.value)} placeholder="kg" style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
-              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px' }}>KG</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>尺寸</span>
-              <input type="number" step="0.1" min="0" value={length} onChange={e => setLength(e.target.value)} placeholder="L" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
-              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
-              <input type="number" step="0.1" min="0" value={width} onChange={e => setWidth(e.target.value)} placeholder="W" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
-              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
-              <input type="number" step="0.1" min="0" value={height} onChange={e => setHeight(e.target.value)} placeholder="H" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
-              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px', flexShrink: 0 }}>CM</span>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '62px' }}>
-              {(product?.category ? (() => {
-                const cat = String(product.category).toLowerCase()
-                if (cat.includes('backpack') || cat.includes('背包') || cat.includes('rucksack')) {
-                  return [{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }]
-                }
-                if (cat.includes('bag') || cat.includes('包') || cat.includes('purse') || cat.includes('tote')) {
-                  return [{ label: '小包', l: '30', w: '20', h: '10' }, { label: '中包', l: '40', w: '28', h: '15' }, { label: '大包', l: '50', w: '35', h: '20' }]
-                }
-                if (cat.includes('shoe') || cat.includes('鞋') || cat.includes('boot') || cat.includes('sneaker')) {
-                  return [{ label: '小鞋盒', l: '30', w: '20', h: '12' }, { label: '鞋盒', l: '35', w: '25', h: '15' }, { label: '大鞋盒', l: '40', w: '30', h: '18' }]
-                }
-                if (cat.includes('jewel') || cat.includes('首饰') || cat.includes('accessor') || cat.includes('配饰')) {
-                  return [{ label: '小件', l: '10', w: '8', h: '3' }, { label: '礼盒', l: '20', w: '15', h: '5' }]
-                }
-                if (cat.includes('cloth') || cat.includes('服装') || cat.includes('apparel') || cat.includes('wear') || cat.includes('shirt') || cat.includes('jacket') || cat.includes('coat')) {
-                  return [{ label: 'T恤', l: '30', w: '20', h: '5' }, { label: '毛衣', l: '35', w: '25', h: '8' }, { label: '外套', l: '45', w: '30', h: '12' }]
-                }
-                // Default: generic backpack presets
-                return [{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }]
-              })() : [{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }]).map(p => {
-                const isActive = selectedVolume === (p.label.includes('L') ? parseInt(p.label, 10) : p.label.length)
-                return (
-                <button key={p.label} onClick={() => { setLength(p.l); setWidth(p.w); setHeight(p.h); setSelectedVolume(p.label.includes('L') ? parseInt(p.label, 10) : p.label.length) }}
-                  style={{ background: isActive ? 'var(--bg-active)' : 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: isActive ? 'var(--text-inverse)' : 'var(--text-primary)', minHeight: '44px', minWidth: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{p.label}</button>
-                )
-              })}
-            </div>
+          {/* Simple mode — always visible: weight + carrier + margin */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+            <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>重量</span>
+            <input type="number" step="0.1" min="0" value={weight} onChange={e => setWeight(e.target.value)} placeholder="kg" style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
+            <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px' }}>KG</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+            <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>承运商</span>
+            <select value={selectedCarrierId ?? ''} onChange={e => {
+              const id = parseInt(e.target.value, 10); setSelectedCarrierId(id)
+              const c = carriers.find(x => x.id === id)
+              if (c) { setFirstWeight(String(c.firstWeight)); setFirstCost(String(c.firstCost)); setAdditionalWeight(String(c.additionalWeight)); setAdditionalCost(String(c.additionalCost)); setVolumeDivisor(String(c.volumeDivisor)) }
+            }} style={{ ...inputStyle, flex: 1, height: '44px' }}>
+              <option value="">自定义</option>
+              {carriers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+            <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>毛利率</span>
+            <input type="number" step="1" min="0" max="99" value={marginRate} onChange={e => setMarginRate(e.target.value)} style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
+            <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>%</span>
           </div>
 
-          {/* Shipping */}
-          <div style={{ marginBottom: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
-              <h3 style={{ ...labelStyle, margin: 0 }}>物流</h3>
-              <button onClick={() => setShowShippingHelp(v => !v)} style={{ width: '14px', height: '14px', borderRadius: '999px', border: 'var(--border-width) solid var(--text-muted)', background: 'none', cursor: 'pointer', fontSize: '10px', lineHeight: '1', display: 'grid', placeItems: 'center', color: 'var(--text-muted)' }}>?</button>
-            </div>
-            {showShippingHelp && (
-              <div style={{ background: 'var(--bg-secondary)', padding: '8px', border: 'var(--border-width) solid var(--border-default)', marginBottom: '6px', fontSize: '10px', lineHeight: '1.4' }}>
-                <p><strong>首重：</strong>首重段重量 + 费用</p>
-                <p><strong>续重：</strong>每个续重单位的费用</p>
-                <p><strong>体积重系数：</strong>长×宽×高(cm) ÷ 系数 = 体积重</p>
-              </div>
-            )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-              <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>承运商</span>
-              <select value={selectedCarrierId ?? ''} onChange={e => {
-                const id = parseInt(e.target.value, 10); setSelectedCarrierId(id)
-                const c = carriers.find(x => x.id === id)
-                if (c) { setFirstWeight(String(c.firstWeight)); setFirstCost(String(c.firstCost)); setAdditionalWeight(String(c.additionalWeight)); setAdditionalCost(String(c.additionalCost)); setVolumeDivisor(String(c.volumeDivisor)) }
-              }} style={{ ...inputStyle, flex: 1, height: '44px' }}>
-                <option value="">Custom</option>
-                {carriers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-            </div>
-            <div style={{ paddingLeft: '62px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>首重</span>
-                <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)} style={{ ...inputStyle, width: '56px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '20px', textAlign: 'center' }}>kg</span>
-                <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)} style={{ ...inputStyle, width: '64px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '16px', textAlign: 'center' }}>¥</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>续重</span>
-                <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)} style={{ ...inputStyle, width: '56px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '20px', textAlign: 'center' }}>kg</span>
-                <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)} style={{ ...inputStyle, width: '64px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '16px', textAlign: 'center' }}>¥</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>体积系数</span>
-                <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVolumeDivisor(e.target.value)} style={{ ...inputStyle, width: '80px', flexShrink: 0 }} />
-              </div>
-            </div>
-          </div>
+          {/* Advanced toggle */}
+          <button onClick={() => setShowAdvanced(v => !v)}
+            style={{ background: 'none', border: 'none', padding: '8px 0', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', minHeight: '44px' }}>
+            <span style={{ fontSize: '10px' }}>{showAdvanced ? '▼' : '▶'}</span> 高级参数
+          </button>
 
-          {/* Profit */}
-          <div style={{ marginBottom: '12px' }}>
-            <h3 style={{ ...labelStyle, marginBottom: '6px' }}>利润设置</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {/* Advanced mode — collapsed by default */}
+          {showAdvanced && (
+            <>
+              {/* Dimensions + presets */}
+              <div style={{ marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                  <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>尺寸</span>
+                  <input type="number" step="0.1" min="0" value={length} onChange={e => setLength(e.target.value)} placeholder="L" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
+                  <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
+                  <input type="number" step="0.1" min="0" value={width} onChange={e => setWidth(e.target.value)} placeholder="W" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
+                  <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '10px', textAlign: 'center', flexShrink: 0 }}>×</span>
+                  <input type="number" step="0.1" min="0" value={height} onChange={e => setHeight(e.target.value)} placeholder="H" style={{ ...inputStyle, width: '56px', flexShrink: 0 }} />
+                  <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '24px', flexShrink: 0 }}>CM</span>
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '62px' }}>
+                  {(product?.category ? (() => {
+                    const cat = String(product.category).toLowerCase()
+                    if (cat.includes('backpack') || cat.includes('背包') || cat.includes('rucksack')) {
+                      return [{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }]
+                    }
+                    if (cat.includes('bag') || cat.includes('包') || cat.includes('purse') || cat.includes('tote')) {
+                      return [{ label: '小包', l: '30', w: '20', h: '10' }, { label: '中包', l: '40', w: '28', h: '15' }, { label: '大包', l: '50', w: '35', h: '20' }]
+                    }
+                    if (cat.includes('shoe') || cat.includes('鞋') || cat.includes('boot') || cat.includes('sneaker')) {
+                      return [{ label: '小鞋盒', l: '30', w: '20', h: '12' }, { label: '鞋盒', l: '35', w: '25', h: '15' }, { label: '大鞋盒', l: '40', w: '30', h: '18' }]
+                    }
+                    if (cat.includes('jewel') || cat.includes('首饰') || cat.includes('accessor') || cat.includes('配饰')) {
+                      return [{ label: '小件', l: '10', w: '8', h: '3' }, { label: '礼盒', l: '20', w: '15', h: '5' }]
+                    }
+                    if (cat.includes('cloth') || cat.includes('服装') || cat.includes('apparel') || cat.includes('wear') || cat.includes('shirt') || cat.includes('jacket') || cat.includes('coat')) {
+                      return [{ label: 'T恤', l: '30', w: '20', h: '5' }, { label: '毛衣', l: '35', w: '25', h: '8' }, { label: '外套', l: '45', w: '30', h: '12' }]
+                    }
+                    return [{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }]
+                  })() : [{ label: '20L', l: '45', w: '30', h: '18' }, { label: '30L', l: '50', w: '30', h: '22' }, { label: '40L', l: '55', w: '32', h: '25' }, { label: '50L', l: '60', w: '35', h: '28' }, { label: '65L', l: '65', w: '38', h: '30' }, { label: '80L', l: '75', w: '40', h: '35' }]).map(p => {
+                    const isActive = selectedVolume === (p.label.includes('L') ? parseInt(p.label, 10) : p.label.length)
+                    return (
+                    <button key={p.label} onClick={() => { setLength(p.l); setWidth(p.w); setHeight(p.h); setSelectedVolume(p.label.includes('L') ? parseInt(p.label, 10) : p.label.length) }}
+                      style={{ background: isActive ? 'var(--bg-active)' : 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: isActive ? 'var(--text-inverse)' : 'var(--text-primary)', minHeight: '44px', minWidth: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{p.label}</button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Shipping details */}
+              <div style={{ marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                  <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7 }}>物流详情</span>
+                  <button onClick={() => setShowShippingHelp(v => !v)} style={{ width: '14px', height: '14px', borderRadius: '999px', border: 'var(--border-width) solid var(--text-muted)', background: 'none', cursor: 'pointer', fontSize: '10px', lineHeight: '1', display: 'grid', placeItems: 'center', color: 'var(--text-muted)' }}>?</button>
+                </div>
+                {showShippingHelp && (
+                  <div style={{ background: 'var(--bg-secondary)', padding: '8px', border: 'var(--border-width) solid var(--border-default)', marginBottom: '6px', fontSize: '10px', lineHeight: '1.4' }}>
+                    <p><strong>首重：</strong>首重段重量 + 费用</p>
+                    <p><strong>续重：</strong>每个续重单位的费用</p>
+                    <p><strong>体积重系数：</strong>长×宽×高(cm) ÷ 系数 = 体积重</p>
+                  </div>
+                )}
+                <div style={{ paddingLeft: '62px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>首重</span>
+                    <input type="number" step="0.1" min="0" value={firstWeight} onChange={e => setFirstWeight(e.target.value)} style={{ ...inputStyle, width: '56px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '20px', textAlign: 'center' }}>kg</span>
+                    <input type="number" step="0.01" min="0" value={firstCost} onChange={e => setFirstCost(e.target.value)} style={{ ...inputStyle, width: '64px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '16px', textAlign: 'center' }}>¥</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>续重</span>
+                    <input type="number" step="0.1" min="0" value={additionalWeight} onChange={e => setAdditionalWeight(e.target.value)} style={{ ...inputStyle, width: '56px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '20px', textAlign: 'center' }}>kg</span>
+                    <input type="number" step="0.01" min="0" value={additionalCost} onChange={e => setAdditionalCost(e.target.value)} style={{ ...inputStyle, width: '64px', flexShrink: 0 }} /><span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, width: '16px', textAlign: 'center' }}>¥</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>体积系数</span>
+                    <input type="number" step="100" min="1000" value={volumeDivisor} onChange={e => setVolumeDivisor(e.target.value)} style={{ ...inputStyle, width: '80px', flexShrink: 0 }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Extra cost */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                 <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>额外</span>
                 <input type="number" step="0.01" min="0" value={extraCost} onChange={e => setExtraCost(e.target.value)} style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
                 <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>¥</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', width: '56px', flexShrink: 0 }}>毛利率</span>
-                <input type="number" step="1" min="0" max="99" value={marginRate} onChange={e => setMarginRate(e.target.value)} style={{ ...inputStyle, width: '96px', flexShrink: 0 }} />
-                <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>%</span>
-              </div>
-            </div>
-            <p style={{ fontSize: '10px', opacity: 0.5, margin: '6px 0 0', lineHeight: '1.5' }}>
-              目标售价 = 总成本 ÷ (1 − 毛利率)
-            </p>
-          </div>
+            </>
+          )}
+
+          <p style={{ fontSize: '10px', opacity: 0.5, margin: '8px 0 12px', lineHeight: '1.5' }}>
+            目标售价 = 总成本 ÷ (1 − 毛利率)
+          </p>
 
           <button onClick={calcEstimate} disabled={estimating}
             style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', opacity: estimating ? 0.4 : 1 }}>
-            {estimating ? '计算中...' : '计算到手成本'}
+            {estimating ? '计算中...' : '计算到手价'}
           </button>
 
           {estimateError && <p style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--danger)', textAlign: 'center', marginTop: '8px' }}>{estimateError}</p>}
@@ -540,7 +548,7 @@ export default function ProductDetail() {
       ) : (
         <div style={{ ...sectionStyle, textAlign: 'center' }}>
           <p style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>登录以使用成本计算</p>
-          <button onClick={() => openLogin()} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>Login</button>
+          <button onClick={() => openLogin()} style={{ background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '8px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>登录</button>
         </div>
       )}
             </motion.div>
@@ -636,19 +644,19 @@ export default function ProductDetail() {
           {crossSource.slice(0, 5).map((item: any) => (
             <button key={item.id} onClick={() => nav(`/product/${item.id}`)}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '8px', marginBottom: '4px', cursor: 'pointer', textAlign: 'left' }}>
-              <img src={item.imageUrl || getPlaceholderUrl('N/A', 40, 40)} alt="" style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+              <img src={item.imageUrl || getPlaceholderUrl('N/A', 40, 40)} alt="" style={{ width: '40px', height: '40px', objectFit: 'cover', flexShrink: 0 }}
                 onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 40, 40) }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
-                <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7 }}>{item.source}</div>
-              </div>
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                <div style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{formatPrice(item.currency, item.price)}</div>
-                {crossRates[item.currency] && displayCurrency !== item.currency && (
-                  <div style={{ fontSize: '11px', fontWeight: 700, opacity: 0.7 }}>
-                    ≈ {formatPrice(displayCurrency, Math.round(parseFloat(item.price) * crossRates[item.currency].rate * 100) / 100)}
-                  </div>
-                )}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '2px' }}>
+                  <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{item.source}</span>
+                  <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>{formatPrice(item.currency, item.price)}</span>
+                  {crossRates[item.currency] && displayCurrency !== item.currency && (
+                    <span style={{ fontSize: 'var(--fs-label)', fontWeight: 700, opacity: 0.6, whiteSpace: 'nowrap' }}>
+                      ≈ {formatPrice(displayCurrency, Math.round(parseFloat(item.price) * crossRates[item.currency].rate * 100) / 100)}
+                    </span>
+                  )}
+                </div>
               </div>
             </button>
           ))}

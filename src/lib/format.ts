@@ -18,10 +18,24 @@ const SYMBOLS: Record<string, string> = {
   HKD: 'HK$',
 }
 
-/** Generate a brand-monogram placeholder URL. Uses neutral grays that work on both themes. */
-export function getPlaceholderUrl(brand: string, width: number, height: number): string {
-  const letter = (brand || '?').slice(0, 4).toUpperCase()
-  return `https://placehold.co/${width}x${height}/C9C9BD/5C5D55?text=${encodeURIComponent(letter)}`
+/** Generate an inline SVG placeholder — gray background + box icon + "暂无图片" text (text hidden at small sizes). */
+export function getPlaceholderUrl(_brand: string, width: number, height: number): string {
+  const cx = width / 2
+  const cy = height / 2
+  const scale = Math.min(width / 72, height / 92, 1)
+  const showText = width >= 60 && height >= 60
+  const sw = 24 * scale
+  const sh = 18 * scale
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+<rect width="${width}" height="${height}" fill="#d4d4cc"/>
+<g transform="translate(${cx.toFixed(1)}, ${(cy - (showText ? 6 : 0)).toFixed(1)})">
+<rect x="${(-sw).toFixed(1)}" y="${(-sh).toFixed(1)}" width="${sw.toFixed(1)}" height="${sh.toFixed(1)}" rx="2" fill="none" stroke="#8b8b82" stroke-width="${(1.5 * scale).toFixed(1)}"/>
+<path d="M${(-sw).toFixed(1)} ${(-sh).toFixed(1)} L0 ${(-sh * 0.2).toFixed(1)} L${sw.toFixed(1)} ${(-sh).toFixed(1)}" fill="none" stroke="#8b8b82" stroke-width="${(1.5 * scale).toFixed(1)}"/>
+<line x1="0" y1="${(-sh * 0.2).toFixed(1)}" x2="0" y2="${sh.toFixed(1)}" stroke="#8b8b82" stroke-width="${(1.5 * scale).toFixed(1)}"/>
+</g>
+${showText ? `<text x="${cx.toFixed(1)}" y="${(cy + sh + 16).toFixed(1)}" text-anchor="middle" font-family="system-ui,sans-serif" font-size="${(10 * scale).toFixed(0)}" fill="#8b8b82">暂无图片</text>` : ''}
+</svg>`
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 }
 
 export function formatPrice(currency: string | undefined | null, price: string | number | undefined | null): string {

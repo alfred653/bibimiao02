@@ -73,13 +73,13 @@ export default function DefaultShippingPage() {
 
   function save() {
     localStorage.setItem('bbm_default_shipping', JSON.stringify(form))
-    toast('Shipping defaults saved', 'success')
+    toast('设置已保存', 'success')
   }
 
   function reset() {
     setForm({ ...DEFAULT_VALUES })
     localStorage.removeItem('bbm_default_shipping')
-    toast('Defaults restored', 'info')
+    toast('已恢复默认', 'info')
   }
 
   return (

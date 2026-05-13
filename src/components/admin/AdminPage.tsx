@@ -755,55 +755,92 @@ export default function AdminPage() {
         </>
       )}
 
-      {/* Carrier Table */}
+      {/* Carrier Table / Cards */}
       {isCarriers && (
-        <div style={{ overflowX: 'auto', marginLeft: '-16px', marginRight: '-16px', paddingLeft: '16px', paddingRight: '16px' }}>
+        <>
           {!loading && data.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '64px 0' }}>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>暂无承运商数据</p>
               <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>点击"+ 新增承运商"添加运费模板</p>
             </div>
+          ) : isMobile ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {data.map((c: any) => (
+                <div key={c.id} style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '15px', fontWeight: 900, fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}>{c.name}</div>
+                    <span style={{ ...tagBase, background: c.isActive === 'active' ? 'var(--brand-soft)' : 'var(--bg-hover)', color: c.isActive === 'active' ? 'var(--success)' : 'var(--danger)' }}>{c.isActive === 'active' ? '上架' : '禁用'}</span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '8px' }}>
+                    <div>首重：{c.firstWeight}kg / ¥{c.firstCost}</div>
+                    <div>续重：{c.additionalWeight}kg / ¥{c.additionalCost} · 体积系数 {c.volumeDivisor}</div>
+                    <div style={{ marginTop: '2px', opacity: 0.6 }}>更新: {c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => setEditCarrier(c)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>编辑</button>
+                    <button onClick={() => {
+                      setConfirmModal({
+                        show: true, title: '确认删除', danger: true, confirmLabel: '删除',
+                        message: `删除承运商 "${c.name}"？`,
+                        onConfirm: () => {
+                          setConfirmModal(null)
+                          apiDelete('/api/admin/shipping-carriers', { id: c.id })
+                            .then(r => r.json())
+                            .then(d => {
+                              if (d.success) { fetchData(page); toast('已删除', 'success') }
+                              else toast(d.error?.message || '删除失败', 'error')
+                            })
+                            .catch(() => toast('网络错误', 'error'))
+                        }
+                      })
+                    }} style={{ ...tagBase, background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', cursor: 'pointer' }}>删除</button>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
-            <table style={{ width: '100%', fontSize: '13px', minWidth: '600px', borderCollapse: 'collapse' }}>
-              <thead><tr style={{ color: 'var(--text-secondary)', borderBottom: 'var(--border-width) solid var(--admin-border)' }}>
-                <th style={thStyle}>Name</th><th style={thStyle}>First Wt</th><th style={thStyle}>First Cost</th><th style={thStyle}>Add. Wt</th><th style={thStyle}>Add. Cost</th><th style={thStyle}>Vol Div</th><th style={thStyle}>Status</th><th style={thStyle}>Updated</th><th style={thStyle}>Actions</th>
-              </tr></thead>
-              <tbody>
-                {data.map((c: any) => (
-                  <tr key={c.id}>
-                    <td style={{ ...tdStyle, fontWeight: 700 }}>{c.name}</td>
-                    <td style={tdStyle}>{c.firstWeight}</td>
-                    <td style={tdStyle}>¥{c.firstCost}</td>
-                    <td style={tdStyle}>{c.additionalWeight}</td>
-                    <td style={tdStyle}>¥{c.additionalCost}</td>
-                    <td style={tdStyle}>{c.volumeDivisor}</td>
-                    <td style={tdStyle}><span style={{ ...tagBase, background: c.isActive === 'active' ? 'var(--brand-soft)' : 'var(--bg-hover)', color: c.isActive === 'active' ? 'var(--success)' : 'var(--danger)' }}>{c.isActive === 'active' ? 'Active' : 'Disabled'}</span></td>
-                    <td style={{ ...tdStyle, fontSize: '13px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
-                    <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
-                      <button onClick={() => setEditCarrier(c)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>编辑</button>
-                      <button onClick={() => {
-                        setConfirmModal({
-                          show: true, title: '确认删除', danger: true, confirmLabel: '删除',
-                          message: `Delete carrier "${c.name}"?`,
-                          onConfirm: () => {
-                            setConfirmModal(null)
-                            apiDelete('/api/admin/shipping-carriers', { id: c.id })
-                              .then(r => r.json())
-                              .then(d => {
-                                if (d.success) { fetchData(page); toast('已删除', 'success') }
-                                else toast(d.error?.message || '删除失败', 'error')
-                              })
-                              .catch(() => toast('网络错误', 'error'))
-                          }
-                        })
-                      }} style={{ ...tagBase, background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', cursor: 'pointer', marginLeft: '8px' }}>删除</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div style={{ overflowX: 'auto', marginLeft: '-16px', marginRight: '-16px', paddingLeft: '16px', paddingRight: '16px' }}>
+              <table style={{ width: '100%', fontSize: '13px', minWidth: '600px', borderCollapse: 'collapse' }}>
+                <thead><tr style={{ color: 'var(--text-secondary)', borderBottom: 'var(--border-width) solid var(--admin-border)' }}>
+                  <th style={thStyle}>承运商</th><th style={thStyle}>首重</th><th style={thStyle}>首重费用</th><th style={thStyle}>续重</th><th style={thStyle}>续重费用</th><th style={thStyle}>体积系数</th><th style={thStyle}>状态</th><th style={thStyle}>更新</th><th style={thStyle}>操作</th>
+                </tr></thead>
+                <tbody>
+                  {data.map((c: any) => (
+                    <tr key={c.id}>
+                      <td style={{ ...tdStyle, fontWeight: 700 }}>{c.name}</td>
+                      <td style={tdStyle}>{c.firstWeight} kg</td>
+                      <td style={tdStyle}>¥{c.firstCost}</td>
+                      <td style={tdStyle}>{c.additionalWeight} kg</td>
+                      <td style={tdStyle}>¥{c.additionalCost}</td>
+                      <td style={tdStyle}>{c.volumeDivisor}</td>
+                      <td style={tdStyle}><span style={{ ...tagBase, background: c.isActive === 'active' ? 'var(--brand-soft)' : 'var(--bg-hover)', color: c.isActive === 'active' ? 'var(--success)' : 'var(--danger)' }}>{c.isActive === 'active' ? '上架' : '禁用'}</span></td>
+                      <td style={{ ...tdStyle, fontSize: '13px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '—'}</td>
+                      <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
+                        <button onClick={() => setEditCarrier(c)} style={{ ...tagBase, background: 'var(--brand-soft)', color: 'var(--brand)', border: 'none', cursor: 'pointer' }}>编辑</button>
+                        <button onClick={() => {
+                          setConfirmModal({
+                            show: true, title: '确认删除', danger: true, confirmLabel: '删除',
+                            message: `删除承运商 "${c.name}"？`,
+                            onConfirm: () => {
+                              setConfirmModal(null)
+                              apiDelete('/api/admin/shipping-carriers', { id: c.id })
+                                .then(r => r.json())
+                                .then(d => {
+                                  if (d.success) { fetchData(page); toast('已删除', 'success') }
+                                  else toast(d.error?.message || '删除失败', 'error')
+                                })
+                                .catch(() => toast('网络错误', 'error'))
+                            }
+                          })
+                        }} style={{ ...tagBase, background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', cursor: 'pointer', marginLeft: '8px' }}>删除</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Product Table / Cards */}
@@ -829,7 +866,7 @@ export default function AdminPage() {
                       else toast(d.error?.message || '删除失败', 'error')
                     }).catch(() => toast('网络错误', 'error')).finally(() => setBatchLoading(false))
                 }
-              })} style={{ background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>删除选中 ({selectedIds.size})</button>
+              })} style={{ background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>删除选中 ({selectedIds.size})</button>
             )}
             {data.map(p => (
               <div key={p.id} style={{ background: 'var(--admin-bg-card)', border: 'var(--border-width) solid var(--admin-border)', padding: '14px' }}>
@@ -948,7 +985,7 @@ export default function AdminPage() {
           padding: '10px 16px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px',
         }}>
           <span style={{ fontSize: '14px', color: 'var(--text-inverse)' }}>已选 <b>{selectedIds.size}</b> 项</span>
-          <button onClick={handleBatchDelete} disabled={batchLoading} style={{ ...tagBase, background: 'var(--danger)', color: 'var(--text-inverse)', border: 'none', cursor: 'pointer', opacity: batchLoading ? 0.4 : 1 }}>
+          <button onClick={handleBatchDelete} disabled={batchLoading} style={{ ...tagBase, background: 'transparent', color: 'var(--danger)', border: '1px solid var(--danger)', cursor: 'pointer', opacity: batchLoading ? 0.4 : 1 }}>
             批量删除
           </button>
           <select
