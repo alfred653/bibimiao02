@@ -357,7 +357,7 @@ export default function SearchPage() {
       {showFilters && (
         <div style={{ display: 'flex', gap: '8px', padding: '8px 0', alignItems: 'center' }}>
           <button onClick={openFilterDrawer}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 14px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-light)', padding: '6px 14px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-secondary)', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 3h10M2.5 6h7M4 9h4"/></svg>
             筛选
           </button>
@@ -486,7 +486,8 @@ export default function SearchPage() {
                 <h2 style={{
                   margin: 0, fontFamily: 'var(--font-display)', fontSize: '14px', lineHeight: '1.2',
                   fontWeight: 700, letterSpacing: '-0.02em', textTransform: 'uppercase',
-                  display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                  display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                  wordBreak: 'break-word', overflowWrap: 'anywhere',
                 }}>
                   {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
                 </h2>
@@ -497,7 +498,7 @@ export default function SearchPage() {
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '15px', lineHeight: '16px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{item.price ? formatPrice(item.currency, item.price) : '—'}</span>
                   {item.currency && item.currency !== displayCurrency && rates[item.currency] && (
-                    <span style={{ fontSize: 'var(--fs-label)', fontWeight: 700, opacity: 0.6, whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, opacity: 0.45, whiteSpace: 'nowrap' }}>
                       ≈ {formatPrice(displayCurrency, Math.round(parseFloat(item.price) * rates[item.currency].rate * 100) / 100)}
                     </span>
                   )}
@@ -507,11 +508,11 @@ export default function SearchPage() {
                 onClick={e => toggleFavorite(item.id, e)}
                 disabled={favToggling.has(item.id)}
                 style={{
-                  width: '44px', height: '44px', marginTop: '4px', marginRight: '2px',
-                  border: favoriteIds.has(item.id) ? '1px solid currentColor' : '1px solid currentColor',
+                  width: '36px', height: '36px', marginTop: '4px', marginRight: '2px',
+                  border: '1px solid currentColor',
                   borderRadius: '50%', display: 'grid', placeItems: 'center',
-                  fontSize: '16px', lineHeight: '1', fontWeight: 800, cursor: 'pointer',
-                  background: 'transparent', color: favoriteIds.has(item.id) ? 'var(--danger)' : 'inherit',
+                  fontSize: '14px', lineHeight: '1', fontWeight: 800, cursor: 'pointer',
+                  background: 'transparent', color: favoriteIds.has(item.id) ? 'var(--danger)' : 'var(--text-muted)',
                   padding: 0,
                 }}
                 aria-label={favoriteIds.has(item.id) ? '取消收藏' : '收藏'}

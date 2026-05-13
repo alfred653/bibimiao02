@@ -23,7 +23,7 @@ export function getPlaceholderUrl(_brand: string, width: number, height: number)
   const cx = width / 2
   const cy = height / 2
   const scale = Math.min(width / 72, height / 92, 1)
-  const showText = width >= 60 && height >= 60
+  const showText = width >= 140 && height >= 140
   const sw = 24 * scale
   const sh = 18 * scale
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">

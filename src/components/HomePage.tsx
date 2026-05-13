@@ -150,6 +150,7 @@ export default function HomePage() {
                       lineHeight: '1.2', fontWeight: 700, letterSpacing: '-0.02em',
                       textTransform: 'uppercase', display: '-webkit-box',
                       WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                      wordBreak: 'break-word', overflowWrap: 'anywhere', lineBreak: 'strict',
                     }}>{p.title}</h2>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                       <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88 }}>{p.brand}</span>
@@ -188,7 +189,7 @@ export default function HomePage() {
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>{b.name}</div>
                     <div style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7, marginTop: '4px' }}>{b.count} 件商品</div>
                   </div>
-                  <span style={{ fontSize: '18px', fontWeight: 700, opacity: 0.3 }}>›</span>
+                  <span style={{ fontSize: '18px', fontWeight: 700, opacity: 0.18 }}>›</span>
                 </button>
               ))}
             </div>

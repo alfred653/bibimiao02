@@ -277,7 +277,7 @@ export default function ProductDetail() {
       <div style={{ ...sectionStyle, padding: '0', display: 'flex', justifyContent: 'center' }}>
         <img
           src={product.imageUrl || getPlaceholderUrl(product.brand || '?', 800, 400)}
-          alt="" style={{ width: '100%', maxHeight: '160px', objectFit: 'contain' }}
+          alt="" style={{ width: '100%', maxHeight: product.imageUrl ? '240px' : '140px', objectFit: 'contain' }}
           loading="eager"
           onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 800, 400) }}
         />
@@ -320,8 +320,8 @@ export default function ProductDetail() {
         {dispRate && dispConverted !== null && !rateLoading && (
           <div style={{ background: 'var(--bg-secondary)', padding: '10px', border: 'var(--border-width) solid var(--border-default)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>
-              <span>换算价</span>
-              <span style={{ color: 'var(--success)' }}>{formatPrice(displayCurrency, dispConverted)}</span>
+              <span>约合人民币</span>
+              <span style={{ color: 'var(--success)' }}>≈ {formatPrice(displayCurrency, dispConverted)}</span>
             </div>
             <div style={{ fontSize: '13px', opacity: 0.7 }}>
               1 {product.currency} = {dispRate.rate} {displayCurrency} · {dispRate.source === 'frankfurter' ? '实时汇率' : dispRate.source === 'cache' ? '最近汇率' : '预设汇率'}
@@ -352,9 +352,9 @@ export default function ProductDetail() {
                 product.country && ['地区', product.country],
                 ['币种', product.currency],
               ].filter(Boolean).map((row: any, i: number) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < 5 ? 'var(--border-width) solid var(--border-light)' : 'none', fontSize: '12px', fontWeight: 500 }}>
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: i < 5 ? 'var(--border-width) solid var(--border-light)' : 'none', fontSize: '12px', fontWeight: 500 }}>
                   <span style={{ opacity: 0.7, fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{row[0]}</span>
-                  <span style={{ fontWeight: 700 }}>{row[1]}</span>
+                  <span style={{ fontWeight: 700, textAlign: 'right', maxWidth: '60%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row[1]}</span>
                 </div>
               ))}
             </div>
@@ -489,7 +489,7 @@ export default function ProductDetail() {
           )}
 
           <p style={{ fontSize: '10px', opacity: 0.5, margin: '8px 0 12px', lineHeight: '1.5' }}>
-            目标售价 = 总成本 ÷ (1 − 毛利率)
+            建议售价 = 到手成本 ÷ (1 - 毛利率)
           </p>
 
           <button onClick={calcEstimate} disabled={estimating}
@@ -555,6 +555,33 @@ export default function ProductDetail() {
           )}
         </AnimatePresence>
 
+      {/* Actions */}
+      <div style={{ ...sectionStyle, borderBottom: 'none' }}>
+        {isSignedIn ? (
+          <button onClick={toggleFavorite} disabled={favToggling}
+            style={{ width: '100%', background: favorited ? 'var(--bg-primary)' : 'var(--bg-active)', color: favorited ? 'var(--danger)' : 'var(--text-inverse)', border: favorited ? 'var(--border-width) solid var(--danger)' : 'none', padding: '12px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', marginBottom: '8px' }}>
+            {favorited ? '已收藏' : '收藏商品'}
+          </button>
+        ) : (
+          <button onClick={() => openLogin()} style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', marginBottom: '8px' }}>
+            登录后收藏
+          </button>
+        )}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <button onClick={() => { if (product?.sourceUrl) window.open(product.sourceUrl, '_blank', 'noopener,noreferrer') }}
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
+            打开来源
+          </button>
+          <button onClick={() => {
+            if (!product?.sourceUrl) return
+            navigator.clipboard.writeText(product.sourceUrl).then(() => { setSourceCopied(true); setTimeout(() => setSourceCopied(false), 2000) }).catch(() => {})
+          }}
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
+            {sourceCopied ? '已复制' : '复制链接'}
+          </button>
+        </div>
+      </div>
+
       {/* Price history */}
       {(product.originalPrice || product.updatedAt) && (
         <>
@@ -609,33 +636,6 @@ export default function ProductDetail() {
           </AnimatePresence>
         </>
       )}
-
-      {/* Actions */}
-      <div style={{ ...sectionStyle, borderBottom: 'none' }}>
-        {isSignedIn ? (
-          <button onClick={toggleFavorite} disabled={favToggling}
-            style={{ width: '100%', background: favorited ? 'var(--bg-primary)' : 'var(--bg-active)', color: favorited ? 'var(--danger)' : 'var(--text-inverse)', border: favorited ? 'var(--border-width) solid var(--danger)' : 'none', padding: '12px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', marginBottom: '8px' }}>
-            {favorited ? '已收藏' : '收藏商品'}
-          </button>
-        ) : (
-          <button onClick={() => openLogin()} style={{ width: '100%', background: 'var(--bg-active)', color: 'var(--text-inverse)', border: 'none', padding: '12px', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', marginBottom: '8px' }}>
-            登录后收藏
-          </button>
-        )}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          <button onClick={() => { if (product?.sourceUrl) window.open(product.sourceUrl, '_blank', 'noopener,noreferrer') }}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
-            打开来源
-          </button>
-          <button onClick={() => {
-            if (!product?.sourceUrl) return
-            navigator.clipboard.writeText(product.sourceUrl).then(() => { setSourceCopied(true); setTimeout(() => setSourceCopied(false), 2000) }).catch(() => {})
-          }}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)' }}>
-            {sourceCopied ? '已复制' : '复制链接'}
-          </button>
-        </div>
-      </div>
 
       {/* Cross-source comparison */}
       {crossSource && crossSource.length > 0 && (
