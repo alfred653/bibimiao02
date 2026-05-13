@@ -17,6 +17,8 @@ export default function FavoritesPage() {
   const [rates, setRates] = useState<Record<string, { rate: number }>>({})
   const [sortBy, setSortBy] = useState('time_desc')
   const [filterBrand, setFilterBrand] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   function loadFavorites() {
     api('/api/favorites').then(r => r.json()).then(d => { if (d.success) setItems(d.data.items) }).finally(() => setLoading(false))
@@ -108,18 +110,65 @@ export default function FavoritesPage() {
             default: return new Date(b.favoritedAt || 0).getTime() - new Date(a.favoritedAt || 0).getTime()
           }
         })
+        const totalPages = Math.max(1, Math.ceil(displayItems.length / pageSize))
+        const currentPage = page > totalPages ? totalPages : page
+        const pagedItems = displayItems.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+        const Pagination = () => {
+          const [input, setInput] = useState(String(currentPage))
+          useEffect(() => { setInput(String(currentPage)) }, [currentPage])
+          function jump() {
+            const n = parseInt(input, 10)
+            if (n >= 1 && n <= totalPages && n !== currentPage) setPage(n)
+            else setInput(String(currentPage))
+          }
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '16px 0' }}>
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                <button disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}
+                  style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: currentPage <= 1 ? 0.4 : 1 }}>上一页</button>
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  let pn: number
+                  if (totalPages <= 5) pn = i + 1
+                  else if (currentPage <= 3) pn = i + 1
+                  else if (currentPage >= totalPages - 2) pn = totalPages - 4 + i
+                  else pn = currentPage - 2 + i
+                  return (
+                    <button key={pn} onClick={() => setPage(pn)}
+                      style={{ width: '32px', height: '32px', fontSize: '13px', fontWeight: 900, cursor: 'pointer', border: 'var(--border-width) solid var(--border-default)', background: pn === currentPage ? 'var(--bg-active)' : 'var(--bg-primary)', color: pn === currentPage ? 'var(--text-inverse)' : 'var(--text-primary)' }}>{pn}</button>
+                  )
+                })}
+                <button disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}
+                  style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: currentPage >= totalPages ? 0.4 : 1 }}>下一页</button>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                <span style={{ opacity: 0.7 }}>{currentPage} / {totalPages}</span>
+                <select value={pageSize} onChange={e => { setPageSize(parseInt(e.target.value)); setPage(1) }}
+                  style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+                  <option value={10}>10条/页</option>
+                  <option value={20}>20条/页</option>
+                  <option value={50}>50条/页</option>
+                </select>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ opacity: 0.7 }}>跳至</span>
+                  <input style={{ width: '40px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 6px', textAlign: 'center', fontSize: 'var(--fs-label)', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }}
+                    value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') jump() }} inputMode="numeric" />
+                </div>
+              </div>
+            </div>
+          )
+        }
         return (
         <div>
           {/* Sort + Filter bar */}
           <div style={{ display: 'flex', gap: '8px', padding: '8px 0', alignItems: 'center' }}>
             {brands.length > 0 && (
-              <select value={filterBrand} onChange={e => setFilterBrand(e.target.value)}
+              <select value={filterBrand} onChange={e => { setFilterBrand(e.target.value); setPage(1) }}
                 style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none', minHeight: '44px' }}>
                 <option value="">全部品牌</option>
                 {brands.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
             )}
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)}
+            <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1) }}
               style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none', minHeight: '44px' }}>
               <option value="time_desc">收藏时间↓</option>
               <option value="time_asc">收藏时间↑</option>
@@ -127,7 +176,7 @@ export default function FavoritesPage() {
               <option value="price_asc">价格↑</option>
             </select>
           </div>
-          {displayItems.map(item => (
+          {pagedItems.map(item => (
             <div key={item.id}
               onClick={() => nav(`/product/${item.id}`)}
               style={{
@@ -165,6 +214,7 @@ export default function FavoritesPage() {
                 title="取消收藏">×</button>
             </div>
           ))}
+          {displayItems.length > pageSize && <Pagination />}
         </div>
         )
       })()}

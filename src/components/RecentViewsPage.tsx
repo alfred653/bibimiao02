@@ -11,6 +11,51 @@ function loadRecent(): RecentItem[] {
   try { return JSON.parse(localStorage.getItem('bbm_recent_views') || '[]') } catch { return [] }
 }
 
+function Pagination({ page, totalPages, pageSize, onPage, onPageSize }: { page: number; totalPages: number; pageSize: number; onPage: (p: number) => void; onPageSize: (n: number) => void }) {
+  const [input, setInput] = useState(String(page))
+  useEffect(() => { setInput(String(page)) }, [page])
+  function jump() {
+    const n = parseInt(input, 10)
+    if (n >= 1 && n <= totalPages && n !== page) onPage(n)
+    else setInput(String(page))
+  }
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '16px 0' }}>
+      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+        <button disabled={page <= 1} onClick={() => onPage(page - 1)}
+          style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page <= 1 ? 0.4 : 1 }}>上一页</button>
+        {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+          let pn: number
+          if (totalPages <= 5) pn = i + 1
+          else if (page <= 3) pn = i + 1
+          else if (page >= totalPages - 2) pn = totalPages - 4 + i
+          else pn = page - 2 + i
+          return (
+            <button key={pn} onClick={() => onPage(pn)}
+              style={{ width: '32px', height: '32px', fontSize: '13px', fontWeight: 900, cursor: 'pointer', border: 'var(--border-width) solid var(--border-default)', background: pn === page ? 'var(--bg-active)' : 'var(--bg-primary)', color: pn === page ? 'var(--text-inverse)' : 'var(--text-primary)' }}>{pn}</button>
+          )
+        })}
+        <button disabled={page >= totalPages} onClick={() => onPage(page + 1)}
+          style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page >= totalPages ? 0.4 : 1 }}>下一页</button>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+        <span style={{ opacity: 0.7 }}>{page} / {totalPages}</span>
+        <select value={pageSize} onChange={e => { onPageSize(parseInt(e.target.value)); onPage(1) }}
+          style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+          <option value={10}>10条/页</option>
+          <option value={20}>20条/页</option>
+          <option value={50}>50条/页</option>
+        </select>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ opacity: 0.7 }}>跳至</span>
+          <input style={{ width: '40px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 6px', textAlign: 'center', fontSize: 'var(--fs-label)', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }}
+            value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') jump() }} inputMode="numeric" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function RecentViewsPage() {
   const nav = useNavigate()
   const [items, setItems] = useState<RecentItem[]>(loadRecent)
@@ -18,6 +63,8 @@ export default function RecentViewsPage() {
   const [displayCurrency, setDisplayCurrency] = useState('CNY')
   const [rates, setRates] = useState<Record<string, { rate: number }>>({})
   const [confirmClear, setConfirmClear] = useState(false)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   useEffect(() => {
     try {
@@ -45,7 +92,13 @@ export default function RecentViewsPage() {
     })
   }, [items, displayCurrency])
 
-  function clearAll() { localStorage.removeItem('bbm_recent_views'); setItems([]); setConfirmClear(false) }
+  const totalPages = Math.max(1, Math.ceil(items.length / pageSize))
+  const currentPage = page > totalPages ? totalPages : page
+  const pagedItems = items.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  useEffect(() => { if (page > totalPages) setPage(totalPages) }, [items.length, pageSize])
+
+  function clearAll() { localStorage.removeItem('bbm_recent_views'); setItems([]); setConfirmClear(false); setPage(1) }
   function removeOne(id: number) {
     const item = items.find(i => i.id === id)
     const next = items.filter(i => i.id !== id)
@@ -103,7 +156,7 @@ export default function RecentViewsPage() {
         </div>
       ) : (
         <div>
-          {items.map(p => (
+          {pagedItems.map(p => (
             <div key={p.id} style={{ minHeight: 'var(--row-height)', display: 'grid', gridTemplateColumns: 'var(--thumb-width) minmax(0, 1fr) auto', borderBottom: 'var(--border-width) solid var(--border-default)', cursor: 'pointer' }}
               onClick={() => nav(`/product/${p.id}`)}>
               <img src={p.imageUrl || getPlaceholderUrl('N/A', 72, 92)} alt="" loading="lazy"
@@ -128,6 +181,9 @@ export default function RecentViewsPage() {
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '18px', padding: 0, alignSelf: 'start', width: '44px', height: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Remove">×</button>
             </div>
           ))}
+          {items.length > pageSize && (
+            <Pagination page={currentPage} totalPages={totalPages} pageSize={pageSize} onPage={setPage} onPageSize={setPageSize} />
+          )}
         </div>
       )}
     </div>
