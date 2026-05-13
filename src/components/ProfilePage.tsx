@@ -279,6 +279,23 @@ export default function ProfilePage() {
         ))}
       </div>
 
+      <div style={{ marginTop: '12px' }}>
+        <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', padding: '0 0 6px' }}>法律信息</div>
+        {[
+          ['隐私政策', '个人信息收集与使用', () => navigate('/privacy')],
+          ['服务协议', '用户条款与条件', () => navigate('/terms')],
+          ['免责声明', '价格与信息准确性', () => navigate('/disclaimer')],
+        ].map(([label, desc, onClick], i) => (
+          <button key={i} onClick={onClick as any} style={rowStyle}>
+            <div>
+              <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase' }}>{label as string}</div>
+              <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7, marginTop: '2px' }}>{desc as string}</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 4l4 4-4 4" /></svg>
+          </button>
+        ))}
+      </div>
+
       {profile?.configuredBrands?.length > 0 && (
         <div style={{ marginTop: '12px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '12px' }}>
           <div style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px' }}>已配置品牌</div>

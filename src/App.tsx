@@ -11,6 +11,9 @@ import AdminPage from './components/admin/AdminPage'
 import RecentViewsPage from './components/RecentViewsPage'
 import DefaultShippingPage from './components/DefaultShippingPage'
 import ExchangeRatePage from './components/ExchangeRatePage'
+import PrivacyPage from './components/PrivacyPage'
+import TermsPage from './components/TermsPage'
+import DisclaimerPage from './components/DisclaimerPage'
 import NotFound from './components/NotFound'
 
 export default function App() {
@@ -25,6 +28,9 @@ export default function App() {
         <Route path="/recent-views" element={<RecentViewsPage />} />
         <Route path="/default-shipping" element={<DefaultShippingPage />} />
         <Route path="/exchange-rate" element={<ExchangeRatePage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/disclaimer" element={<DisclaimerPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="/admin" element={<AdminLayout />}>
