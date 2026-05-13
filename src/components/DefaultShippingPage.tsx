@@ -95,12 +95,12 @@ export default function DefaultShippingPage() {
       </header>
 
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', padding: '14px 0 10px', borderBottom: 'var(--border-width) solid var(--border-default)', margin: '0 calc(-1 * var(--page-padding))', marginBottom: '12px' }}>
-        Shipping<br />Defaults
+        默认运费
       </h1>
 
       {/* Carrier */}
       <div style={sectionStyle}>
-        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Default Carrier</label>
+        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>默认承运商</label>
         <select
           value={form.carrierId ?? ''}
           onChange={e => {
@@ -109,7 +109,7 @@ export default function DefaultShippingPage() {
           }}
           style={{ width: '100%', ...inputStyle }}
         >
-          <option value="">No preset (select manually each time)</option>
+          <option value="">不预设（每次手动选择）</option>
           {carriers.map(c => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
@@ -118,7 +118,7 @@ export default function DefaultShippingPage() {
           const c = carriers.find(x => x.id === form.carrierId)!
           return (
             <div style={{ marginTop: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-              First {c.firstWeight}kg / {c.firstCost}yuan, Additional {c.additionalWeight}kg / {c.additionalCost}yuan, Vol divisor {c.volumeDivisor}
+              首重 {c.firstWeight}kg / {c.firstCost}元, 续重 {c.additionalWeight}kg / {c.additionalCost}元, 体积系数 {c.volumeDivisor}
             </div>
           )
         })()}
@@ -126,23 +126,23 @@ export default function DefaultShippingPage() {
 
       {/* Weight & Dimensions */}
       <div style={sectionStyle}>
-        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>Default Product Params</label>
+        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>默认商品参数</label>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Weight</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>重量</span>
             <input type="number" step="0.1" min="0" value={form.weight} onChange={e => set('weight', e.target.value)}
               style={{ flex: 1, ...inputStyle }} />
             <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>kg</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Dimensions</span>
-            <input type="number" step="1" min="0" value={form.length} onChange={e => set('length', e.target.value)} placeholder="L"
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>尺寸</span>
+            <input type="number" step="1" min="0" value={form.length} onChange={e => set('length', e.target.value)} placeholder="长"
               style={{ width: '56px', textAlign: 'center', ...inputStyle }} />
             <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>x</span>
-            <input type="number" step="1" min="0" value={form.width} onChange={e => set('width', e.target.value)} placeholder="W"
+            <input type="number" step="1" min="0" value={form.width} onChange={e => set('width', e.target.value)} placeholder="宽"
               style={{ width: '56px', textAlign: 'center', ...inputStyle }} />
             <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>x</span>
-            <input type="number" step="1" min="0" value={form.height} onChange={e => set('height', e.target.value)} placeholder="H"
+            <input type="number" step="1" min="0" value={form.height} onChange={e => set('height', e.target.value)} placeholder="高"
               style={{ width: '56px', textAlign: 'center', ...inputStyle }} />
             <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>cm</span>
           </div>
@@ -151,16 +151,16 @@ export default function DefaultShippingPage() {
 
       {/* Profit settings */}
       <div style={sectionStyle}>
-        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>Default Profit Settings</label>
+        <label style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>默认利润设置</label>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Extra Cost</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>额外成本</span>
             <input type="number" step="0.01" min="0" value={form.extraCost} onChange={e => set('extraCost', e.target.value)}
               style={{ flex: 1, ...inputStyle }} />
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>yuan</span>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>元</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>Margin Rate</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', width: '48px', flexShrink: 0 }}>毛利率</span>
             <input type="number" step="1" min="0" max="100" value={form.marginRate} onChange={e => set('marginRate', e.target.value)}
               style={{ flex: 1, ...inputStyle }} />
             <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>%</span>
@@ -171,11 +171,11 @@ export default function DefaultShippingPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
         <button onClick={reset}
           style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-secondary)' }}>
-          Reset
+          重置
         </button>
         <button onClick={save}
           style={{ background: 'var(--bg-active)', border: 'none', padding: '10px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-inverse)' }}>
-          Save
+          保存
         </button>
       </div>
     </div>

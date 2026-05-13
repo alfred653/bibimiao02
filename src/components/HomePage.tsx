@@ -182,10 +182,11 @@ export default function HomePage() {
                     background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)',
                     padding: '12px 10px', cursor: 'pointer',
                     minHeight: '72px', width: '100%',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                    textAlign: 'left',
                   }}
                 >
-                  <div>
+                  <div style={{ textAlign: 'left' }}>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>{b.name}</div>
                     <div style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7, marginTop: '4px' }}>{b.count} 件商品</div>
                   </div>

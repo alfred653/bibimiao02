@@ -54,7 +54,7 @@ export default function ExchangeRatePage() {
       </header>
 
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', padding: '14px 0 10px', borderBottom: 'var(--border-width) solid var(--border-default)', margin: '0 calc(-1 * var(--page-padding))', marginBottom: '12px' }}>
-        汇率<br />设置
+        汇率设置
       </h1>
 
       <div style={sectionStyle}>
