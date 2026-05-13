@@ -36,33 +36,6 @@ const SORT_OPTIONS = [
   { value: 'price:desc', label: '排序：价格↓' },
 ]
 
-function PaginationJumper({ current, max, onJump }: { current: number; max: number; onJump: (p: number) => void }) {
-  const [input, setInput] = useState(String(current))
-  useEffect(() => { setInput(String(current)) }, [current])
-  function handleJump() {
-    const n = parseInt(input, 10)
-    if (n >= 1 && n <= max && n !== current) onJump(n)
-    else setInput(String(current))
-  }
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-      <span>跳至</span>
-      <input
-        style={{ width: '48px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', textAlign: 'center', fontSize: '13px', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }}
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        onKeyDown={e => { if (e.key === 'Enter') handleJump() }}
-        inputMode="numeric"
-      />
-      <button
-        onClick={handleJump}
-        style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', cursor: 'pointer', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)' }}
-      >GO</button>
-      <span style={{ opacity: 0.7 }}>/ {max}</span>
-    </div>
-  )
-}
-
 export default function SearchPage() {
   const [params] = useSearchParams()
   const nav = useNavigate()
@@ -95,6 +68,9 @@ export default function SearchPage() {
   const [displayCurrency, setDisplayCurrency] = useState('CNY')
   const [rates, setRates] = useState<Record<string, { rate: number }>>({})
   const [pageSize, setPageSize] = useState(10)
+  const [jumpInput, setJumpInput] = useState('1')
+
+  useEffect(() => { setJumpInput(String(page)) }, [page])
 
   // Temp filter state for drawer
   const [dfBrand, setDfBrand] = useState('')
@@ -367,12 +343,6 @@ export default function SearchPage() {
             style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none', minHeight: '44px' }}>
             {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </select>
-          <select value={pageSize} onChange={e => { const n = parseInt(e.target.value); setPageSize(n); setPage(1); doSearch(1, { pageSize: n }) }}
-            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none', minHeight: '44px' }}>
-            <option value={10}>10条/页</option>
-            <option value={20}>20条/页</option>
-            <option value={50}>50条/页</option>
-          </select>
         </div>
       )}
 
@@ -533,16 +503,23 @@ export default function SearchPage() {
       )}
 
       {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
+      {pagination && pagination.totalPages > 1 && (() => {
+        const tp = pagination.totalPages
+        function jump() {
+          const n = parseInt(jumpInput, 10)
+          if (n >= 1 && n <= tp && n !== page) doSearch(n)
+          else setJumpInput(String(page))
+        }
+        return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '16px 0' }}>
-          <div style={{ display: 'flex', gap: '4px' }}>
+          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
             <button disabled={page <= 1} onClick={() => doSearch(page - 1)}
               style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page <= 1 ? 0.4 : 1 }}>上一页</button>
-            {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
+            {Array.from({ length: Math.min(tp, 5) }, (_, i) => {
               let pageNum: number
-              if (pagination.totalPages <= 5) pageNum = i + 1
+              if (tp <= 5) pageNum = i + 1
               else if (page <= 3) pageNum = i + 1
-              else if (page >= pagination.totalPages - 2) pageNum = pagination.totalPages - 4 + i
+              else if (page >= tp - 2) pageNum = tp - 4 + i
               else pageNum = page - 2 + i
               return (
                 <button key={pageNum} onClick={() => doSearch(pageNum)}
@@ -554,12 +531,26 @@ export default function SearchPage() {
                   }}>{pageNum}</button>
               )
             })}
-            <button disabled={page >= pagination.totalPages} onClick={() => doSearch(page + 1)}
-              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page >= pagination.totalPages ? 0.4 : 1 }}>下一页</button>
+            <button disabled={page >= tp} onClick={() => doSearch(page + 1)}
+              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 12px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--text-primary)', opacity: page >= tp ? 0.4 : 1 }}>下一页</button>
           </div>
-          <PaginationJumper current={page} max={pagination.totalPages} onJump={p => doSearch(p)} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            <span style={{ opacity: 0.7 }}>{page} / {tp}</span>
+            <select value={pageSize} onChange={e => { const n = parseInt(e.target.value); setPageSize(n); setPage(1); doSearch(1, { pageSize: n }) }}
+              style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none' }}>
+              <option value={10}>10条/页</option>
+              <option value={20}>20条/页</option>
+              <option value={50}>50条/页</option>
+            </select>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ opacity: 0.7 }}>跳至</span>
+              <input style={{ width: '40px', background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 6px', textAlign: 'center', fontSize: 'var(--fs-label)', fontFamily: 'var(--font-body)', color: 'var(--text-primary)', outline: 'none' }}
+                value={jumpInput} onChange={e => setJumpInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') jump() }} inputMode="numeric" />
+            </div>
+          </div>
         </div>
-      )}
+        )
+      })()}
 
       {/* Login prompt */}
       {isAnon && (
