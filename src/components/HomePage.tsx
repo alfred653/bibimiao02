@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api-client'
-import { formatPrice, getPlaceholderUrl } from '../lib/format'
+import { formatPrice, getPlaceholderUrl, stripBrandPrefix } from '../lib/format'
 
 interface Overview { totalProducts: number; brandCount: number; sourceCount: number; brands: { name: string; count: number }[]; lastUpdated: string | null; recentProducts: { id: number; title: string; brand: string; price: string; currency: string; imageUrl: string | null }[] }
 
@@ -151,7 +151,7 @@ export default function HomePage() {
                       textTransform: 'uppercase', display: '-webkit-box',
                       WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                       wordBreak: 'break-word', overflowWrap: 'anywhere', lineBreak: 'strict',
-                    }}>{p.title}</h2>
+                    }}>{stripBrandPrefix(p.title, p.brand)}</h2>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                       <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.88 }}>{p.brand}</span>
                       <span style={{ fontSize: '15px', lineHeight: '16px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{formatPrice(p.currency, p.price)}</span>
