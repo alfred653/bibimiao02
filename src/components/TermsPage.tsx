@@ -41,7 +41,7 @@ export default function TermsPage() {
         <Section title="三、用户行为规范">
           <p>使用本服务时，您不得：</p>
           <List>
-            <li>利用自动化工具（爬虫、脚本等）大规模抓取数据</li>
+            <li>未经授权大批量导出或复制平台数据</li>
             <li>干扰或破坏服务的正常运行</li>
             <li>以任何方式绕过付费功能的限制</li>
             <li>上传或传播恶意代码</li>
