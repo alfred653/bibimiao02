@@ -276,7 +276,7 @@ export default function SearchPage() {
         marginLeft: 'calc(-1 * var(--page-padding))', marginRight: 'calc(-1 * var(--page-padding))',
       }}>
         <h1 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 8vw, 32px)', lineHeight: '0.88', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', maxWidth: '260px' }}>
-          商品<br />搜索
+          商品搜索
         </h1>
         <label style={{ display: 'block' }}>
           <span style={{ fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '8px', display: 'block' }}>搜索关键词</span>
@@ -441,10 +441,10 @@ export default function SearchPage() {
           {[1, 2, 3, 4].map(i => (
             <div key={i} style={{ ...rowStyle, cursor: 'default' }}>
               <div className="skeleton" style={{ width: 'var(--thumb-width)', height: 'var(--row-height)' }} />
-              <div style={{ padding: '12px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ padding: '10px 8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div className="skeleton" style={{ height: '13px', width: '75%' }} />
-                <div className="skeleton" style={{ height: '9px', width: '40%', marginTop: '4px' }} />
-                <div className="skeleton" style={{ height: '11px', width: '55%', marginTop: '4px' }} />
+                <div className="skeleton" style={{ height: '9px', width: '45%', marginTop: '2px' }} />
+                <div className="skeleton" style={{ height: '11px', width: '55%', marginTop: '2px' }} />
               </div>
               <div />
             </div>
@@ -482,7 +482,7 @@ export default function SearchPage() {
                 style={{ width: 'var(--thumb-width)', height: 'var(--row-height)', objectFit: 'cover', border: 'var(--border-width) solid var(--border-default)' }}
                 onError={e => { (e.target as HTMLImageElement).src = getPlaceholderUrl('N/A', 72, 92) }}
               />
-              <div style={{ minWidth: 0, padding: '12px 8px 8px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ minWidth: 0, padding: '10px 8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <h2 style={{
                   margin: 0, fontFamily: 'var(--font-display)', fontSize: '14px', lineHeight: '1.2',
                   fontWeight: 700, letterSpacing: '-0.02em', textTransform: 'uppercase',
@@ -491,11 +491,11 @@ export default function SearchPage() {
                 }}>
                   {highlightText(stripBrandPrefix(item.title, item.brand), keyword)}
                 </h2>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center', minWidth: 0 }}>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center', minWidth: 0, marginTop: '2px' }}>
                   <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{item.brand}</span>
                   {item.source && <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{item.source}</span>}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap', marginTop: '2px' }}>
                   <span style={{ fontSize: '15px', lineHeight: '16px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{item.price ? formatPrice(item.currency, item.price) : '—'}</span>
                   {item.currency && item.currency !== displayCurrency && rates[item.currency] && (
                     <span style={{ fontSize: 'var(--fs-label)', fontWeight: 600, opacity: 0.45, whiteSpace: 'nowrap' }}>
