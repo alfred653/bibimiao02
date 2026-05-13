@@ -454,6 +454,7 @@ export default function AdminPage() {
   const [brandFilter, setBrandFilter] = useState('')
   const [quickFilter, setQuickFilter] = useState('')
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [pagination, setPagination] = useState<{ totalPages: number; total: number } | null>(null)
 
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
@@ -547,6 +548,7 @@ export default function AdminPage() {
       if (tierFilter) params.set('tier', tierFilter)
       if (statusFilter) params.set('status', statusFilter)
       params.set('page', String(p))
+      params.set('pageSize', String(pageSize))
       url = `/api/admin/users?${params}`
     } else if (isProducts) {
       const params = new URLSearchParams()
@@ -556,6 +558,7 @@ export default function AdminPage() {
       if (quickFilter === 'noImage') params.set('missingImage', '1')
       if (quickFilter === 'noSource') params.set('missingSource', '1')
       params.set('page', String(p))
+      params.set('pageSize', String(pageSize))
       url = `/api/admin/products?${params}`
     } else if (isCarriers) {
       url = '/api/admin/shipping-carriers'
@@ -576,7 +579,7 @@ export default function AdminPage() {
         }
       })
       .finally(() => setLoading(false))
-  }, [isUsers, isProducts, isCarriers, search, tierFilter, statusFilter, brandFilter, quickFilter])
+  }, [isUsers, isProducts, isCarriers, search, tierFilter, statusFilter, brandFilter, quickFilter, pageSize])
 
   useEffect(() => { setPage(1); fetchData(1) }, [loc.pathname, search, tierFilter, statusFilter, brandFilter, quickFilter])
   useEffect(() => { fetchData(page) }, [page])
@@ -968,7 +971,19 @@ export default function AdminPage() {
         </div>
         )})()}
 
-      {/* Pagination */}
+      {/* Page size + Pagination */}
+      {(isUsers || isProducts) && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '16px' }}>
+          <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>每页</span>
+          <select value={pageSize} onChange={e => { const n = parseInt(e.target.value); setPageSize(n); setPage(1) }}
+            style={{ background: 'var(--bg-input)', border: 'var(--border-width) solid var(--border-default)', padding: '4px 8px', fontSize: '14px', color: 'var(--text-primary)', outline: 'none' }}>
+            <option value={10}>10条</option>
+            <option value={20}>20条</option>
+            <option value={50}>50条</option>
+          </select>
+          <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>条</span>
+        </div>
+      )}
       {pagination && pagination.totalPages > 1 && (
         <PaginationBar
           page={page}

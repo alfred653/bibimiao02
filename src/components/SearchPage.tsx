@@ -94,6 +94,7 @@ export default function SearchPage() {
   const [confirmClearHistory, setConfirmClearHistory] = useState(false)
   const [displayCurrency, setDisplayCurrency] = useState('CNY')
   const [rates, setRates] = useState<Record<string, { rate: number }>>({})
+  const [pageSize, setPageSize] = useState(10)
 
   // Temp filter state for drawer
   const [dfBrand, setDfBrand] = useState('')
@@ -155,15 +156,16 @@ export default function SearchPage() {
   const filtersRef = useRef({ keyword, brand, source, currency, sortBy, sortOrder, priceMin, priceMax })
   filtersRef.current = { keyword, brand, source, currency, sortBy, sortOrder, priceMin, priceMax }
 
-  function doSearch(p = 1, overrides?: Partial<typeof filtersRef.current>) {
+  function doSearch(p = 1, overrides?: Partial<typeof filtersRef.current & { pageSize: number }>) {
     const f = { ...filtersRef.current, ...overrides }
+    const ps = overrides?.pageSize ?? pageSize
     if (!f.keyword.trim()) return
     setLoading(true); setSearched(true); addToHistory(f.keyword.trim())
     apiPost('/api/products/search', {
       keyword: f.keyword.trim(), brand: f.brand || undefined, source: f.source || undefined,
       currency: f.currency || undefined, sortBy: f.sortBy === 'relevance' ? 'relevance' : f.sortBy,
       sortOrder: f.sortBy === 'relevance' ? 'desc' : f.sortOrder,
-      priceMin: f.priceMin || undefined, priceMax: f.priceMax || undefined, page: p, pageSize: 10,
+      priceMin: f.priceMin || undefined, priceMax: f.priceMax || undefined, page: p, pageSize: ps,
     }).then(r => r.json()).then(d => {
       if (d.success) {
         setResults(d.data.items); setSummary(d.data.summary); setPagination(d.data.pagination)
@@ -364,6 +366,12 @@ export default function SearchPage() {
           <select value={`${sortBy}:${sortOrder}`} onChange={e => { const [sb, so] = e.target.value.split(':'); setSortBy(sb); setSortOrder(so); doSearch(1, { sortBy: sb, sortOrder: so }) }}
             style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none', minHeight: '44px' }}>
             {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+          </select>
+          <select value={pageSize} onChange={e => { const n = parseInt(e.target.value); setPageSize(n); setPage(1); doSearch(1, { pageSize: n }) }}
+            style={{ background: 'var(--bg-primary)', border: 'var(--border-width) solid var(--border-default)', padding: '6px 10px', fontSize: 'var(--fs-label)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-primary)', outline: 'none', minHeight: '44px' }}>
+            <option value={10}>10条/页</option>
+            <option value={20}>20条/页</option>
+            <option value={50}>50条/页</option>
           </select>
         </div>
       )}
